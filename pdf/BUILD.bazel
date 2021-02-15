@@ -1,0 +1,13 @@
+load("@bazel_latex//:latex.bzl", "latex_document")
+
+latex_document(
+    name = "pdf",
+    srcs = glob([
+        "chapters/*.tex",
+    ]) + [
+        "@bazel_latex//packages:biblatex",
+        "references.bib",
+    ],
+    cmd_flags = ["--bibtex-cmd=biber"],
+    main = "darbas.tex",
+)

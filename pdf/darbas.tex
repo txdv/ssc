@@ -1,0 +1,24 @@
+\documentclass[a4paper]{article}
+\usepackage{etoolbox}
+
+%\newcommand{\usebib}{}
+
+\ifdefempty{\usebib}{
+	\usepackage[backend=biber]{biblatex}
+	\addbibresource{pdf/references.bib}
+}{}
+
+\title{Bazel rules for LaTex example}
+\author{Prodrive Technologies}
+\date{2019-11-13}
+
+\begin{document}
+\maketitle
+\input{pdf/chapters/introduction}
+
+\ifdefempty{\usebib}{
+	\printbibliography
+}{}
+
+\end{document}
+
