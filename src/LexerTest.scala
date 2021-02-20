@@ -4,11 +4,7 @@ import collection.mutable.Stack
 import org.scalatest._
 import flatspec._
 import matchers._
-import LexerToken.{
-  IdentifierToken => Identifier,
-  NumberToken => Number,
-  WhitespaceToken => Whitespace,
-}
+import LexerToken._
 
 class LexerSpec extends AnyFlatSpec with should.Matchers {
 

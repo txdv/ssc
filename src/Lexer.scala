@@ -5,18 +5,18 @@ import scala.reflect.ClassTag
 import java.io.File
 import java.nio.file.Files
 
-abstract class LexerToken(value: String) {
+sealed abstract class LexerToken(value: String) {
   def getString = value
 }
 
 object LexerToken {
-  case class CommentToken(value: String) extends LexerToken(value)
-  case class NumberToken(value: String) extends LexerToken(value)
-  case class CharToken(value: String) extends LexerToken(value)
-  case class IdentifierToken(value: String) extends LexerToken(value)
-  case class BooleanToken(value: String) extends LexerToken(value)
-  case class WhitespaceToken(value: String) extends LexerToken(value)
-  case class StringToken(value: String) extends LexerToken(value)
+  case class Comment(value: String) extends LexerToken(value)
+  case class Number(value: String) extends LexerToken(value)
+  case class Symbol(value: String) extends LexerToken(value)
+  case class Identifier(value: String) extends LexerToken(value)
+  case class Bool(value: String) extends LexerToken(value)
+  case class Whitespace(value: String) extends LexerToken(value)
+  case class Str(value: String) extends LexerToken(value)
 }
 
 import LexerToken._
@@ -42,18 +42,18 @@ case class Span(start: Int, end: Int, buffer: Array[Byte]) {
 
   def to[T <: LexerToken](implicit classTag: ClassTag[T]): T = {
     val klass = classTag.runtimeClass
-    (if (klass == classOf[IdentifierToken]) {
-      IdentifierToken(getString)
-    } else if (klass == classOf[WhitespaceToken]) {
-      WhitespaceToken(getString)
-    } else if (klass == classOf[NumberToken]) {
-      NumberToken(getString)
-    } else if (klass == classOf[CharToken]) {
-      CharToken(getString)
-    } else if (klass == classOf[StringToken]) {
-      StringToken(getString)
-    } else if (klass == classOf[CommentToken]) {
-      CommentToken(getString)
+    (if (klass == classOf[Identifier]) {
+      Identifier(getString)
+    } else if (klass == classOf[Whitespace]) {
+      Whitespace(getString)
+    } else if (klass == classOf[Number]) {
+      Number(getString)
+    } else if (klass == classOf[Symbol]) {
+      Symbol(getString)
+    } else if (klass == classOf[Str]) {
+      Str(getString)
+    } else if (klass == classOf[Comment]) {
+      Comment(getString)
     } else {
       throw new Exception
     }).asInstanceOf[T]
@@ -116,20 +116,20 @@ object Lexer {
     val ch = buffer.char
 
     if (ch.isWhitespace) {
-      buffer.takeWhile(_.isWhitespace).map(_.to[WhitespaceToken])
+      buffer.takeWhile(_.isWhitespace).map(_.to[Whitespace])
     } else if (ch.isLetter) {
-      buffer.takeWhile(isIdentifier).map(_.to[IdentifierToken])
+      buffer.takeWhile(isIdentifier).map(_.to[Identifier])
     } else if (singleChars.contains(ch)) {
-      buffer.takeChar.map(_.to[CharToken])
+      buffer.takeChar.map(_.to[Symbol])
     } else if (ch == '"') {
       // TODO: support escaping
       val SpanSplit(prefix, suffix) = buffer.takeChar
-      (prefix + suffix.takeWhile(_ != '"').move(1)).map(_.to[StringToken])
+      (prefix + suffix.takeWhile(_ != '"').move(1)).map(_.to[Str])
     } else if (ch.isDigit) {
-      buffer.takeWhile(_.isDigit).map(_.to[NumberToken])
+      buffer.takeWhile(_.isDigit).map(_.to[Number])
     } else if (ch == '#') {
       val SpanSplit(prefix, suffix) = buffer.takeChar
-      (prefix + suffix.takeWhile(_ != '\n').move(1)).map(_.to[CommentToken])
+      (prefix + suffix.takeWhile(_ != '\n').move(1)).map(_.to[Comment])
     } else {
       throw new Exception(s"can't parse ${buffer.start} ${buffer.getString(10)}")
     }
