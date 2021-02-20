@@ -5,18 +5,20 @@ import scala.reflect.ClassTag
 import java.io.File
 import java.nio.file.Files
 
-sealed abstract class LexerToken(value: String) {
-  def getString = value
+sealed trait LexerToken {
+  val value: String
+
+  def getString: String = value
 }
 
 object LexerToken {
-  case class Comment(value: String) extends LexerToken(value)
-  case class Number(value: String) extends LexerToken(value)
-  case class Symbol(value: String) extends LexerToken(value)
-  case class Identifier(value: String) extends LexerToken(value)
-  case class Bool(value: String) extends LexerToken(value)
-  case class Whitespace(value: String) extends LexerToken(value)
-  case class Str(value: String) extends LexerToken(value)
+  case class Comment(value: String) extends LexerToken
+  case class Number(value: String) extends LexerToken
+  case class Symbol(value: String) extends LexerToken
+  case class Identifier(value: String) extends LexerToken
+  case class Bool(value: String) extends LexerToken
+  case class Whitespace(value: String) extends LexerToken
+  case class Str(value: String) extends LexerToken
 }
 
 import LexerToken._

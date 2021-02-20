@@ -32,4 +32,13 @@ class LexerSpec extends AnyFlatSpec with should.Matchers {
   it should "treat strings starting with # as a comment" in {
     Lexer.lexAll("# hello world") should be (Seq(Comment("# hello world")))
   }
+
+  it should "fail compilation with unexaustive check" in {
+    val a: LexerToken = Comment("comment")
+
+    a match {
+      case Str(value) =>
+      case _ =>
+    }
+  }
 }

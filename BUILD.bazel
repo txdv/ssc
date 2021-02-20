@@ -1,0 +1,9 @@
+config_setting(
+    name = "scalac_opts_fatal_warnings",
+    define_values = {"scalac_fatal_warnings": "1"},
+)
+
+config_setting(
+    name = "scalac_opts_deprecations",
+    define_values = {"scalac_deprecations": "1"},
+)
