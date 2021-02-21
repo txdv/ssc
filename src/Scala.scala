@@ -29,8 +29,6 @@ object Scala {
   val `}` = symbol('}')
   val `.` = symbol('.')
 
-  val ident = token(sat[Identifier])
-
   val fullIdentifier = token(sepByN(sat[Identifier], `.`))
 
   val `import`: Parser[Import] = for {
