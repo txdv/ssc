@@ -15,7 +15,13 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
   "Scala" should "parse simple import" in {
     Util.check {
       Parser.parse(Scala.main, "import some.other.value123".getBytes)
-    } should be (Import("some.other.value123"))
+    } should be (Some(Import("some.other.value123")))
+  }
+
+  it should "parse imports only on the same line" in {
+    Util.check {
+      Parser.parse(Scala.main, "import some.other\n.value123".getBytes)
+    } should be (None)
   }
 
 

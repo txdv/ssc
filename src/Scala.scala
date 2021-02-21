@@ -31,7 +31,7 @@ object Scala {
 
   val ident = token(sat[Identifier])
 
-  val fullIdentifier = token(sepByN(ident, `.`))
+  val fullIdentifier = token(sepByN(sat[Identifier], `.`))
 
   val `import`: Parser[Import] = for {
     ident <- identifierWithName("import")
