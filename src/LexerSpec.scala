@@ -1,6 +1,5 @@
 package lt.vu.mif.bentkus.bachelor.compiler.lexer
 
-import collection.mutable.Stack
 import org.scalatest._
 import flatspec._
 import matchers._

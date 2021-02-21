@@ -61,7 +61,8 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-	"org.typelevel:cats-core_2.13:jar:2.4.1"
+        "org.typelevel:cats-core_2.13:jar:2.4.1",
+        "org.scalaz:scalaz-core_2.13:jar:7.3.0-M32",
     ],
     repositories = [
         "https://jcenter.bintray.com/",
