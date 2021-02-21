@@ -68,7 +68,9 @@ object Parser {
   def sat3[T <: LexerToken](token: LexerToken)(implicit classTag: ClassTag[T]): Parser[T] = sat2(_ == token)
   */
 
-  lazy val space: Parser[List[LexerToken]] = many(sat[Whitespace].map(_.asInstanceOf[LexerToken]) +++ sat[Comment].map(_.asInstanceOf[LexerToken]))
+  lazy val space: Parser[List[LexerToken]] =
+    many(sat[Whitespace].map(_.asInstanceOf[LexerToken]) +++
+    sat[Comment].map(_.asInstanceOf[LexerToken]))
 
   def token[A](parser: Parser[A]): Parser[A] = for {
     a <- parser

@@ -23,22 +23,25 @@ object Scala {
 
   def symbol(ch: Char): Parser[LexerToken] = token(sat(Symbol(ch.toString)))
 
-  def identifier(value: String): Parser[LexerToken] = token(sat(Identifier(value)))
+  def identifierWithName(value: String): Parser[LexerToken] = token(sat(Identifier(value)))
 
-  lazy val `{` = symbol('{')
-  lazy val `}` = symbol('}')
-  lazy val `.` = symbol('.')
+  val `{` = symbol('{')
+  val `}` = symbol('}')
+  val `.` = symbol('.')
 
-  lazy val ident = token(sat[Identifier])
+  val ident = token(sat[Identifier])
 
-  val importStatement: Parser[Import] = for {
-    ident <- ident
-    if ident.value == "import"
-  } yield Import(ident.value)
+  val fullIdentifier = token(sepByN(ident, `.`))
 
-  def main: Parser[Expression] = for {
-    ident <- identifier("import")
-    name <- token(sepByN(identifier("a"), `.`))
+  val `import`: Parser[Import] = for {
+    ident <- identifierWithName("import")
+    name <- fullIdentifier
     fullname = name.map(_.value).mkString(".")
   } yield Import(fullname)
+
+  val statement: Parser[Expression] =
+    `import`.asInstanceOf[Parser[Expression]]
+
+
+  def main: Parser[Expression] = statement
 }

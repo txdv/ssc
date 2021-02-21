@@ -14,8 +14,9 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
   "Scala" should "parse simple import" in {
     Util.check {
-      Parser.parse(Scala.main, "import a.a.a".getBytes)
-    } should be (Import("a.a.a"))
+      Parser.parse(Scala.main, "import some.other.value123".getBytes)
+    } should be (Import("some.other.value123"))
   }
+
 
 }
