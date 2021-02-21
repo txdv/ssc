@@ -3,7 +3,7 @@ package lt.vu.mif.bentkus.bachelor.compiler.parser
 import scalaz.{Monad, MonadPlus}
 import scalaz.syntax.monadPlus._
 import scala.reflect.ClassTag
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken
+import lt.vu.mif.bentkus.bachelor.compiler.lexer.{Lexer, LexerToken}
 import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken._
 
 case class Parser[A](run: List[LexerToken] => List[(A, List[LexerToken])]){
@@ -155,10 +155,15 @@ k
   def symbol(cs: List[Char]): Parser[List[Char]] = token (string(cs))
   */
 
-  def parse[A](parser: Parser[A], str: List[LexerToken]): List[(A, List[LexerToken])] = {
+  def parseTokens[A](parser: Parser[A], tokens: List[LexerToken]): List[(A, List[LexerToken])] = {
     for {
       _ <- space
       p <- parser
     } yield p
-  }.run(str)
+  }.run(tokens)
+
+  def parse[A](parser: Parser[A], content: Array[Byte]): List[(A, List[LexerToken])] = {
+    val tokens = Lexer.lexAll(content)
+    parseTokens[A](parser, tokens.toList)
+  }
 }

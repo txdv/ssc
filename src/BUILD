@@ -35,14 +35,39 @@ scala_test(
     deps = [":lexer"])
 
 scala_library(
+    name = "util",
+    srcs = ["Util.scala"],
+    scalacopts = fatal_warnings())
+
+scala_library(
     name = "parser",
     srcs = ["Parser.scala"],
     scalacopts = fatal_warnings(),
     deps = [":lexer", ":scalaz"],
-    exports = [":lexer", ":scalaz"])
+    exports = [":lexer", ":scalaz", ":util"])
 
 scala_test(
     name = "parser_spec",
     srcs = ["ParserSpec.scala"],
     scalacopts = fatal_warnings(),
-    deps = [":parser"])
+    deps = [":parser", ":util"])
+
+scala_library(
+    name = "scala",
+    srcs = ["Scala.scala"],
+    scalacopts = fatal_warnings(),
+    deps = [":parser"],
+    exports = [":parser"])
+
+scala_test(
+    name = "scala_spec",
+    srcs = ["ScalaSpec.scala"],
+    scalacopts = fatal_warnings(),
+    deps = [":scala"])
+
+scala_binary(
+    name = "scala_app",
+    srcs = ["ScalaApp.scala"],
+    scalacopts = fatal_warnings(),
+    deps = [":scala", ":lexer"],
+    main_class = "lt.vu.mif.bentkus.bachelor.compiler.parser.scala.ScalaApp")

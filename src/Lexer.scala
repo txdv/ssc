@@ -107,7 +107,7 @@ object Span {
 }
 
 object Lexer {
-  private val singleChars = Set('(', ')', '[', ']', '=', ',', '+', '%', '{', '}', ':')
+  private val singleChars = Set('(', ')', '[', ']', '=', ',', '.', '+', '%', '{', '}', ':')
 
   def isIdentifier(ch: Char): Boolean =
     ch.isLetterOrDigit || ch == '_'
@@ -133,7 +133,7 @@ object Lexer {
       val SpanSplit(prefix, suffix) = buffer.takeChar
       (prefix + suffix.takeWhile(_ != '\n').move(1)).map(_.to[Comment])
     } else {
-      throw new Exception(s"can't parse ${buffer.start} ${buffer.getString(10)}")
+      throw new Exception(s"can't parse symbol '$ch' which starts at ${buffer.start}: ${buffer.getString}")
     }
   }
 
