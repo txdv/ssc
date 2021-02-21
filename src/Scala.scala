@@ -25,21 +25,31 @@ object Scala {
 
   def identifierWithName(value: String): Parser[LexerToken] = token(sat(Identifier(value)))
 
+  val identifier = token(sat[Identifier])
+
   val `{` = symbol('{')
   val `}` = symbol('}')
   val `.` = symbol('.')
 
-  val fullIdentifier = token(sepByN(sat[Identifier], `.`))
+  val fullIdentifier = token(sepBy(sat[Identifier], `.`))
 
   val `import`: Parser[Import] = for {
-    ident <- identifierWithName("import")
+    _ <- identifierWithName("import")
     name <- fullIdentifier
     fullname = name.map(_.value).mkString(".")
   } yield Import(fullname)
 
+  val defObject: Parser[DefObject] = for {
+    _ <- identifierWithName("object")
+    name <- identifier
+    _ <- `{`
+    _ <- `}`
+  } yield DefObject(name.value)
+
   val statement: Parser[Expression] =
-    `import`.asInstanceOf[Parser[Expression]]
+    `import`.asInstanceOf[Parser[Expression]] +++
+    defObject.asInstanceOf[Parser[Expression]]
 
+  val main: Parser[List[Expression]] = many(token(statement))
 
-  def main: Parser[Expression] = statement
 }

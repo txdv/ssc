@@ -124,6 +124,7 @@ k
     as <- many(for { p <- parser; _ <- separator } yield p)
   } yield a :: as
 
+  // this one does not work as expected
   def sepByN[A, B](parser: Parser[A], separator: Parser[B]): Parser[List[A]] = for {
     res <- sepByT(parser, separator) bomb sepBy(parser, separator)
   } yield res
