@@ -17,9 +17,6 @@ case class Parser[A](run: List[LexerToken] => List[(A, List[LexerToken])]){
     case Nil => Nil
     case x :: _ => List(x)
   })
-
-  // TODO: bomb is an exponential bomb
-  def bomb(b: Parser[A]): Parser[A] = Parser[A](cs => t(cs) ++ b.t(cs))
 }
 
 object Parser {
@@ -123,11 +120,6 @@ k
     _ <- separator
     as <- many(for { p <- parser; _ <- separator } yield p)
   } yield a :: as
-
-  // this one does not work as expected
-  def sepByN[A, B](parser: Parser[A], separator: Parser[B]): Parser[List[A]] = for {
-    res <- sepByT(parser, separator) bomb sepBy(parser, separator)
-  } yield res
 
   def chainl[A](parser: Parser[A], opParser: Parser[(A, A) => A], value: A): Parser[A] = {
     chainl1(parser, opParser) +++ Monad[Parser].pure[A](value)
