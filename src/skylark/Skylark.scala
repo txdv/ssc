@@ -4,29 +4,34 @@ import lt.vu.mif.bentkus.bachelor.compiler.lexer.{Lexer, LexerToken}
 import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken._
 import lt.vu.mif.bentkus.bachelor.compiler.parser._
 import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser._
+
 import scalaz.{Monad, MonadPlus}
 import scalaz.syntax.monadPlus._
 
 sealed trait Expression
 
-case class EString(value: String) extends Expression
-case class EList(expressions: Seq[Expression]) extends Expression
-case class EFunction(name: String, arguments: Seq[Argument]) extends Expression
-case class EInt(value: Int) extends Expression
-case class EBoolean(value: Boolean) extends Expression
-case class EOperator(name: String, left: Expression, right: Expression) extends Expression
-case class EIdentifier(name: String) extends Expression
-case class EHash(elements: Seq[EHashElement]) extends Expression
+object Expression {
 
-case class EAssignment(name: String, value: Expression) extends Expression
+  case class EString(value: String) extends Expression
+  case class EList(expressions: Seq[Expression]) extends Expression
+  case class EFunction(name: String, arguments: Seq[Argument]) extends Expression
+  case class EInt(value: Int) extends Expression
+  case class EBoolean(value: Boolean) extends Expression
+  case class EOperator(name: String, left: Expression, right: Expression) extends Expression
+  case class EIdentifier(name: String) extends Expression
+  case class EHash(elements: Seq[EHashElement]) extends Expression
 
-case class EHashElement(key: Expression, value: Expression)
+  case class EAssignment(name: String, value: Expression) extends Expression
 
-sealed trait Argument
-case class NamedArgument(name: String, expression: Expression) extends Argument
-case class UnnamedArgument(expression: Expression) extends Argument
+  case class EHashElement(key: Expression, value: Expression)
+
+  sealed trait Argument
+  case class NamedArgument(name: String, expression: Expression) extends Argument
+  case class UnnamedArgument(expression: Expression) extends Argument
+}
 
 object Skylark {
+  import Expression._
 
   def char(ch: Char): Parser[LexerToken] = token(sat(Symbol(ch.toString)))
 
