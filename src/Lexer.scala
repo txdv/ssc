@@ -18,7 +18,9 @@ object LexerToken {
   case class Identifier(value: String) extends LexerToken
   case class Bool(value: String) extends LexerToken
   case class Whitespace(value: String) extends LexerToken
-  case class Str(value: String) extends LexerToken
+  case class Str(value: String) extends LexerToken {
+    val unquoted = value.substring(1, value.length - 1)
+  }
 }
 
 import LexerToken._

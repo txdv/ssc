@@ -22,6 +22,9 @@ object Expression {
   sealed trait Expr extends Statement
 
   case class Ident(name: String) extends Expr
+  case class Func(name: String, arguments: Seq[Expr]) extends Expr
+  case class Num(value: String) extends Expr
+  case class Stri(value: String) extends Expr
 }
 
 object Scala {
@@ -33,9 +36,12 @@ object Scala {
 
   val identifier = token(sat[Identifier])
 
+  val `(` = symbol('(')
+  val `)` = symbol(')')
   val `{` = symbol('{')
   val `}` = symbol('}')
   val `.` = symbol('.')
+  val `,` = symbol(',')
   val `:` = symbol(':')
   val `=` = symbol('=')
 
@@ -70,11 +76,44 @@ object Scala {
     _ <- expr.all
   } yield DefMethod(name.value)
 
-
   object expr {
+    val number: Parser[Expr] = for {
+      number <- token(sat[Number])
+    } yield Num(number.value)
+
     val ident: Parser[Expr] = for {
       ident <- identifier
     } yield Ident(ident.value)
+
+    /*
+    val function: Parser[Expr] = for {
+      func <- sat[Identifier]
+      _ <- `(`
+      arguments <- sepBy(expr.all, `,`)
+      _ <- `)`
+    } yield Func(func.value, arguments)
+    */
+
+    val string: Parser[Expr] = for {
+      string <- token(sat[Str])
+    } yield Stri(string.unquoted)
+
+    val function: Parser[Expr] = for {
+      name <- identifier
+      args <- one(expressionGroup)
+    } yield {
+      args.map { args =>
+        Func(name.value, args)
+      } getOrElse {
+        Ident(name.value)
+      }
+    }
+
+    val expressionGroup = for {
+      _ <- `(`
+      expressions <- sepBy(expr.all, `,`)
+      _ <- `)`
+    } yield expressions
 
     def grouped: Parser[Expr] = for {
       _ <- `{`
@@ -83,7 +122,10 @@ object Scala {
     } yield all
 
     def all: Parser[Expr] =
-      ident +++ grouped
+      number +++
+      string +++
+      function +++
+      grouped
   }
 
   val statement: Parser[Expression] =

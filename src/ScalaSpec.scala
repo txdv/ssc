@@ -12,10 +12,16 @@ import Expression._
 
 object Helper {
   implicit class StringOps(val string: String) {
-    def ast[A](parser: Parser[A]): Option[A] = Util.check {
-      Parser.parse(parser, string.stripMargin.getBytes)
-    }
+    def ast[A](parser: Parser[A], debug: Boolean = false): Option[A] = Util.check {
+      val result = Parser.parse(parser, string.stripMargin.getBytes)
 
+      if (debug) {
+        println(s"result: $result")
+        Util.error(result)
+
+      }
+      result
+    }
   }
 }
 
@@ -51,10 +57,6 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
   }
 
-  "expr" should "parse symbol identifier reference" in {
-    "???".ast(Scala.expr.ident) should be (Some(Ident("???")))
-  }
-
   "defMethod" should "parse method with expr surrounded in { }" in {
     """
       |def method_name: Unit = {
@@ -62,6 +64,10 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |}""".ast(Scala.defMethod) should be (Some(
         DefMethod("method_name")
       ))
+  }
+
+  "expr" should "parse symbol identifier reference" in {
+    "???".ast(Scala.expr.ident) should be (Some(Ident("???")))
   }
 
   "defObject" should "parse empty object definition" in {
@@ -83,4 +89,61 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
         DefObject("Main", Seq(DefMethod("methodName")))
       ))
   }
+
+  "number" should "parse integer number" in {
+    "123".ast(Scala.expr.number) should be (Some(Num("123")))
+  }
+
+  "function" should "parse a simple function call with no parameters" in {
+    "method()".ast(Scala.expr.function) should be (Some(
+      Func("method", arguments = Seq.empty)
+    ))
+  }
+
+  "function" should "parse a simple function call with one parameter" in {
+    """method(a)""".ast(Scala.expr.function) should be (Some(
+      Func("method", Seq(Ident("a")))
+    ))
+
+    "func(1)".ast(Scala.expr.function) should be (Some(
+      Func("func", Seq(Num("1")))
+    ))
+  }
+
+  "function" should "parse a simple function call with two parameters" in {
+    """method(a, b)""".ast(Scala.expr.function) should be (Some(
+      Func("method", Seq(Ident("a"), Ident("b")))
+    ))
+
+    """method(a, 2)""".ast(Scala.expr.function) should be (Some(
+      Func("method", Seq(Ident("a"), Num("2")))
+    ))
+  }
+
+  "function" should "parse functions as arguments" in {
+    "func(func(1))".ast(Scala.expr.function) should be (Some(
+      Func("func", Seq(Func("func", Seq(Num("1")))))
+    ))
+  }
+
+  "expr.all" should "parse values correctly" in {
+    "1".ast(Scala.expr.all) should be (Some(Num("1")))
+    "a".ast(Scala.expr.all) should be (Some(Ident("a")))
+    "a(1, 2)".ast(Scala.expr.all) should be (Some(Func("a", arguments = Seq(Num("1"), Num("2")))))
+    """println("Hello World!")""".ast(Scala.expr.all) should be (Some(
+      Func("println", Seq(Stri("Hello World!")))
+    ))
+  }
+
+  /*
+  "defObject" should "parse scala hello world" in {
+    """
+      |object Main {
+      |  def main(arg: Array[String]): Unit = {
+      |    println("Hello World!")
+      |  }
+      |}
+      |""".ast(Scala.defObject) should not be (None)
+  }
+  */
 }
