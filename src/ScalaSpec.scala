@@ -36,15 +36,35 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     } should be (Some(List(Import("some.other.value123"), Import("some.other.value2"))))
   }
 
+  "defMethod" should "parse simple method definition" in {
+    Util.check {
+      Parser.parse(Scala.defMethod, "def method_name: Unit = ???".getBytes)
+    } should be (Some(DefMethod("method_name")))
+  }
+
   "defObject" should "parse empty object definition" in {
     Util.check {
       Parser.parse(Scala.defObject, "object empty{}".getBytes)
     } should be (Some(DefObject("empty")))
   }
 
-  "main" should "parse multiple statements" in {
-    Util.error {
+  "defObject" should "parse multiple statements" in {
+    Util.check {
       Parser.parse(Scala.main, "import a.b.c\nobject empty{}\n".getBytes)
     } should be (Some(List(Import("a.b.c"), DefObject("empty"))))
+  }
+
+  it should "parse a method in object" in {
+    val src = """
+      |object Main {
+      | def method: Unit = ???
+      |}
+      |""".stripMargin
+
+
+    Util.check {
+      Parser.parse(Scala.defObject, src.getBytes)
+    } should not be (None)
+
   }
 }

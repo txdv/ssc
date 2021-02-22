@@ -40,4 +40,8 @@ class LexerSpec extends AnyFlatSpec with should.Matchers {
       case _ =>
     }
   }
+
+  it should "treat ??? as identifier" in {
+    Lexer.lexAll("???") should be (Seq(Identifier("???")))
+  }
 }

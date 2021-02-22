@@ -13,7 +13,7 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
   "Parser" should "parse any token with any" in {
     Util.check {
       Parser.parse(Parser.any, "some".getBytes)
-    } should be (Identifier("some"))
+    } should be (Some(Identifier("some")))
   }
 
 }

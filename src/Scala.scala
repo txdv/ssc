@@ -15,7 +15,9 @@ object Expression {
 
   case class Package(name: String) extends Statement
   case class Import(name: String) extends Statement
-  case class DefObject(name: String) extends Statement
+  case class DefObject(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
+
+  case class DefMethod(name: String) extends Statement
 }
 
 object Scala {
@@ -30,6 +32,8 @@ object Scala {
   val `{` = symbol('{')
   val `}` = symbol('}')
   val `.` = symbol('.')
+  val `:` = symbol(':')
+  val `=` = symbol('=')
 
   val fullIdentifier = token(sepBy(sat[Identifier], `.`))
 
@@ -43,8 +47,23 @@ object Scala {
     _ <- identifierWithName("object")
     name <- identifier
     _ <- `{`
+    statements <- objectStatements
     _ <- `}`
-  } yield DefObject(name.value)
+  } yield DefObject(name.value, statements)
+
+  val objectStatement =
+    defMethod
+
+  val objectStatements = many(objectStatement)
+
+  def defMethod: Parser[DefMethod] = for {
+    _ <- identifierWithName("def")
+    name <- identifier
+    _ <- `:`
+    returnType <- identifierWithName("Unit")
+    _ <- `=`
+    _ <- identifierWithName("???")
+  } yield DefMethod(name.value)
 
   val statement: Parser[Expression] =
     `import`.asInstanceOf[Parser[Expression]] +++

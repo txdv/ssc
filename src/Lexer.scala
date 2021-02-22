@@ -109,8 +109,12 @@ object Span {
 object Lexer {
   private val singleChars = Set('(', ')', '[', ']', '=', ',', '.', '+', '%', '{', '}', ':')
 
+  private val special = Set('?', '!')
+
+  // TODO: question marks are weird in scala
+  // do something more appropriate
   def isIdentifier(ch: Char): Boolean =
-    ch.isLetterOrDigit || ch == '_'
+    ch.isLetterOrDigit || Seq('_').contains(ch)
 
   def lex(buffer: Span): (LexerToken, Span) = {
     var pos = buffer.start
@@ -119,6 +123,8 @@ object Lexer {
 
     if (ch.isWhitespace) {
       buffer.takeWhile(_.isWhitespace).map(_.to[Whitespace])
+    } else if (special.contains(ch)) {
+      buffer.takeWhile(special.contains).map(_.to[Identifier])
     } else if (ch.isLetter) {
       buffer.takeWhile(isIdentifier).map(_.to[Identifier])
     } else if (singleChars.contains(ch)) {
