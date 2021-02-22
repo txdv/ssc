@@ -18,6 +18,10 @@ object Expression {
   case class DefObject(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
 
   case class DefMethod(name: String) extends Statement
+
+  sealed trait Expr extends Statement
+
+  case class Ident(name: String) extends Expr
 }
 
 object Scala {
@@ -54,7 +58,8 @@ object Scala {
   val objectStatement =
     defMethod
 
-  val objectStatements = many(objectStatement)
+  val objectStatements =
+    many(objectStatement)
 
   def defMethod: Parser[DefMethod] = for {
     _ <- identifierWithName("def")
@@ -62,8 +67,24 @@ object Scala {
     _ <- `:`
     returnType <- identifierWithName("Unit")
     _ <- `=`
-    _ <- identifierWithName("???")
+    _ <- expr.all
   } yield DefMethod(name.value)
+
+
+  object expr {
+    val ident: Parser[Expr] = for {
+      ident <- identifier
+    } yield Ident(ident.value)
+
+    def grouped: Parser[Expr] = for {
+      _ <- `{`
+      all <- all
+      _ <- `}`
+    } yield all
+
+    def all: Parser[Expr] =
+      ident +++ grouped
+  }
 
   val statement: Parser[Expression] =
     `import`.asInstanceOf[Parser[Expression]] +++

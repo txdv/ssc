@@ -42,6 +42,24 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     } should be (Some(DefMethod("method_name")))
   }
 
+  "expr" should "parse symbol identifier reference" in {
+    Util.check {
+      Parser.parse(Scala.expr.ident, "???".getBytes)
+    } should be (Some(Ident("???")))
+
+  }
+
+  "defMethod" should "parse method with expr surrounded in { }" in {
+    val src = """
+      |def method_name: Unit = {
+      |  ???
+      |}""".stripMargin.getBytes
+
+    Util.check {
+      Parser.parse(Scala.defMethod, src)
+    } should be (Some(DefMethod("method_name")))
+  }
+
   "defObject" should "parse empty object definition" in {
     Util.check {
       Parser.parse(Scala.defObject, "object empty{}".getBytes)
@@ -54,17 +72,15 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     } should be (Some(List(Import("a.b.c"), DefObject("empty"))))
   }
 
-  it should "parse a method in object" in {
+  "defObject" should "parse an empty method in an object" in {
     val src = """
       |object Main {
-      | def method: Unit = ???
+      |  def method: Unit = ???
       |}
       |""".stripMargin
-
 
     Util.check {
       Parser.parse(Scala.defObject, src.getBytes)
     } should not be (None)
-
   }
 }
