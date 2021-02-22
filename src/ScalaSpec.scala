@@ -135,6 +135,14 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
   }
 
+  "main" should "parse multiple object definitions" oin {
+    def src(i) = s"""
+      |object Main$i {
+      |}
+      |"""
+    (1 to 100).map(src).mkString("\n").ast(Scala.defObject) should not be (None)
+  }
+
   /*
   "defObject" should "parse scala hello world" in {
     """
