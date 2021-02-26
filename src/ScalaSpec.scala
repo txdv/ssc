@@ -27,6 +27,9 @@ object Helper {
 
 class ScalaSpec extends AnyFlatSpec with should.Matchers {
   val `???` = Ident("???")
+  val `Int` = SimpleType("Int")
+  val `String` = SimpleType("String")
+
 
   import Helper._
 
@@ -53,6 +56,11 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
   }
 
+  "typeDef" should "parse simple types" in {
+    "Int".ast(Scala.typeDef) should be (Some(`Int`))
+    "String".ast(Scala.typeDef) should be (Some(`String`))
+  }
+
   "defMethod" should "parse simple method definition" in {
     "def method_name: Unit = ???".ast(Scala.defMethod) should be (Some(
       DefMethod("method_name", "Unit", body = Seq(`???`))
@@ -72,27 +80,27 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     val src = """def method1(arg1: Int, arg2: String): Unit = ???"""
     src.ast(Scala.defMethod) should be (Some(
       DefMethod("method1", "Unit", Seq(
-        DefMethodArgument("arg1", "Int"),
-        DefMethodArgument("arg2", "String"),
+        DefMethodArgument("arg1", `Int`),
+        DefMethodArgument("arg2", `String`),
       ),
       body = Seq(`???`))
     ))
   }
 
   "defMethodArgument" should "parse name and type tuple" in {
-    val expected = DefMethodArgument("name", "Int")
+    val expected = DefMethodArgument("name", `Int`)
     """name:Int""".ast(Scala.defMethodArgument) should be (Some(expected))
   }
 
   "methodArguments" should "parse method with arguments and types" in {
      """(a: Int)""".ast(Scala.methodArguments) should be (Some(
-       Seq(DefMethodArgument("a", "Int"))
+       Seq(DefMethodArgument("a", `Int`))
      ))
   }
 
   "methodArguments" should "parse method with two arguments" in {
      """(a: Int, b: String)""".ast(Scala.methodArguments) should be (Some(
-       Seq(DefMethodArgument("a", "Int"), DefMethodArgument("b", "String"))
+       Seq(DefMethodArgument("a", `Int`), DefMethodArgument("b", `String`))
      ))
   }
 

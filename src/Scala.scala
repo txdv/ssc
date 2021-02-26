@@ -17,13 +17,17 @@ object Expression {
   case class Import(name: String) extends Statement
   case class DefObject(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
 
+  trait ScalaType extends Expression
+  case class SimpleType(name: String) extends ScalaType
+  case class GenericType(name: String) extends ScalaType
+
   case class DefMethod(
     name: String,
     returnType: String,
     arguments: Seq[DefMethodArgument] = Seq.empty,
     body: Seq[Expr] = Seq.empty) extends Statement
 
-  case class DefMethodArgument(name: String, argumentType: String)
+  case class DefMethodArgument(name: String, argumentType: ScalaType)
 
   sealed trait Expr extends Statement
 
@@ -58,6 +62,10 @@ object Scala {
 
   val fullIdentifier = token(sepBy(sat[Identifier], `.`))
 
+  val typeDef: Parser[ScalaType] = for {
+    name <- identifier
+  } yield SimpleType(name.value)
+
   val `import`: Parser[Import] = for {
     _ <- identifierWithName("import")
     name <- fullIdentifier
@@ -81,8 +89,8 @@ object Scala {
   def defMethodArgument: Parser[DefMethodArgument] = for {
     name <- identifier
     _ <- `:`
-    argumentType <- identifierWithNames(Seq("Int", "String", "Array[String]"))
-  } yield DefMethodArgument(name.value, argumentType.value)
+    argumentType <- typeDef
+  } yield DefMethodArgument(name.value, argumentType)
 
   def methodArgumentsGroup: Parser[Seq[DefMethodArgument]] = for {
     _ <- `(`
