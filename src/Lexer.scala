@@ -146,14 +146,16 @@ object Lexer {
   }
 
   def lexAll(buffer: Span): Seq[LexerToken] = {
-    val (identifier, rest) = lex(buffer)
+    var result: Seq[LexerToken] = Seq.empty
+    var buf: Span = buffer
 
-    Seq(identifier) ++ {
-      if (rest.isEmpty)
-        Seq.empty[LexerToken]
-      else
-        lexAll(rest)
-    }
+    do {
+      val lexres = lex(buf)
+      result = result :+ lexres._1
+      buf = lexres._2
+    } while (!buf.isEmpty)
+
+    result
   }
 
   def lexAll(bytes: Array[Byte]): Seq[LexerToken] = {
