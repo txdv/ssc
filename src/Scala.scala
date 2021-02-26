@@ -17,7 +17,10 @@ object Expression {
   case class Import(name: String) extends Statement
   case class DefObject(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
 
-  case class DefMethod(name: String, returnType: String) extends Statement
+  case class DefMethod(
+    name: String,
+    returnType: String,
+    body: Seq[Expr] = Seq.empty) extends Statement
 
   sealed trait Expr extends Statement
 
@@ -73,8 +76,8 @@ object Scala {
     _ <- `:`
     returnType <- identifierWithName("Unit")
     _ <- `=`
-    _ <- expr.all
-  } yield DefMethod(name.value, returnType.value)
+    expr <- expr.all
+  } yield DefMethod(name.value, returnType.value, Seq(expr))
 
   object expr {
     val number: Parser[Expr] = for {
