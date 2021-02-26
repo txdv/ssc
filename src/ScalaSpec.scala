@@ -135,11 +135,22 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
   }
 
-  "main" should "parse multiple object definitions" oin {
-    def src(i) = s"""
-      |object Main$i {
+  "main" should "parse multiple object definitions" in {
+    val src = """
+      |object Main {
+      |  def method1: Unit = ???
+      |  def method2: Unit = ???
+      |  def method3: Unit = ???
       |}
       |"""
-    (1 to 100).map(src).mkString("\n").ast(Scala.defObject) should not be (None)
+
+    val expected = DefObject("Main", Seq(
+      DefMethod("method1"),
+      DefMethod("method2"),
+      DefMethod("method3"),
+    ))
+
+    src.ast(Scala.defObject) should be (Some(expected))
+
   }
 }
