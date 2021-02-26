@@ -19,7 +19,7 @@ object Expression {
 
   trait ScalaType extends Expression
   case class SimpleType(name: String) extends ScalaType
-  case class GenericType(name: String) extends ScalaType
+  case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
 
   case class DefMethod(
     name: String,
@@ -51,6 +51,8 @@ object Scala {
 
   val identifier = token(sat[Identifier])
 
+  val `[` = symbol('[')
+  val `]` = symbol(']')
   val `(` = symbol('(')
   val `)` = symbol(')')
   val `{` = symbol('{')
@@ -62,9 +64,22 @@ object Scala {
 
   val fullIdentifier = token(sepBy(sat[Identifier], `.`))
 
-  val typeDef: Parser[ScalaType] = for {
+  def typeDef: Parser[ScalaType] = for {
     name <- identifier
-  } yield SimpleType(name.value)
+    generic <- one {
+      for {
+        _ <- `[`
+        generics <- sepBy(typeDef, `,`)
+        _ <- `]`
+      } yield generics
+    }
+  } yield {
+    generic.map { types =>
+      GenericType(name.value, types)
+    } getOrElse {
+      SimpleType(name.value)
+    }
+  }
 
   val `import`: Parser[Import] = for {
     _ <- identifierWithName("import")

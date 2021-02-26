@@ -61,6 +61,15 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     "String".ast(Scala.typeDef) should be (Some(`String`))
   }
 
+  "typeDef" should "parse generic types" in {
+    "Option[Int]".ast(Scala.typeDef) should be (Some(
+      GenericType("Option", Seq(`Int`))
+    ))
+    "List[String]".ast(Scala.typeDef) should be (Some(
+      GenericType("List", Seq(`String`))
+    ))
+  }
+
   "defMethod" should "parse simple method definition" in {
     "def method_name: Unit = ???".ast(Scala.defMethod) should be (Some(
       DefMethod("method_name", "Unit", body = Seq(`???`))
@@ -205,6 +214,31 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       DefMethod("main", "Unit", body = Seq(
         Func("println", Seq(Stri("Hello World!")))
       ))
+    ))
+
+    src.ast(Scala.defObject) should be (Some(expected))
+  }
+
+  "main" should "parse 'hello world' example" in {
+    val src = """
+      |object Main {
+      |  def main(args: Array[String]): Unit = {
+      |    println("Hello World!")
+      |  }
+      |}
+      |"""
+
+    val args = DefMethodArgument("args", GenericType("Array", Seq(SimpleType("String"))))
+
+    val expected = DefObject("Main", Seq(
+      DefMethod(
+        name = "main",
+        returnType = "Unit",
+        arguments = Seq(args),
+        body = Seq(
+          Func("println", Seq(Stri("Hello World!")))
+        )
+      )
     ))
 
     src.ast(Scala.defObject) should be (Some(expected))
