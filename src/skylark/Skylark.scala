@@ -80,13 +80,13 @@ object Skylark {
 
   lazy val list: Parser[Expression] = for {
     _ <- `[`
-    expressions <- token(sepByN(expr, comma))
+    expressions <- token(sepBy(expr, comma))
     _ <- `]`
   } yield EList(expressions)
 
   lazy val hash: Parser[Expression] = for {
     _ <- `{`
-    elements <- token(sepByN(hashElement, comma))
+    elements <- token(sepBy(hashElement, comma))
     _ <- `}`
   } yield EHash(elements)
 
@@ -114,7 +114,7 @@ object Skylark {
   } yield args
 
   lazy val arguments = for {
-    result <- sepByN(argument, comma)
+    result <- sepBy(argument, comma)
   } yield result
 
   lazy val argument = for {

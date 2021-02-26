@@ -9,7 +9,7 @@ object ScalaApp extends App {
 
   val content = Files.readAllBytes(new File(args(0)).toPath)
 
-  val state = Parser.parseString(Scala.main, Lexer.lexAll(Span(content)).toList)
+  val state = Parser.parseTokens(Scala.main, Lexer.lexAll(Span(content)).toList)
 
   val result = state
     .find { case (_, tokens) => tokens.isEmpty }

@@ -142,16 +142,4 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
     (1 to 100).map(src).mkString("\n").ast(Scala.defObject) should not be (None)
   }
-
-  /*
-  "defObject" should "parse scala hello world" in {
-    """
-      |object Main {
-      |  def main(arg: Array[String]): Unit = {
-      |    println("Hello World!")
-      |  }
-      |}
-      |""".ast(Scala.defObject) should not be (None)
-  }
-  */
 }

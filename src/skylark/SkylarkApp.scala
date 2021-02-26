@@ -9,6 +9,6 @@ object SkylarkApp extends App {
 
   val content = Files.readAllBytes(new File(args(0)).toPath)
 
-  val s = Parser.parse(Skylark.expressions, Lexer.lexAll(Span(content)).toList)
+  val s = Parser.parseTokens(Skylark.expressions, Lexer.lexAll(Span(content)).toList)
   println(s)
 }
