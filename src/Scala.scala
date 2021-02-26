@@ -20,7 +20,10 @@ object Expression {
   case class DefMethod(
     name: String,
     returnType: String,
+    arguments: Seq[DefMethodArgument] = Seq.empty,
     body: Seq[Expr] = Seq.empty) extends Statement
+
+  case class DefMethodArgument(name: String, argumentType: String)
 
   sealed trait Expr extends Statement
 
@@ -35,7 +38,12 @@ object Scala {
 
   def symbol(ch: Char): Parser[LexerToken] = token(sat(Symbol(ch.toString)))
 
-  def identifierWithName(value: String): Parser[LexerToken] = token(sat(Identifier(value)))
+  def identifierWithName(value: String): Parser[LexerToken] =
+    token(sat(Identifier(value)))
+
+  def identifierWithNames(values: Seq[String]): Parser[LexerToken] = token {
+    sat2(values.map(Identifier(_)).contains)
+  }
 
   val identifier = token(sat[Identifier])
 
@@ -70,14 +78,31 @@ object Scala {
   val objectStatements =
     many(objectStatement)
 
+  def defMethodArgument: Parser[DefMethodArgument] = for {
+    name <- identifier
+    _ <- `:`
+    argumentType <- identifierWithNames(Seq("Int", "String", "Array[String]"))
+  } yield DefMethodArgument(name.value, argumentType.value)
+
+  def methodArgumentsGroup: Parser[Seq[DefMethodArgument]] = for {
+    _ <- `(`
+    args <- sepBy(defMethodArgument, `,`)
+    _ <- `)`
+  } yield args
+
+  def methodArguments: Parser[Seq[DefMethodArgument]] = for {
+    args <- one(methodArgumentsGroup)
+  } yield args.getOrElse(Seq.empty)
+
   def defMethod: Parser[DefMethod] = for {
     _ <- identifierWithName("def")
     name <- identifier
+    arguments <- methodArguments
     _ <- `:`
     returnType <- identifierWithName("Unit")
     _ <- `=`
     expr <- expr.all
-  } yield DefMethod(name.value, returnType.value, Seq(expr))
+  } yield DefMethod(name.value, returnType.value, arguments, body = Seq(expr))
 
   object expr {
     val number: Parser[Expr] = for {

@@ -55,7 +55,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
   "defMethod" should "parse simple method definition" in {
     "def method_name: Unit = ???".ast(Scala.defMethod) should be (Some(
-      DefMethod("method_name", "Unit", Seq(`???`))
+      DefMethod("method_name", "Unit", body = Seq(`???`))
     ))
   }
 
@@ -64,8 +64,36 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |def method_name: Unit = {
       |  ???
       |}""".ast(Scala.defMethod) should be (Some(
-        DefMethod("method_name", "Unit", Seq(`???`))
+        DefMethod("method_name", "Unit", body = Seq(`???`))
       ))
+  }
+
+  "defMethod" should "parse method with arguments and types" in {
+    val src = """def method1(arg1: Int, arg2: String): Unit = ???"""
+    src.ast(Scala.defMethod) should be (Some(
+      DefMethod("method1", "Unit", Seq(
+        DefMethodArgument("arg1", "Int"),
+        DefMethodArgument("arg2", "String"),
+      ),
+      body = Seq(`???`))
+    ))
+  }
+
+  "defMethodArgument" should "parse name and type tuple" in {
+    val expected = DefMethodArgument("name", "Int")
+    """name:Int""".ast(Scala.defMethodArgument) should be (Some(expected))
+  }
+
+  "methodArguments" should "parse method with arguments and types" in {
+     """(a: Int)""".ast(Scala.methodArguments) should be (Some(
+       Seq(DefMethodArgument("a", "Int"))
+     ))
+  }
+
+  "methodArguments" should "parse method with two arguments" in {
+     """(a: Int, b: String)""".ast(Scala.methodArguments) should be (Some(
+       Seq(DefMethodArgument("a", "Int"), DefMethodArgument("b", "String"))
+     ))
   }
 
   "expr" should "parse symbol identifier reference" in {
@@ -84,7 +112,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
   "defObject" should "parse an empty method in an object" in {
     val expected = DefObject("Main", Seq(
-      DefMethod("methodName", "Unit", Seq(`???`))
+      DefMethod("methodName", "Unit", body = Seq(`???`))
     ))
     """
       |object Main {
@@ -148,9 +176,9 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
 
     val expected = DefObject("Main", Seq(
-      DefMethod("method1", "Unit", Seq(`???`)),
-      DefMethod("method2", "Unit", Seq(`???`)),
-      DefMethod("method3", "Unit", Seq(`???`)),
+      DefMethod("method1", "Unit", body = Seq(`???`)),
+      DefMethod("method2", "Unit", body = Seq(`???`)),
+      DefMethod("method3", "Unit", body = Seq(`???`)),
     ))
 
     src.ast(Scala.defObject) should be (Some(expected))
@@ -166,7 +194,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
 
     val expected = DefObject("Main", Seq(
-      DefMethod("main", "Unit", Seq(
+      DefMethod("main", "Unit", body = Seq(
         Func("println", Seq(Stri("Hello World!")))
       ))
     ))
