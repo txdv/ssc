@@ -150,6 +150,21 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
 
     src.ast(Scala.defObject) should be (Some(expected))
+  }
 
+  "main" should "parse 'hello world' example without arguments in main method" in {
+    val src = """
+      |object Main {
+      |  def main: Unit = {
+      |    println("Hello World!")
+      |  }
+      |}
+      |"""
+
+    val expected = DefObject("Main", Seq(
+      DefMethod("main", "Unit")
+    ))
+
+    src.ast(Scala.defObject) should be (Some(expected))
   }
 }
