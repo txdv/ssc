@@ -23,7 +23,7 @@ object Expression {
 
   case class DefMethod(
     name: String,
-    returnType: String,
+    returnType: ScalaType,
     arguments: Seq[DefMethodArgument] = Seq.empty,
     body: Seq[Expr] = Seq.empty) extends Statement
 
@@ -122,10 +122,10 @@ object Scala {
     name <- identifier
     arguments <- methodArguments
     _ <- `:`
-    returnType <- identifierWithName("Unit")
+    returnType <- typeDef
     _ <- `=`
     expr <- expr.all
-  } yield DefMethod(name.value, returnType.value, arguments, body = Seq(expr))
+  } yield DefMethod(name.value, returnType, arguments, body = Seq(expr))
 
   object expr {
     val number: Parser[Expr] = for {
