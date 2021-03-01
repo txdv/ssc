@@ -72,11 +72,17 @@ scala_binary(
     deps = [":scala", ":lexer"],
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.parser.scala.ScalaApp")
 
-scala_binary(
+scala_library(
     name = "classfile",
     srcs = ["ClassFile.scala"],
+    scalacopts = fatal_warnings())
+
+scala_binary(
+    name = "classfile_app",
+    srcs = ["ClassFileApp.scala"],
     scalacopts = fatal_warnings(),
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.MainApp")
+    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.ClassFileApp",
+    deps = [":classfile"])
 
 scala_binary(
     name = "class",
