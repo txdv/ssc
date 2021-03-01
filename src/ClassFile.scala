@@ -6,6 +6,19 @@ import java.nio.file.Files
 
 case class Version(minor: Int, major: Int)
 
+sealed trait Constant
+
+object Constant {
+  case class Class(name: Int) extends Constant
+  case class MethodRef(klass: Int, nameType: Int) extends Constant
+  case class FieldRef(klass: Int, nameType: Int) extends Constant
+  case class Utf8(string: String) extends Constant
+  case class NameAndType(index: Int, descriptor: Int) extends Constant
+  case class ConstString(index: Int) extends Constant
+}
+
+import Constant._
+
 case class ClassFile(
   version: Version,
   constants: Seq[Constant],
@@ -29,20 +42,12 @@ case class ClassFile(
   }
 }
 
-sealed trait Constant
-
-case class Class(name: Int) extends Constant
-case class MethodRef(klass: Int, nameType: Int) extends Constant
-case class FieldRef(klass: Int, nameType: Int) extends Constant
-case class Utf8(string: String) extends Constant
-case class NameAndType(index: Int, descriptor: Int) extends Constant
-case class ConstString(index: Int) extends Constant
-
 case class MethodInfo(accessFlags: Int, name: Int, descriptor: Int, attributes: Seq[AttributeInfo])
 case class AttributeInfo(name: Int, info: Array[Byte])
 case class FieldInfo(accessFlags: Int, name: Int, descriptor: Int, attributes: Seq[AttributeInfo])
 
 object ClassFile {
+
   def parse(byte: Array[Byte]): ClassFile = {
     val bb = ByteBuffer.wrap(byte)
     val magic = bb.getInt
