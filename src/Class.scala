@@ -2,7 +2,6 @@ package lt.vu.mif.bentkus.bachelor.compiler.classfile.higher
 
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.{
   ClassFile,
-  MainApp => OldApp,
   MethodInfo,
   Span,
   Version
@@ -135,6 +134,83 @@ object AccessFlag {
   }
 }
 
+sealed trait MethodAccessFlag {
+  def value: Int
+
+  def isSet(int: Int): Boolean = {
+    (int & value) == value
+  }
+}
+
+object MethodAccessFlag {
+  case object Public extends MethodAccessFlag {
+    val value: Int = 0x0001
+  }
+
+  case object Private extends MethodAccessFlag {
+    val value: Int = 0x0002
+  }
+
+  case object Protected extends MethodAccessFlag {
+    val value: Int = 0x0004
+  }
+
+  case object Static extends MethodAccessFlag {
+    val value: Int = 0x0008
+  }
+
+  case object Final extends MethodAccessFlag {
+    val value: Int = 0x0010
+  }
+
+  case object Synchronized extends MethodAccessFlag {
+    val value: Int = 0x0020
+  }
+
+  case object Bridge extends MethodAccessFlag {
+    val value: Int = 0x0040
+  }
+
+  case object Varargs extends MethodAccessFlag {
+    val value: Int = 0x0080
+  }
+
+  case object Native extends MethodAccessFlag {
+    val value: Int = 0x0100
+  }
+
+  case object Abstract extends MethodAccessFlag {
+    val value: Int = 0x0400
+  }
+
+  case object Strict extends MethodAccessFlag {
+    val value: Int = 0x0800
+  }
+
+  case object Synthetic extends MethodAccessFlag {
+    val value: Int = 0x0800
+  }
+
+  val Values = Set[MethodAccessFlag](
+    Public,
+    Private,
+    Protected,
+    Static,
+    Final,
+    Synchronized,
+    Bridge,
+    Varargs,
+    Native,
+    Abstract,
+    Strict,
+    Synthetic
+  )
+
+  def parse(af: Int): Set[MethodAccessFlag] = {
+    Values.filter(_.isSet(af))
+  }
+}
+
 object Converter {
   def convert(classFile: ClassFile): Class = {
     val consts = classFile.constants
@@ -172,7 +248,16 @@ object Converter {
 
 object MainApp extends App {
 
-  val classFile = OldApp.read(args.head)
+  val filename = args.head
+
+  val bytes = {
+    import java.io.File
+    import java.nio.file.Files
+    val file = new File(filename)
+    Files.readAllBytes(file.toPath)
+  }
+
+  val classFile = ClassFile.parse(bytes)
 
   println(Converter.convert(classFile))
 }

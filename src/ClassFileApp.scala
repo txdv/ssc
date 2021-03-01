@@ -1,10 +1,12 @@
 package lt.vu.mif.bentkus.bachelor.compiler.classfile
 
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MethodAccessFlag
+import Constant._
+
 import java.io.File
 import java.nio.file.Files
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import Constant._
 
 object ClassFileApp extends App {
 
@@ -65,6 +67,13 @@ object ClassFileApp extends App {
     }
   }
 
+  def keywords(flags: Set[MethodAccessFlag]): String = {
+    flags.toSeq.
+      sortBy(_.value)
+      .map(_.toString.toLowerCase)
+      .mkString(" ")
+  }
+
   def print(classFile: ClassFile): Unit = {
     import classFile._
     val thisClassString = className(thisClass)
@@ -89,9 +98,20 @@ object ClassFileApp extends App {
     }
     println("{")
     methods.foreach { method =>
-      val methodName = string(method.name)
-      val af = method.accessFlags
-      println(s"  $methodName")
+      val methodName = string(method.name) match {
+        case "<init>" => thisClassString
+        case str => str
+      }
+
+      val flags = MethodAccessFlag.parse(method.accessFlags)
+      val kw = keywords(flags)
+      val descriptorName = string(method.descriptor)
+      println(s"  $kw $methodName $descriptorName")
+      println(s"    descriptor: $descriptorName")
+
+      val stringFlags = flags.toSeq.sortBy(_.value).map(s => s"ACC_${s.toString.toUpperCase}").mkString(", ")
+      println(s"    flags: (${toHex(method.accessFlags)}) $stringFlags")
+      println
     }
 
     println("}")
