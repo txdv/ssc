@@ -85,7 +85,6 @@ scala_binary(
     scalacopts = fatal_warnings(),
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MainApp")
 
-
 scala_binary(
     name = "compiler",
     srcs = ["Compiler.scala"],

@@ -1,6 +1,12 @@
 package lt.vu.mif.bentkus.bachelor.compiler.classfile.higher
 
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.{MainApp => OldApp, ClassFile, MethodInfo, Span}
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.{
+  ClassFile,
+  MainApp => OldApp,
+  MethodInfo,
+  Span,
+  Version
+}
 import java.nio.ByteBuffer
 
 sealed trait JavaType
@@ -50,13 +56,6 @@ case class Arr(info: JavaType) extends JavaType {
     case arr: Arr => 1 + arr.arity
     case _ => 1 }
 }
-/*
-sealed trait JavaType
-
-case object JavaInt extends JavaType
-case object JavaVoid extends JavaType
-case class JavaClass(name: String)
-*/
 
 case class Method(
   name: String,
@@ -64,6 +63,7 @@ case class Method(
   access: Set[AccessFlag])
 
 case class Class(
+  version: Version,
   thisClass: JavaClass,
   superClass: JavaClass,
   methods: Seq[Method],
@@ -91,35 +91,35 @@ sealed trait AccessFlag {
   }
 }
 
-case object Public extends AccessFlag {
-  val value: Int = 0x0001
-}
-
-case object Private extends AccessFlag {
-  def value: Int = 0x0010
-}
-
-case object Super extends AccessFlag {
-  def value: Int = 0x0020
-}
-
-case object Interface extends AccessFlag {
-  def value: Int = 0x0200
-}
-
-case object Abstract extends AccessFlag {
-  def value: Int = 0x0400
-}
-
-case object Annotation extends AccessFlag {
-  def value: Int = 0x2000
-}
-
-case object Enum extends AccessFlag {
-  def value: Int = 0x4000
-}
-
 object AccessFlag {
+  case object Public extends AccessFlag {
+    val value: Int = 0x0001
+  }
+
+  case object Private extends AccessFlag {
+    def value: Int = 0x0010
+  }
+
+  case object Super extends AccessFlag {
+    def value: Int = 0x0020
+  }
+
+  case object Interface extends AccessFlag {
+    def value: Int = 0x0200
+  }
+
+  case object Abstract extends AccessFlag {
+    def value: Int = 0x0400
+  }
+
+  case object Annotation extends AccessFlag {
+    def value: Int = 0x2000
+  }
+
+  case object Enum extends AccessFlag {
+    def value: Int = 0x4000
+  }
+
   val values = Set[AccessFlag](
     Public,
     Private,
@@ -162,6 +162,7 @@ object Converter {
     println(classFile.fields)
 
     Class(
+      version = classFile.version,
       thisClass = JavaClass(classFile.className(classFile.thisClass)),
       superClass = JavaClass(classFile.className(classFile.superClass)),
       methods,

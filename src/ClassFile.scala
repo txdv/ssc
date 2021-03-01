@@ -3,6 +3,8 @@ package lt.vu.mif.bentkus.bachelor.compiler.classfile
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.file.Files
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 case class Version(minor: Int, major: Int)
 
@@ -34,15 +36,31 @@ case class ClassFile(
   }
 
   def klass(index: Int): Class = {
-    constants(index -1).asInstanceOf[Class]
+    constants(index - 1).asInstanceOf[Class]
   }
 
   def className(index: Int): String = {
     string(klass(index).name)
   }
+
+  def nameAndType(index: Int): String = {
+    val nt = constants(index - 1).asInstanceOf[NameAndType]
+    nameAndType(nt)
+    //s""""${string(a)}":${string(b)}"""
+  }
+
+  def nameAndType(nt: NameAndType): String = {
+    val NameAndType(a, b) = nt
+    s""""${string(a)}":${string(b)}"""
+  }
 }
 
-case class MethodInfo(accessFlags: Int, name: Int, descriptor: Int, attributes: Seq[AttributeInfo])
+case class MethodInfo(
+  accessFlags: Int,
+  name: Int,
+  descriptor: Int,
+  attributes: Seq[AttributeInfo])
+
 case class AttributeInfo(name: Int, info: Array[Byte])
 case class FieldInfo(accessFlags: Int, name: Int, descriptor: Int, attributes: Seq[AttributeInfo])
 
@@ -185,14 +203,107 @@ object Span {
 
 object MainApp extends App {
 
-  def read(file: String): ClassFile = {
-    val bytes = Files.readAllBytes(new File(file).toPath)
+  val formatter = DateTimeFormatter.ofPattern("LLL d, YYYY")
+    .withZone(ZoneId.systemDefault())
 
-    ClassFile.parse(bytes)
+  def toHex(i: Int): String = {
+    String.format("0x%04X", i)
   }
 
-  args.headOption.map { file =>
-    println(read(args.head))
+  def repeat(char: Char, times: Int): String = {
+    (1 to times).map(_ => char).mkString("")
+  }
+
+  def leftpad(str: String, filler: Char = ' ', size: Int = 5): String = {
+    val i = Math.max(size - str.length, 0)
+    repeat(filler, i) + str
+  }
+
+  def rightpad(str: String, filler: Char = ' ', size: Int = 19): String = {
+    val i = Math.max(size - str.length, 0)
+    str + repeat(filler, i)
+  }
+
+  def toValue(c: Constant): String = {
+    c match {
+      case MethodRef(klass, nameType) =>
+        s"#$klass.#$nameType"
+      case Class(i) =>
+        s"#$i"
+      case NameAndType(index, descriptor) =>
+        s"#$index:#$descriptor"
+      case Utf8(str) =>
+        str
+      case _ =>
+        c.toString
+    }
+  }
+
+  def toComment(classFile: ClassFile, constant: Constant): Option[String] = {
+    import classFile._
+
+    constant match {
+      case MethodRef(klass, nameAndTypeId) =>
+        val b = nameAndType(nameAndTypeId)
+        val value = s"${className(klass)}.${b}"
+        Some("// ").map(_ + value)
+        //Some(s"// $value")
+      case Class(index) =>
+        val value = string(index)
+        Some("// ").map(_ + value)
+      case n: NameAndType =>
+        val value = nameAndType(n)
+        Some("// ").map(_ + value)
+      case _ =>
+        None
+    }
+  }
+
+  def print(classFile: ClassFile): Unit = {
+    import classFile._
+    val thisClassString = className(thisClass)
+    println(s"public class $thisClassString")
+    println(s"  minor version: ${version.minor}")
+    println(s"  major version: ${version.major}")
+    println(s"  flags: (${toHex(accessFlags)})")
+    println(s"  this_class: #${thisClass} // $thisClassString")
+    println(s"  super_class: #${superClass} // ${className(superClass)} ")
+    println(s"  interfaces: 0, fields: 0, methods: ${methods.size}, attributes: 0")
+    println("Constant pool:")
+    constants.zipWithIndex.foreach { case (constant, i) =>
+      val nr = i + 1
+      constant match {
+        case _ =>
+          val nrstr = leftpad(s"#$nr", ' ')
+          val name = rightpad(constant.getClass.getSimpleName, ' ', 18)
+          val value = rightpad(toValue(constant), ' ', 15)
+          val comments = toComment(classFile, constant).getOrElse("")
+          println(s"$nrstr = $name $value $comments")
+      }
+    }
+    println("{")
+    methods.foreach { method =>
+      val methodName = string(method.name)
+      val af = method.accessFlags
+      println(s"  $methodName")
+    }
+
+    println("}")
+  }
+
+  args.headOption.map { filename =>
+    val file = new File(filename)
+    val bytes = Files.readAllBytes(file.toPath)
+
+    import java.nio.file.attribute.BasicFileAttributes
+
+    val t = Files.readAttributes[BasicFileAttributes](file.toPath, classOf[BasicFileAttributes])
+    val cf = ClassFile.parse(bytes)
+
+    val date = formatter.format(t.lastModifiedTime.toInstant)
+    println(s"  Last modified $date; size ${bytes.size} bytes")
+
+    print(cf)
   } getOrElse {
     println("Please pass file.")
   }

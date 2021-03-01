@@ -4,7 +4,7 @@ import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
 import lt.vu.mif.bentkus.bachelor.compiler.lexer.{Lexer, Span}
 import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.{Scala, Expression}
 import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.DefObject
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{Class, JavaClass}
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{Class, JavaClass, AccessFlag}
 
 import java.io.File
 import java.nio.file.Files
