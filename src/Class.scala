@@ -13,28 +13,27 @@ sealed trait JavaType
 case class JavaGeneric(namespace: String, genericType: JavaType)
 
 object JavaType {
-  case object JavaInt extends JavaType
-  case object JavaChar extends JavaType
-  case object JavaVoid extends JavaType
+  case object Int extends JavaType
+  case object Char extends JavaType
+  case object Void extends JavaType
 
-  case class JavaClass(namespace: String) extends JavaType {
+  case class Class(namespace: String) extends JavaType {
     private val tmp = namespace.split("/").reverse
     val pkg = tmp.drop(1).reverse.mkString("/")
     val name = tmp.head
   }
 
-  object JavaClass {
+  object Class {
     def isChar(ch: Char): Boolean =
       ch.isLetterOrDigit || ch == '_' || ch == '/'
   }
 
-  case class Arr(info: JavaType) extends JavaType {
+  case class Array(info: JavaType) extends JavaType {
     val arity: Int = info match {
-      case arr: Arr => 1 + arr.arity
+      case arr: Array => 1 + arr.arity
       case _ => 1
     }
   }
-
 
   def parse(a: String): Seq[JavaType] = {
     Seq.empty
@@ -43,15 +42,15 @@ object JavaType {
   def from(a: String): JavaType = {
     a(0) match {
       case 'L' =>
-        JavaClass(a.drop(1).takeWhile(JavaClass.isChar))
+        Class(a.drop(1).takeWhile(Class.isChar))
       case '[' =>
-        Arr(from(a.drop(1)))
+        Array(from(a.drop(1)))
       case 'I' =>
-        JavaInt
+        Int
       case 'C' =>
-        JavaChar
+        Char
       case 'V' =>
-        JavaVoid
+        Void
       case _ =>
         throw new Exception("invalid format")
     }
@@ -67,12 +66,10 @@ case class Method(
   taip: String,
   access: Set[AccessFlag])
 
-import JavaType.JavaClass
-
 case class Class(
   version: Version,
-  thisClass: JavaClass,
-  superClass: JavaClass,
+  thisClass: JavaType.Class,
+  superClass: JavaType.Class,
   methods: Seq[Method],
   attributes: Seq[Attribute])
 
@@ -247,8 +244,8 @@ object Converter {
 
     Class(
       version = classFile.version,
-      thisClass = JavaClass(classFile.className(classFile.thisClass)),
-      superClass = JavaClass(classFile.className(classFile.superClass)),
+      thisClass = JavaType.Class(classFile.className(classFile.thisClass)),
+      superClass = JavaType.Class(classFile.className(classFile.superClass)),
       methods,
       attributes)
   }

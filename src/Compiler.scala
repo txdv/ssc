@@ -4,7 +4,8 @@ import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
 import lt.vu.mif.bentkus.bachelor.compiler.lexer.{Lexer, Span}
 import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.{Scala, Expression}
 import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.DefObject
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{Class, JavaClass, AccessFlag}
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.Version
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{Class, JavaType, AccessFlag}
 
 import java.io.File
 import java.nio.file.Files
@@ -12,8 +13,9 @@ import java.nio.file.Files
 object MainApp extends App {
   def convert(expr: DefObject): Class = {
     Class(
-      thisClass = JavaClass(expr.name),
-      superClass = JavaClass("java/lang/Object"),
+      version = Version(0, 59),
+      thisClass = JavaType.Class(expr.name),
+      superClass = JavaType.Class("java/lang/Object"),
       methods = Seq.empty,
       attributes = Seq.empty)
   }

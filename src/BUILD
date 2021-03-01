@@ -100,6 +100,6 @@ scala_test(
 scala_binary(
     name = "compiler",
     srcs = ["Compiler.scala"],
-    deps = [":scala", ":class"],
+    deps = [":scala", ":class", ":classfile"],
     scalacopts = fatal_warnings(),
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.MainApp")

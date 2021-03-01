@@ -7,9 +7,9 @@ import matchers._
 class ClassSpec extends AnyFlatSpec with should.Matchers {
   import JavaType._
 
-  "a" should "b" in {
+  "JavaType" should "parse main method descriptor string" in {
     val args = "([Ljava/lang/String;)V"
-    val expected = Seq(Arr(JavaClass("java/a/String")), JavaVoid)
+    val expected = Seq(Array(Class("java/a/String")), Void)
     JavaType.parse(args) should be (expected)
   }
 }
