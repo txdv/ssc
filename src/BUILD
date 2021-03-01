@@ -71,3 +71,16 @@ scala_binary(
     scalacopts = fatal_warnings(),
     deps = [":scala", ":lexer"],
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.parser.scala.ScalaApp")
+
+scala_binary(
+    name = "classfile",
+    srcs = ["ClassFile.scala"],
+    scalacopts = fatal_warnings(),
+    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.MainApp")
+
+scala_binary(
+    name = "class",
+    srcs = ["Class.scala"],
+    deps = [":classfile"],
+    scalacopts = fatal_warnings(),
+    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MainApp")
