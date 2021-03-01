@@ -91,6 +91,12 @@ scala_binary(
     scalacopts = fatal_warnings(),
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MainApp")
 
+scala_test(
+    name = "class_spec",
+    srcs = ["ClassSpec.scala"],
+    deps = [":class"],
+    scalacopts = fatal_warnings())
+
 scala_binary(
     name = "compiler",
     srcs = ["Compiler.scala"],
