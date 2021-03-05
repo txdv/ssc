@@ -17,6 +17,11 @@ scala_library(
       "@maven//:org_scalaz_scalaz_core_2_13",
     ])
 
+scala_library(
+    name = "span",
+    srcs = ["Span.scala"],
+    scalacopts = fatal_warnings())
+
 scala_binary(
     name = "version",
     srcs = ["Version.scala"],
@@ -26,6 +31,7 @@ scala_binary(
     name = "lexer",
     srcs = ["Lexer.scala"],
     scalacopts = fatal_warnings(),
+    deps = [":span"],
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerApp")
 
 scala_test(

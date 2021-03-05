@@ -1,5 +1,7 @@
 package lt.vu.mif.bentkus.bachelor.compiler.lexer
 
+import lt.vu.mif.bentkus.bachelor.compiler.span._
+
 import scala.reflect.ClassTag
 
 import java.io.File
@@ -26,87 +28,34 @@ object LexerToken {
 import LexerToken._
 
 
-case class Span(start: Int, end: Int, buffer: Array[Byte]) {
+object SpanExtensions {
+  implicit class Converter(span: Span) {
 
-  def char(pos: Int): Char =
-    buffer(pos).asInstanceOf[Char]
+    import span._
 
-  def takeWhile(predicate: Char => Boolean): SpanSplit = {
-    var i = start
-    while (i < end && predicate(char(i))) {
-      i += 1
-    }
-    split(i - start)
-  }
-
-  def split(prefix: Int) =
-    SpanSplit(Span(start, start + prefix, buffer), Span(start + prefix, end, buffer))
-
-  def takeChar = split(1)
-
-  def to[T <: LexerToken](implicit classTag: ClassTag[T]): T = {
-    val klass = classTag.runtimeClass
-    (if (klass == classOf[Identifier]) {
-      Identifier(getString)
-    } else if (klass == classOf[Whitespace]) {
-      Whitespace(getString)
-    } else if (klass == classOf[Number]) {
-      Number(getString)
-    } else if (klass == classOf[Symbol]) {
-      Symbol(getString)
-    } else if (klass == classOf[Str]) {
-      Str(getString)
-    } else if (klass == classOf[Comment]) {
-      Comment(getString)
-    } else {
-      throw new Exception
-    }).asInstanceOf[T]
-  }
-
-  def getString: String = getString(end - start)
-
-  def getString(number: Int): String = {
-    val end = scala.math.min(number, buffer.size)
-    new String(buffer, start, end)
-  }
-
-  def char: Char = char(start)
-
-  def isEmpty: Boolean = start >= end
-
-  def withStart(f: Int => Int): Span =
-    copy(start = f(start))
-
-  def withEnd(f: Int => Int): Span =
-    copy(end = f(end))
-
-  def +(that: Span): Span = {
-    if (buffer == that.buffer && end == that.start) {
-      Span(start, that.end, buffer)
-    } else {
-      throw new Exception
+    def to[T <: LexerToken](implicit classTag: ClassTag[T]): T = {
+      val klass = classTag.runtimeClass
+      (if (klass == classOf[Identifier]) {
+        Identifier(getString)
+      } else if (klass == classOf[Whitespace]) {
+        Whitespace(getString)
+      } else if (klass == classOf[Number]) {
+        Number(getString)
+      } else if (klass == classOf[Symbol]) {
+        Symbol(getString)
+      } else if (klass == classOf[Str]) {
+        Str(getString)
+      } else if (klass == classOf[Comment]) {
+        Comment(getString)
+      } else {
+        throw new Exception
+      }).asInstanceOf[T]
     }
   }
-
-  def +(that: SpanSplit) = that + this
 }
 
-case class SpanSplit(prefix: Span, suffix: Span) {
-  def map[T](f: Span => T): (T, Span) = (f(prefix), suffix)
+import SpanExtensions._
 
-  def move(step: Int): SpanSplit =
-    SpanSplit(prefix.withEnd(_ + step), suffix.withStart(_ + step))
-
-  def +(that: Span): SpanSplit = {
-    SpanSplit(that + prefix, suffix)
-  }
-}
-
-object Span {
-  def apply(buffer: Array[Byte]): Span = {
-    Span(0, buffer.length, buffer)
-  }
-}
 
 object Lexer {
   private val singleChars = Set('(', ')', '[', ']', '=', ',', '.', '+', '%', '{', '}', ':')
