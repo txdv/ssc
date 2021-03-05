@@ -24,6 +24,25 @@ object ByteArray {
 
 import ByteArray.Extensions
 
+object Hex {
+  def encode(bytes: Array[Byte]): String = {
+    bytes.map(encode).mkString("")
+  }
+
+  def encode(b: Byte): String = {
+    String.format("%02X", Byte.box(b))
+  }
+}
+
+object SHA256 {
+  lazy val digest = java.security.MessageDigest.getInstance("SHA-256")
+
+  def sum(bytes: Array[Byte]): String = {
+    val output = digest.digest(bytes)
+    new String(Hex.encode(output))
+  }
+}
+
 object ClassFileApp extends App {
 
   val formatter = DateTimeFormatter.ofPattern("LLL d, YYYY")
@@ -106,6 +125,37 @@ object ClassFileApp extends App {
     }
   }
 
+  def indent(offset: Int): Unit = {
+    print("  " * offset)
+  }
+
+  def indent(offset: Int, suffix: String): Unit = {
+    indent(offset)
+    println(suffix)
+  }
+
+  def output(offset: Int, classFile: ClassFile, instr: Instr): Unit = {
+    indent(5)
+    print(s"$offset: ")
+    output(classFile, instr)
+  }
+
+  def output(classFile: ClassFile, instr: Instr): Unit = {
+    import Instr._
+    instr match {
+      case index: Index =>
+        val name = index.getClass.getSimpleName
+        //val indexValue = classFile.get(index.idx)
+        val suffix = toComment(classFile, classFile.const(index.idx)).getOrElse("")
+        println(rightpad(s"$name #${index.idx}", ' ', 40) + suffix)
+      case Return =>
+        println("return")
+      case _ =>
+        println(instr)
+    }
+
+  }
+
   private def format(methodName: String, types: Seq[JavaType]): String = {
     val returnType = types.last
     val args = types.reverse.drop(1).reverse
@@ -116,24 +166,24 @@ object ClassFileApp extends App {
     s"$returnTypeString $methodName($argsString);"
   }
 
-  def print(classFile: ClassFile): Unit = {
+  def printClassFile(classFile: ClassFile): Unit = {
     import classFile._
     val thisClassString = className(thisClass)
-    println(s"public class $thisClassString")
-    println(s"  minor version: ${version.minor}")
-    println(s"  major version: ${version.major}")
-    println(s"  flags: (${toHex(accessFlags)})")
-    println(s"  this_class: #${thisClass} // $thisClassString")
-    println(s"  super_class: #${superClass} // ${className(superClass)} ")
-    println(s"  interfaces: 0, fields: 0, methods: ${methods.size}, attributes: 0")
-    println("Constant pool:")
+    indent(0, s"public class $thisClassString")
+    indent(1, s"minor version: ${version.minor}")
+    indent(1, s"major version: ${version.major}")
+    indent(1, s"flags: (${toHex(accessFlags)})")
+    indent(1, rightpad(s"this_class: #${thisClass}",   ' ', 40) + s"// $thisClassString")
+    indent(1, rightpad(s"super_class: #${superClass}", ' ', 40) + s"// ${className(superClass)}")
+    indent(1, s"interfaces: 0, fields: 0, methods: ${methods.size}, attributes: 0")
+    indent(0, "Constant pool:")
     constants.zipWithIndex.foreach { case (constant, i) =>
       val nr = i + 1
       constant match {
         case _ =>
           val nrstr = leftpad(s"#$nr", ' ')
           val name = rightpad(constant.getClass.getSimpleName, ' ', 18)
-          val value = rightpad(toValue(constant), ' ', 15)
+          val value = rightpad(toValue(constant), ' ', 14)
           val comments = toComment(classFile, constant).getOrElse("")
           println(s"$nrstr = $name $value $comments")
       }
@@ -159,8 +209,19 @@ object ClassFileApp extends App {
         val name = string(attribute.name)
         if (name == "Code") {
           val size = attribute.info.size
-          val code = CodeAttribute.parse(classFile, attribute).get
-          println(s"    Code: ${code.code.formatHex}")
+          CodeAttribute.parse(classFile, attribute).foreach { code =>
+            indent(2, "Code:")
+            indent(3, s"stack=${code.maxStack}, locals=${code.maxLocals}, args_size = ?")
+            //println(s"      ")
+            var offset = 0
+            code.instructions.foreach { instr =>
+              output(offset, classFile, instr)
+              offset += instr.size
+            }
+          }
+          println
+        } else {
+          throw new Exception(s"$name attributes are not implemented")
         }
       }
     }
@@ -171,6 +232,7 @@ object ClassFileApp extends App {
 
   args.headOption.map { filename =>
     val file = new File(filename)
+    println(s"Classfile: ${file.getAbsolutePath}")
     val bytes = Files.readAllBytes(file.toPath)
 
     import java.nio.file.attribute.BasicFileAttributes
@@ -179,9 +241,10 @@ object ClassFileApp extends App {
     val cf = ClassFile.parse(bytes)
 
     val date = formatter.format(t.lastModifiedTime.toInstant)
-    println(s"  Last modified $date; size ${bytes.size} bytes")
+    indent(1, s"Last modified $date; size ${bytes.size} bytes")
+    indent(1, s"SHA-256 checksum ${SHA256.sum(bytes)}")
 
-    print(cf)
+    printClassFile(cf)
   } getOrElse {
     println("Please pass file.")
   }

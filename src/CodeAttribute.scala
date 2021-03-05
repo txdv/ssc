@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 case class CodeAttribute(
   maxStack: Short,
   maxLocals: Short,
-  code: Array[Byte],
+  instructions: Seq[Instr],
 )
 
 sealed trait Instr {
@@ -26,13 +26,13 @@ object Instr {
   case object aload_2 extends Single(0x2C)
   case object aload_3 extends Single(0x2C)
 
-  abstract class Index(opcodeInt: Int, index: Int) extends Instr {
+  abstract class Index(opcodeInt: Int, val idx: Int) extends Instr {
     val opcode: Byte = opcodeInt.toByte
 
     val value: Array[Byte] = Array[Byte](
       opcode.toByte,
-      (index & 0xff).toByte,
-      ((index >> 8) & 0xff).toByte)
+      ((idx       ) & 0xff).toByte,
+      ((idx   >> 8) & 0xff).toByte)
   }
 
   case class invokespecial(index: Int) extends Index(0xB7, index)
@@ -74,14 +74,12 @@ object CodeAttribute {
       val codeAttribute = CodeAttribute(
         maxStack = bb.getShort,
         maxLocals = bb.getShort,
-        code = {
+        instructions = {
           val length = bb.getInt
           val byteArray = new Array[Byte](length)
           bb.get(byteArray)
-          byteArray
+          Instr.parse(byteArray)
         })
-
-      println(bb.getInt)
 
       Some(codeAttribute)
     }

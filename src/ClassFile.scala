@@ -50,6 +50,27 @@ case class ClassFile(
     val NameAndType(a, b) = nt
     s""""${string(a)}":${string(b)}"""
   }
+
+  def const(index: Int): Constant = {
+    constants(index - 1)
+  }
+
+  def get(index: Int): String = {
+    const(index) match {
+      case Utf8(value) =>
+        value
+      case Class(index) =>
+        get(index)
+      case MethodRef(klass, nameType) =>
+        s"Method ${get(klass)}, ${get(nameType)}"
+      case FieldRef(klass, nameType) =>
+        s"${get(klass)}, ${get(nameType)}"
+      case NameAndType(klass, descriptor) =>
+        s"${get(klass)}, ${get(descriptor)}"
+      case ConstString(index) =>
+        get(index)
+    }
+  }
 }
 
 case class MethodInfo(
