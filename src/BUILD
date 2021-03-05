@@ -92,6 +92,13 @@ scala_library(
     deps = [":span"],
     exports = [":span"])
 
+scala_binary(
+    name = "codeattribute",
+    srcs = ["CodeAttributeApp.scala"],
+    scalacopts = fatal_warnings(),
+    deps = [":classfile"],
+    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.CodeAttributeApp")
+
 scala_test(
     name = "classfile_spec",
     srcs = ["ClassFileSpec.scala"],
