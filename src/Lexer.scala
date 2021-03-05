@@ -4,9 +4,6 @@ import lt.vu.mif.bentkus.bachelor.compiler.span._
 
 import scala.reflect.ClassTag
 
-import java.io.File
-import java.nio.file.Files
-
 sealed trait LexerToken {
   val value: String
 
@@ -113,22 +110,5 @@ object Lexer {
 
   def lexAll(string: String): Seq[LexerToken] = {
     lexAll(string.getBytes)
-  }
-}
-
-object LexerApp extends App {
-  val file = args.headOption.getOrElse {
-    println("Please provide file to parse")
-    System.exit(1)
-    ???
-  }
-
-  val path = new File(file).toPath
-  val bytes = Files.readAllBytes(path)
-
-  val lexems = Lexer.lexAll(Span(bytes))
-  println(lexems)
-  lexems.foreach { byte =>
-    print(byte.getString)
   }
 }

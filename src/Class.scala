@@ -1,9 +1,9 @@
 package lt.vu.mif.bentkus.bachelor.compiler.classfile.higher
 
+import lt.vu.mif.bentkus.bachelor.compiler.span.Span
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.{
   ClassFile,
   MethodInfo,
-  Span,
   Version
 }
 import java.nio.ByteBuffer

@@ -5,8 +5,8 @@ scala_library(
     name = "skylark",
     srcs = ["Skylark.scala"],
     scalacopts = fatal_warnings(),
-    deps = ["//src:parser", "//src:scalaz", "//src:lexer"],
-    exports = ["//src:parser", "//src:lexer"])
+    deps = ["//src:parser", "//src:scalaz", "//src:lexer", "//src:span"],
+    exports = ["//src:parser", "//src:lexer", "//src:span"])
 
 scala_binary(
     name = "app",

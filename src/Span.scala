@@ -44,6 +44,9 @@ case class Span(start: Int, end: Int, buffer: Array[Byte]) {
   }
 
   def +(that: SpanSplit) = that + this
+
+  def toHex: String =
+    buffer.map(Span.toHex).mkString
 }
 
 case class SpanSplit(prefix: Span, suffix: Span) {
@@ -61,4 +64,11 @@ object Span {
   def apply(buffer: Array[Byte]): Span = {
     Span(0, buffer.length, buffer)
   }
+
+  def toHex(b: Byte): String = {
+    String.format("%02X", Byte.box(b))
+  }
+
+  def toHex(b: Array[Byte]): String =
+    b.map(Span.toHex).mkString
 }

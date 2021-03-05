@@ -27,11 +27,18 @@ scala_binary(
     srcs = ["Version.scala"],
     main_class = "Version")
 
-scala_binary(
+scala_library(
     name = "lexer",
     srcs = ["Lexer.scala"],
     scalacopts = fatal_warnings(),
     deps = [":span"],
+    exports = [":span"])
+
+scala_binary(
+    name = "lexer_app",
+    srcs = ["LexerApp.scala"],
+    scalacopts = fatal_warnings(),
+    deps = [":lexer"],
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerApp")
 
 scala_test(
@@ -81,7 +88,9 @@ scala_binary(
 scala_library(
     name = "classfile",
     srcs = ["ClassFile.scala", "CodeAttribute.scala"],
-    scalacopts = fatal_warnings())
+    scalacopts = fatal_warnings(),
+    deps = [":span"],
+    exports = [":span"])
 
 scala_test(
     name = "classfile_spec",

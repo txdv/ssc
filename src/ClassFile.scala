@@ -1,5 +1,6 @@
 package lt.vu.mif.bentkus.bachelor.compiler.classfile
 
+import lt.vu.mif.bentkus.bachelor.compiler.span._
 import java.nio.ByteBuffer
 
 case class Version(minor: Int, major: Int)
@@ -146,53 +147,4 @@ object ClassFile {
       case i => throw new Exception(i + " -> " + Span.toHex(i))
     }
   }
-}
-
-
-case class Span(start: Int, end: Int, buffer: Array[Byte]) {
-  def readByte: (Int, Span) = {
-    (buffer(0) & 0xFF, skip(1))
-  }
-
-  def readInt: (Int, Span) = (getInt, skip(4))
-
-  def getInt: Int = toByteBuffer.getInt
-
-  def toByteBuffer: ByteBuffer = ByteBuffer.wrap(buffer, start, end - start)
-
-  def skip(i: Int): Span = Span(start + i, end, buffer)
-
-  def toHex: String =
-    buffer.map(Span.toHex).mkString
-
-  def format: String = {
-    import scala.io.AnsiColor.{GREEN, RED, RESET}
-
-    val prefix = toHex.substring(0, start * 2)
-
-    val infix = toHex.substring(start * 2, end)
-
-    val suffix = ""
-
-    GREEN + prefix + RED + infix + GREEN + suffix + RESET
-  }
-
-  def apply(index: Int): Byte = {
-    buffer(start + index)
-  }
-}
-
-
-object Span {
-  def apply(buffer: Array[Byte]): Span = {
-    Span(0, buffer.length, buffer)
-  }
-
-  def toHex(b: Byte): String = {
-    String.format("%02X", Byte.box(b))
-  }
-
-  def toHex(b: Array[Byte]): String =
-    b.map(Span.toHex).mkString
-
 }
