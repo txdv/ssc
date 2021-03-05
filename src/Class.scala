@@ -8,19 +8,31 @@ import lt.vu.mif.bentkus.bachelor.compiler.classfile.{
 }
 import java.nio.ByteBuffer
 
-sealed trait JavaType
+sealed trait JavaType {
+
+  val value: String
+
+}
 
 case class JavaGeneric(namespace: String, genericType: JavaType)
 
 object JavaType {
-  case object Int extends JavaType
-  case object Char extends JavaType
-  case object Void extends JavaType
+  case object Int extends JavaType {
+    val value: String = "I"
+  }
+  case object Char extends JavaType {
+    val value: String = "C"
+  }
+  case object Void extends JavaType {
+    val value: String = "V"
+  }
 
   case class Class(namespace: String) extends JavaType {
-    private val tmp = namespace.split("/").reverse
+    val tmp = namespace.split("/").reverse
     val pkg = tmp.drop(1).reverse.mkString("/")
     val name = tmp.head
+
+    val value: String = "L" + namespace + ";"
   }
 
   object Class {
@@ -33,24 +45,46 @@ object JavaType {
       case arr: Array => 1 + arr.arity
       case _ => 1
     }
+
+    val value: String = "[" + info.value
   }
 
-  def parse(a: String): Seq[JavaType] = {
-    Seq.empty
+
+  def parse(str: String): Seq[JavaType] = {
+    parse(str, types = Seq.empty)
+  }
+
+  private def parse(str: String, types: Seq[JavaType]): Seq[JavaType] = {
+    if (str.size == 0) {
+      types
+    } else {
+      str(0) match {
+        case '(' | ')' =>
+          parse(str.substring(1), types)
+        case _ =>
+          val t = from(str)
+          parse(str.substring(t.value.size), types :+ t)
+
+      }
+    }
   }
 
   def from(a: String): JavaType = {
     a(0) match {
       case 'L' =>
-        Class(a.drop(1).takeWhile(Class.isChar))
-      case '[' =>
-        Array(from(a.drop(1)))
+        val until = a.indexOf(';')
+        if (until == -1) {
+          throw new Exception("invalid format")
+        }
+        Class(a.substring(1, until))
       case 'I' =>
         Int
       case 'C' =>
         Char
       case 'V' =>
         Void
+      case '[' =>
+        Array(from(a.substring(1)))
       case _ =>
         throw new Exception("invalid format")
     }
