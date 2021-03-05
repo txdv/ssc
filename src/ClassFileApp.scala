@@ -1,6 +1,7 @@
 package lt.vu.mif.bentkus.bachelor.compiler.classfile
 
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MethodAccessFlag
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.JavaType
 import Constant._
 
 import java.io.File
@@ -74,6 +75,32 @@ object ClassFileApp extends App {
       .mkString(" ")
   }
 
+  private def format(jtype: JavaType): String = {
+    import JavaType._
+    jtype match {
+      case Void =>
+        "void"
+      case Int =>
+        "int"
+      case c: Class =>
+        c.namespace.replace("/", ".")
+      case array: Array =>
+        format(array.info) + "[]"
+      case _ =>
+        "Not supported"
+    }
+  }
+
+  private def format(methodName: String, types: Seq[JavaType]): String = {
+    val returnType = types.last
+    val args = types.reverse.drop(1).reverse
+
+    val returnTypeString = format(returnType)
+    val argsString = args.map(format).mkString(", ")
+
+    s"$returnTypeString $methodName($argsString);"
+  }
+
   def print(classFile: ClassFile): Unit = {
     import classFile._
     val thisClassString = className(thisClass)
@@ -105,9 +132,10 @@ object ClassFileApp extends App {
 
       val flags = MethodAccessFlag.parse(method.accessFlags)
       val kw = keywords(flags)
-      val descriptorName = string(method.descriptor)
-      println(s"  $kw $methodName $descriptorName")
-      println(s"    descriptor: $descriptorName")
+      val descriptorString = string(method.descriptor)
+      val annotation = format(methodName, JavaType.parse(descriptorString))
+      println(s"  $kw $annotation")
+      println(s"    descriptor: $descriptorString")
 
       val stringFlags = flags.toSeq.sortBy(_.value).map(s => s"ACC_${s.toString.toUpperCase}").mkString(", ")
       println(s"    flags: (${toHex(method.accessFlags)}) $stringFlags")

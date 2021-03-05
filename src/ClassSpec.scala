@@ -37,4 +37,13 @@ class ClassSpec extends AnyFlatSpec with should.Matchers {
     JavaType.parse(args) should be (expected)
   }
 
+  def arrayFrom(str: String): Array = {
+    from(str).asInstanceOf[Array]
+  }
+
+  "Array" should "calculate correct arity" in {
+    arrayFrom("[I").arity should be (1)
+    arrayFrom("[[I").arity should be (2)
+  }
+
 }

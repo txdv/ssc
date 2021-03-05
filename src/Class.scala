@@ -29,7 +29,9 @@ object JavaType {
 
   case class Class(namespace: String) extends JavaType {
     val tmp = namespace.split("/").reverse
+
     val pkg = tmp.drop(1).reverse.mkString("/")
+
     val name = tmp.head
 
     val value: String = "L" + namespace + ";"
