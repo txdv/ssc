@@ -74,8 +74,14 @@ scala_binary(
 
 scala_library(
     name = "classfile",
-    srcs = ["ClassFile.scala"],
+    srcs = ["ClassFile.scala", "CodeAttribute.scala"],
     scalacopts = fatal_warnings())
+
+scala_test(
+    name = "classfile_spec",
+    srcs = ["ClassFileSpec.scala"],
+    scalacopts = fatal_warnings(),
+    deps = [":classfile", ":class"])
 
 scala_binary(
     name = "classfile_app",

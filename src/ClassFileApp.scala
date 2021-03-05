@@ -9,6 +9,21 @@ import java.nio.file.Files
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+object ByteArray {
+  def toHex(byte: Byte): String = {
+    String.format("%02X", Byte.box(byte))
+  }
+
+  implicit class Extensions(array: Array[Byte]) {
+
+    def formatHex: String = {
+      array.map(toHex).mkString(" ")
+    }
+  }
+}
+
+import ByteArray.Extensions
+
 object ClassFileApp extends App {
 
   val formatter = DateTimeFormatter.ofPattern("LLL d, YYYY")
@@ -139,9 +154,18 @@ object ClassFileApp extends App {
 
       val stringFlags = flags.toSeq.sortBy(_.value).map(s => s"ACC_${s.toString.toUpperCase}").mkString(", ")
       println(s"    flags: (${toHex(method.accessFlags)}) $stringFlags")
-      println
+
+      method.attributes.foreach { attribute =>
+        val name = string(attribute.name)
+        if (name == "Code") {
+          val size = attribute.info.size
+          val code = CodeAttribute.parse(classFile, attribute).get
+          println(s"    Code: ${code.code.formatHex}")
+        }
+      }
     }
 
+    println
     println("}")
   }
 

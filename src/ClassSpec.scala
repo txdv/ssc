@@ -45,5 +45,4 @@ class ClassSpec extends AnyFlatSpec with should.Matchers {
     arrayFrom("[I").arity should be (1)
     arrayFrom("[[I").arity should be (2)
   }
-
 }
