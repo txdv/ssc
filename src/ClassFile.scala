@@ -8,11 +8,31 @@ case class Version(minor: Int, major: Int)
 sealed trait Constant
 
 object Constant {
-  case class Class(name: Int) extends Constant
-  case class MethodRef(klass: Int, nameType: Int) extends Constant
+  case class Class(name: Int) extends Constant {
+    def stringName(implicit classFile: ClassFile): String = {
+      classFile.string(name)
+    }
+  }
+  case class MethodRef(klass: Int, nameType: Int) extends Constant {
+    def constClass(implicit classFile: ClassFile): Class = {
+      classFile.klass(klass)
+    }
+
+    def constNameAndType(implicit classFile: ClassFile): NameAndType = {
+      classFile.constAs[NameAndType](nameType)
+    }
+  }
   case class FieldRef(klass: Int, nameType: Int) extends Constant
   case class Utf8(string: String) extends Constant
-  case class NameAndType(index: Int, descriptor: Int) extends Constant
+  case class NameAndType(index: Int, descriptor: Int) extends Constant {
+    def stringName(implicit classFile: ClassFile): String = {
+      classFile.string(index)
+    }
+
+    def stringType(implicit classFile: ClassFile): String = {
+      classFile.string(descriptor)
+    }
+  }
   case class ConstString(index: Int) extends Constant
 }
 
@@ -29,11 +49,11 @@ case class ClassFile(
   attributes: Seq[AttributeInfo]) {
 
   def string(index: Int): String = {
-    constants(index - 1).asInstanceOf[Utf8].string
+    const(index).asInstanceOf[Utf8].string
   }
 
   def klass(index: Int): Class = {
-    constants(index - 1).asInstanceOf[Class]
+    const(index).asInstanceOf[Class]
   }
 
   def className(index: Int): String = {
@@ -41,7 +61,7 @@ case class ClassFile(
   }
 
   def nameAndType(index: Int): String = {
-    val nt = constants(index - 1).asInstanceOf[NameAndType]
+    val nt = const(index).asInstanceOf[NameAndType]
     nameAndType(nt)
     //s""""${string(a)}":${string(b)}"""
   }
@@ -53,6 +73,10 @@ case class ClassFile(
 
   def const(index: Int): Constant = {
     constants(index - 1)
+  }
+
+  def constAs[T <: Constant](index: Int): T  = {
+    const(index).asInstanceOf[T]
   }
 
   def get(index: Int): String = {

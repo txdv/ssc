@@ -2,7 +2,11 @@ package lt.vu.mif.bentkus.bachelor.compiler.classfile.higher
 
 import lt.vu.mif.bentkus.bachelor.compiler.span.Span
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.{
+  AttributeInfo,
+  Constant,
+  Instr,
   ClassFile,
+  CodeAttribute,
   MethodInfo,
   Version
 }
@@ -13,8 +17,6 @@ sealed trait JavaType {
   val value: String
 
 }
-
-case class JavaGeneric(namespace: String, genericType: JavaType)
 
 object JavaType {
   case object Int extends JavaType {
@@ -91,21 +93,36 @@ object JavaType {
         throw new Exception(s"invalid format ${a(0)}")
     }
   }
-
-  def method(str: String): Seq[JavaType] = {
-    Seq.empty
-  }
 }
+
+case class Code(
+  stackSize: Int,
+  localsCount: Int,
+  operations: Seq[Op])
+
+
+sealed trait Op
+
+object Op {
+  case class aload(index: Int) extends Op
+  case object Return extends Op
+  case class invokespecial(ref: MethodRef) extends Op
+}
+
+case class MethodRef(
+  jclass: JavaType.Class,
+  name: String,
+  signature: Seq[JavaType])
 
 case class Method(
   name: String,
   signature: Seq[JavaType],
-  access: Set[AccessFlag]) {
+  access: Set[AccessFlag],
+  code: Option[Code]) {
 
   def returnType: JavaType = signature.head
 
   def arguments: Seq[JavaType] = signature.drop(1)
-
 }
 
 case class Class(
@@ -262,14 +279,16 @@ object Converter {
   def convert(classFile: ClassFile): Class = {
     val consts = classFile.constants
 
-    val methods = classFile.methods.map { case MethodInfo(accessFlags, name, descriptor, attributes) =>
+    val methods = classFile.methods.map { methodInfo =>
+      import methodInfo._
       Method(
         name = classFile.string(name),
         signature = lastElementAsFirst(JavaType.parse(classFile.string(descriptor))),
-        access = AccessFlag.parse(accessFlags))
+        access = AccessFlag.parse(accessFlags),
+        code = convertCode(classFile, attributes))
     }
 
-    val attributes = classFile.attributes.map { attribute =>
+    val classAttributes = classFile.attributes.map { attribute =>
       val name = classFile.string(attribute.name)
       val bb = ByteBuffer.wrap(attribute.info)
       name match {
@@ -289,7 +308,49 @@ object Converter {
       thisClass = JavaType.Class(classFile.className(classFile.thisClass)),
       superClass = JavaType.Class(classFile.className(classFile.superClass)),
       methods,
-      attributes)
+      classAttributes)
+  }
+
+  def convertCode(classFile: ClassFile, attributes: Seq[AttributeInfo]): Option[Code] = {
+    attributes.find { attribute =>
+      classFile.string(attribute.name) == "Code"
+    } flatMap { attribute =>
+      CodeAttribute.parse(classFile, attribute).map { codeAttribute =>
+        import codeAttribute._
+        Code(
+          maxStack,
+          maxLocals,
+          instructions.map(instr => convert(instr)(classFile)))
+      }
+    }
+  }
+
+  def convert(instr: Instr)(implicit classFile: ClassFile): Op = {
+
+    instr match {
+      case Instr.aload_0 =>
+        Op.aload(0)
+      case Instr.aload_1 =>
+        Op.aload(1)
+      case Instr.aload_2 =>
+        Op.aload(2)
+      case Instr.aload_3 =>
+        Op.aload(3)
+      case Instr.invokespecial(index) =>
+        val ref = classFile.constAs[Constant.MethodRef](index)
+
+        val nameAndType = ref.constNameAndType
+
+        val methodRef = MethodRef(
+          JavaType.Class(ref.constClass.stringName),
+          nameAndType.stringName,
+          signature = JavaType.parse(nameAndType.stringType))
+
+        Op.invokespecial(methodRef)
+      case Instr.Return =>
+        Op.Return
+      case _ => throw new RuntimeException
+    }
   }
 
   private def lastElementAsFirst[T](seq: Seq[T]): Seq[T] = {
