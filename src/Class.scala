@@ -375,7 +375,7 @@ object Converter {
       case Instr.invokevirtual(index) =>
         Op.invoke(getMethodRef(index), Op.invoke.virtual)
       case Instr.invokespecial(index) =>
-        Op.invoke(getMethodRef(index), Op.invoke.virtual)
+        Op.invoke(getMethodRef(index), Op.invoke.special)
       case Instr.Return =>
         Op.Return
       case Instr.getstatic(index) =>
