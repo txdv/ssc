@@ -35,6 +35,11 @@ object Instr {
       ((idx   >> 8) & 0xff).toByte)
   }
 
+  // TODO: this is a single byte index
+  case class ldc(index: Int) extends Index(0x12, index)
+
+  case class getstatic(index: Int) extends Index(0xB2, index)
+  case class invokevirtual(index: Int) extends Index(0xB6, index)
   case class invokespecial(index: Int) extends Index(0xB7, index)
 
   def parse(bytes: Array[Byte]): Seq[Instr] = {
@@ -51,13 +56,21 @@ object Instr {
 
   def parse(buffer: ByteBuffer): Instr = {
     val b = buffer.get
-    if (b == 0xB1.toByte) {
+    if (b == 0x12.toByte) {
+      ldc(buffer.get & 0xFF)
+    } else if (b == 0xB1.toByte) {
       Return
     } else if (b == 0x2A.toByte) {
       aload_0
+    } else if (b == 0xB2.toByte) {
+      getstatic(buffer.getShort)
+    } else if (b == 0xB6.toByte) {
+      invokevirtual(buffer.getShort)
     } else if (b == 0xB7.toByte) {
       invokespecial(buffer.getShort)
     } else {
+      val instr = b & 0xFF
+      println(s"missing: 0x${Hex.encode(b)}")
       ???
     }
   }
@@ -85,4 +98,14 @@ object CodeAttribute {
     }
   }
 
+}
+
+object Hex {
+  def encode(bytes: Array[Byte]): String = {
+    bytes.map(encode).mkString("")
+  }
+
+  def encode(b: Byte): String = {
+    String.format("%02x", Byte.box(b))
+  }
 }

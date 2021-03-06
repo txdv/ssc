@@ -22,7 +22,15 @@ object Constant {
       classFile.constAs[NameAndType](nameType)
     }
   }
-  case class FieldRef(klass: Int, nameType: Int) extends Constant
+  case class FieldRef(klass: Int, nameType: Int) extends Constant {
+    def constClass(implicit classFile: ClassFile): Class = {
+      classFile.klass(klass)
+    }
+
+    def constNameAndType(implicit classFile: ClassFile): NameAndType = {
+      classFile.constAs[NameAndType](nameType)
+    }
+  }
   case class Utf8(string: String) extends Constant
   case class NameAndType(index: Int, descriptor: Int) extends Constant {
     def stringName(implicit classFile: ClassFile): String = {

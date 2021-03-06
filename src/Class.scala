@@ -98,7 +98,7 @@ object JavaType {
 case class Code(
   stackSize: Int,
   localsCount: Int,
-  operations: Seq[Op])
+  ops: Seq[Op])
 
 
 sealed trait Op
@@ -106,8 +106,16 @@ sealed trait Op
 object Op {
   case class aload(index: Int) extends Op
   case object Return extends Op
-  case class invokespecial(ref: MethodRef) extends Op
+  case class invokespecial(method: MethodRef) extends Op
+  case class invokevirtual(method: MethodRef) extends Op
+  case class getstatic(field: FieldRef) extends Op
+  case class ldc(index: Int) extends Op
 }
+
+case class FieldRef(
+  jclass: JavaType.Class,
+  name: String,
+  signature: Seq[JavaType])
 
 case class MethodRef(
   jclass: JavaType.Class,
@@ -325,6 +333,17 @@ object Converter {
     }
   }
 
+  private def getMethodRef(index: Int)(implicit classFile: ClassFile): MethodRef = {
+    val ref = classFile.constAs[Constant.MethodRef](index)
+
+    val nameAndType = ref.constNameAndType
+
+    MethodRef(
+      JavaType.Class(ref.constClass.stringName),
+      nameAndType.stringName,
+      signature = JavaType.parse(nameAndType.stringType))
+  }
+
   def convert(instr: Instr)(implicit classFile: ClassFile): Op = {
 
     instr match {
@@ -336,20 +355,28 @@ object Converter {
         Op.aload(2)
       case Instr.aload_3 =>
         Op.aload(3)
+      case Instr.invokevirtual(index) =>
+        Op.invokevirtual(getMethodRef(index))
       case Instr.invokespecial(index) =>
-        val ref = classFile.constAs[Constant.MethodRef](index)
+        Op.invokespecial(getMethodRef(index))
+      case Instr.Return =>
+        Op.Return
+      case Instr.getstatic(index) =>
+        val ref = classFile.constAs[Constant.FieldRef](index)
 
         val nameAndType = ref.constNameAndType
 
-        val methodRef = MethodRef(
+        val fieldRef = FieldRef(
           JavaType.Class(ref.constClass.stringName),
           nameAndType.stringName,
           signature = JavaType.parse(nameAndType.stringType))
 
-        Op.invokespecial(methodRef)
-      case Instr.Return =>
-        Op.Return
-      case _ => throw new RuntimeException
+        Op.getstatic(fieldRef)
+
+      case Instr.ldc(index) =>
+        Op.ldc(index)
+      case instr =>
+        throw new RuntimeException(s"not implemented: $instr")
     }
   }
 
