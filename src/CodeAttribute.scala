@@ -31,8 +31,17 @@ object Instr {
 
     val value: Array[Byte] = Array[Byte](
       opcode.toByte,
-      ((idx       ) & 0xff).toByte,
-      ((idx   >> 8) & 0xff).toByte)
+      ((idx     ) & 0xff).toByte,
+      ((idx >> 8) & 0xff).toByte)
+  }
+
+  abstract class branch(opcodeInt: Int, val branchoffset: Int) extends Instr {
+    val opcode: Byte = opcodeInt.toByte
+
+    val value: Array[Byte] = Array[Byte](
+      opcode.toByte,
+      ((branchoffset     ) & 0xff).toByte,
+      ((branchoffset >> 8) & 0xff).toByte)
   }
 
   // TODO: this is a single byte index
@@ -41,6 +50,8 @@ object Instr {
   case class getstatic(index: Int) extends Index(0xB2, index)
   case class invokevirtual(index: Int) extends Index(0xB6, index)
   case class invokespecial(index: Int) extends Index(0xB7, index)
+
+  case class ifnonnull(branch: Int) extends branch(0xC7, branch)
 
   def parse(bytes: Array[Byte]): Seq[Instr] = {
     val buffer = ByteBuffer.wrap(bytes)
@@ -58,10 +69,12 @@ object Instr {
     val b = buffer.get
     if (b == 0x12.toByte) {
       ldc(buffer.get & 0xFF)
-    } else if (b == 0xB1.toByte) {
-      Return
     } else if (b == 0x2A.toByte) {
       aload_0
+    } else if (b == 0xC7.toByte) {
+      ifnonnull(buffer.getShort)
+    } else if (b == 0xB1.toByte) {
+      Return
     } else if (b == 0xB2.toByte) {
       getstatic(buffer.getShort)
     } else if (b == 0xB6.toByte) {

@@ -133,16 +133,18 @@ object ClassFileApp extends App {
   def output(offset: Int, classFile: ClassFile, instr: Instr): Unit = {
     indent(5)
     print(s"$offset: ")
-    output(classFile, instr)
+    output2(offset, classFile, instr)
   }
 
-  def output(classFile: ClassFile, instr: Instr): Unit = {
+  def output2(offset: Int, classFile: ClassFile, instr: Instr): Unit = {
     import Instr._
+    val name = instr.getClass.getSimpleName
     instr match {
       case index: Index =>
-        val name = index.getClass.getSimpleName
         val suffix = toComment(classFile, classFile.const(index.idx)).getOrElse("")
         println(rightpad(s"$name #${index.idx}", ' ', 40) + suffix)
+      case b: branch =>
+        println(s"$name #${b.branchoffset + instr.size - 1}")
       case Return =>
         println("return")
       case _ =>
