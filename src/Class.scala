@@ -99,8 +99,14 @@ object JavaType {
 
 case class Method(
   name: String,
-  taip: String,
-  access: Set[AccessFlag])
+  signature: Seq[JavaType],
+  access: Set[AccessFlag]) {
+
+  def returnType: JavaType = signature.head
+
+  def arguments: Seq[JavaType] = signature.drop(1)
+
+}
 
 case class Class(
   version: Version,
@@ -259,7 +265,10 @@ object Converter {
     val methods = classFile.methods.map { case MethodInfo(accessFlags, name, descriptor, attributes) =>
       Method(
         name = classFile.string(name),
-        taip = classFile.string(descriptor),
+        signature = {
+          val tmp = JavaType.parse(classFile.string(descriptor))
+          Seq(tmp.last) ++ tmp.take(tmp.size - 1)
+        },
         access = AccessFlag.parse(accessFlags))
     }
 
