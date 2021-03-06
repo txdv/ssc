@@ -10,14 +10,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 object ByteArray {
-  def toHex(byte: Byte): String = {
-    String.format("%02X", Byte.box(byte))
-  }
-
   implicit class Extensions(array: Array[Byte]) {
 
     def formatHex: String = {
-      array.map(toHex).mkString(" ")
+      array.map(Hex.encode).mkString(" ")
     }
   }
 }
@@ -30,7 +26,7 @@ object Hex {
   }
 
   def encode(b: Byte): String = {
-    String.format("%02X", Byte.box(b))
+    String.format("%02x", Byte.box(b))
   }
 }
 
@@ -145,7 +141,6 @@ object ClassFileApp extends App {
     instr match {
       case index: Index =>
         val name = index.getClass.getSimpleName
-        //val indexValue = classFile.get(index.idx)
         val suffix = toComment(classFile, classFile.const(index.idx)).getOrElse("")
         println(rightpad(s"$name #${index.idx}", ' ', 40) + suffix)
       case Return =>
@@ -175,7 +170,7 @@ object ClassFileApp extends App {
     indent(1, s"flags: (${toHex(accessFlags)})")
     indent(1, rightpad(s"this_class: #${thisClass}",   ' ', 40) + s"// $thisClassString")
     indent(1, rightpad(s"super_class: #${superClass}", ' ', 40) + s"// ${className(superClass)}")
-    indent(1, s"interfaces: 0, fields: 0, methods: ${methods.size}, attributes: 0")
+    indent(1, s"interfaces: 0, fields: 0, methods: ${methods.size}, attributes: ${attributes.size}")
     indent(0, "Constant pool:")
     constants.zipWithIndex.foreach { case (constant, i) =>
       val nr = i + 1
