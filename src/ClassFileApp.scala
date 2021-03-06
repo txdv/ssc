@@ -144,7 +144,7 @@ object ClassFileApp extends App {
         val suffix = toComment(classFile, classFile.const(index.idx)).getOrElse("")
         println(rightpad(s"$name #${index.idx}", ' ', 40) + suffix)
       case b: branch =>
-        println(s"$name #${b.branchoffset + instr.size - 1}")
+        println(s"$name ${offset + b.branchoffset}")
       case Return =>
         println("return")
       case _ =>
