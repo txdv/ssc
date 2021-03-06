@@ -11,5 +11,8 @@ tex:
 biber:
 	biber out/darbas.bcf
 
-run:
+out/darbas.pdf: pdf/darbas.tex
+	xelatex -output-directory=out/ pdf/darbas.tex
+
+open: out/darbas.pdf
 	open out/darbas.pdf
