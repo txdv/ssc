@@ -88,7 +88,7 @@ object JavaType {
       case '[' =>
         Array(from(a.substring(1)))
       case _ =>
-        throw new Exception("invalid format")
+        throw new Exception(s"invalid format ${a(0)}")
     }
   }
 
