@@ -445,5 +445,12 @@ object MainApp extends App {
 
   val classFile = ClassFile.parse(bytes)
 
-  println(Converter.convert(classFile))
+  val cl = Converter.convert(classFile)
+  cl.methods.foreach { method =>
+    println(s"${method.returnType} ${method.name}(${method.arguments})")
+    method.code.toSeq.flatMap(_.ops).foreach { op =>
+      print("  ")
+      println(op)
+    }
+  }
 }

@@ -223,6 +223,18 @@ object ClassFileApp extends App {
       }
     }
 
+    classFile.attributes.foreach { attribute =>
+      val attributeName = string(attribute.name)
+
+      println(s"attributeName: $attributeName, size: ${attribute.info.size}")
+
+      /*
+      if (string(attribute.name) == "SourceFile") {
+        println(attribute.info)
+      }
+      */
+    }
+
     println
     println("}")
   }
