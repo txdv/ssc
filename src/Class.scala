@@ -110,8 +110,12 @@ sealed trait Op
 object Op {
   case class aload(index: Int) extends Op
   case object Return extends Op
-  case class invokespecial(method: MethodRef) extends Op
-  case class invokevirtual(method: MethodRef) extends Op
+  case class invoke(method: MethodRef, invokeType: invoke.Type) extends Op
+  object invoke {
+    sealed trait Type
+    case object special extends Type
+    case object virtual extends Type
+  }
   case class getstatic(field: FieldRef) extends Op
   case class ldc(const: OpConst) extends Op
 }
@@ -369,9 +373,9 @@ object Converter {
       case Instr.aload_3 =>
         Op.aload(3)
       case Instr.invokevirtual(index) =>
-        Op.invokevirtual(getMethodRef(index))
+        Op.invoke(getMethodRef(index), Op.invoke.virtual)
       case Instr.invokespecial(index) =>
-        Op.invokespecial(getMethodRef(index))
+        Op.invoke(getMethodRef(index), Op.invoke.virtual)
       case Instr.Return =>
         Op.Return
       case Instr.getstatic(index) =>
@@ -387,7 +391,7 @@ object Converter {
         Op.getstatic(fieldRef)
 
       case Instr.ldc(index) =>
-        Op.ldc(index)
+        Op.ldc(getOpConst(index))
       case instr =>
         throw new RuntimeException(s"not implemented: $instr")
     }
