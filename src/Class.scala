@@ -101,6 +101,10 @@ case class Code(
   ops: Seq[Op])
 
 
+sealed trait OpConst
+
+case class ConstString(value: String) extends OpConst
+
 sealed trait Op
 
 object Op {
@@ -109,7 +113,7 @@ object Op {
   case class invokespecial(method: MethodRef) extends Op
   case class invokevirtual(method: MethodRef) extends Op
   case class getstatic(field: FieldRef) extends Op
-  case class ldc(index: Int) extends Op
+  case class ldc(const: OpConst) extends Op
 }
 
 case class FieldRef(
@@ -342,6 +346,15 @@ object Converter {
       JavaType.Class(ref.constClass.stringName),
       nameAndType.stringName,
       signature = JavaType.parse(nameAndType.stringType))
+  }
+
+  private def getOpConst(index: Int)(implicit classFile: ClassFile): OpConst = {
+    classFile.const(index) match {
+      case Constant.ConstString(index) =>
+        ConstString(classFile.string(index))
+      case c =>
+        throw new RuntimeException(s"not supported: $c")
+    }
   }
 
   def convert(instr: Instr)(implicit classFile: ClassFile): Op = {
