@@ -21,10 +21,16 @@ object Instr {
   }
 
   case object Return extends Single(0xB1)
+
   case object aload_0 extends Single(0x2A)
   case object aload_1 extends Single(0x2B)
   case object aload_2 extends Single(0x2C)
   case object aload_3 extends Single(0x2C)
+
+  case object astore_0 extends Single(0x4B)
+  case object astore_1 extends Single(0x4C)
+  case object astore_2 extends Single(0x4D)
+  case object astore_3 extends Single(0x4E)
 
   abstract class Index(opcodeInt: Int, val idx: Int) extends Instr {
     val opcode: Byte = opcodeInt.toByte
@@ -51,7 +57,12 @@ object Instr {
   case class invokevirtual(index: Int) extends Index(0xB6, index)
   case class invokespecial(index: Int) extends Index(0xB7, index)
 
+  case class if_acmpne(branch: Int) extends branch(0xA6, branch)
+  case class goto(branch: Int) extends branch(0xA7, branch)
   case class ifnonnull(branch: Int) extends branch(0xC7, branch)
+
+  case class newobj(index: Int) extends Index(0xBB, index)
+  case object dup extends Single(0x59)
 
   def parse(bytes: Array[Byte]): Seq[Instr] = {
     val buffer = ByteBuffer.wrap(bytes)
@@ -71,6 +82,26 @@ object Instr {
       ldc(buffer.get & 0xFF)
     } else if (b == 0x2A.toByte) {
       aload_0
+    } else if (b == 0x2B.toByte) {
+      aload_1
+    } else if (b == 0x2C.toByte) {
+      aload_2
+    } else if (b == 0x2D.toByte) {
+      aload_3
+    } else if (b == 0x4B.toByte) {
+      astore_0
+    } else if (b == 0x4C.toByte) {
+      astore_1
+    } else if (b == 0x4D.toByte) {
+      astore_2
+    } else if (b == 0x4E.toByte) {
+      astore_3
+    } else if (b == 0x59.toByte) {
+      dup
+    } else if (b == 0xA6.toByte) {
+      if_acmpne(buffer.getShort)
+    } else if (b == 0xA7.toByte) {
+      goto(buffer.getShort)
     } else if (b == 0xC7.toByte) {
       ifnonnull(buffer.getShort)
     } else if (b == 0xB1.toByte) {
@@ -81,6 +112,8 @@ object Instr {
       invokevirtual(buffer.getShort)
     } else if (b == 0xB7.toByte) {
       invokespecial(buffer.getShort)
+    } else if (b == 0xBB.toByte) {
+      newobj(buffer.getShort)
     } else {
       val instr = b & 0xFF
       println(s"missing: 0x${Hex.encode(b)}")

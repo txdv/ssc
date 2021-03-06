@@ -109,6 +109,7 @@ sealed trait Op
 
 object Op {
   case class aload(index: Int) extends Op
+  case class astore(index: Int) extends Op
   case object Return extends Op
   case class invoke(method: MethodRef, invokeType: invoke.Type) extends Op
   object invoke {
@@ -118,6 +119,11 @@ object Op {
   }
   case class getstatic(field: FieldRef) extends Op
   case class ldc(const: OpConst) extends Op
+  case class newobj(jclass: JavaType.Class) extends Op
+  case object dup extends Op
+
+  case class if_acmpne(offset: Int) extends Op
+  case class goto(offset: Int) extends Op
 }
 
 case class FieldRef(
@@ -372,6 +378,16 @@ object Converter {
         Op.aload(2)
       case Instr.aload_3 =>
         Op.aload(3)
+
+      case Instr.astore_0 =>
+        Op.astore(0)
+      case Instr.astore_1 =>
+        Op.astore(1)
+      case Instr.astore_2 =>
+        Op.astore(2)
+      case Instr.astore_3 =>
+        Op.astore(3)
+
       case Instr.invokevirtual(index) =>
         Op.invoke(getMethodRef(index), Op.invoke.virtual)
       case Instr.invokespecial(index) =>
@@ -392,6 +408,16 @@ object Converter {
 
       case Instr.ldc(index) =>
         Op.ldc(getOpConst(index))
+      case Instr.newobj(index) =>
+        Op.newobj(JavaType.Class(classFile.klass(index).stringName))
+      case Instr.dup =>
+        Op.dup
+
+      case Instr.if_acmpne(index) =>
+        Op.if_acmpne(index)
+      case Instr.goto(index) =>
+        Op.goto(index)
+
       case instr =>
         throw new RuntimeException(s"not implemented: $instr")
     }
