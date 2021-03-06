@@ -265,10 +265,7 @@ object Converter {
     val methods = classFile.methods.map { case MethodInfo(accessFlags, name, descriptor, attributes) =>
       Method(
         name = classFile.string(name),
-        signature = {
-          val tmp = JavaType.parse(classFile.string(descriptor))
-          Seq(tmp.last) ++ tmp.take(tmp.size - 1)
-        },
+        signature = lastElementAsFirst(JavaType.parse(classFile.string(descriptor))),
         access = AccessFlag.parse(accessFlags))
     }
 
@@ -293,6 +290,14 @@ object Converter {
       superClass = JavaType.Class(classFile.className(classFile.superClass)),
       methods,
       attributes)
+  }
+
+  private def lastElementAsFirst[T](seq: Seq[T]): Seq[T] = {
+    if (seq.size > 1) {
+      seq.last +: seq.take(seq.size - 1)
+    } else {
+      seq
+    }
   }
 }
 
