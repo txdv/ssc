@@ -22,3 +22,6 @@ open: out/darbas.pdf
 
 planas: out/planas.pdf
 	open out/planas.pdf
+
+planb:
+	biber out/planas.bcf
