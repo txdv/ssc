@@ -51,9 +51,12 @@ As computers get faster more resources are available, but programmers tend to ut
 
 Another vector of academic improvement within the compiler sphere is to add new features or utilize new paradigms like dependent types or formal specifications in order to allow the compiler to do more sophisticated type checking and verification than classic type checking allows while significantly increasing runtime compilation.
 
+When assessing the adoption of a new programming language the runtime speed of the available compilers for a particular programming languages are often gauged \cite{ScalaSlow} as an important metric among other such as language complexicity, available libraries and spread of ecosystem.
+Dealing with enormous compilation times of huge projects can have negative effectives on the producitivity of programmers and even drive away people from an entire ecosystem \cite{ScalaReallySlow}.
+%Look at this example where  people refuse to adopt languages because they compilation times is really bad.
+
 Fast compilers are a thing now, because go is so awesome.
 
-Look at this example where  people refuse to adopt languages because they compilation times is really bad.
 
 % Keliami uždaviniai ir laukiami rezultatai
 \subsection{Challenges and expected results}
@@ -61,7 +64,7 @@ The goal of this bachelor thesis is to create a minimal compiler for a small sub
 Then an attempt will be made to introduce translation unit granularization.
 A translation unit is usually the entire input of source code that is compiled to a compiler it usually gets recompiled in its entirity even though most of the input does not changes inbetween compilation runs.
 
-Scala is known to have a multitude of advanced and complicated features{ScalaSpec}, however the targeted compiler implementation in this thesis will support only the most basic features in order to allow for an easier approach of implementation.
+Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, however the targeted compiler implementation in this thesis will support only the most basic features in order to allow for an easier approach of implementation.
 
 % Tyrimo Metodas
 \subsection{Investigation method}
