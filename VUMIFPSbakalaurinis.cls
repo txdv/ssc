@@ -278,7 +278,7 @@
 
 % Literatūros sąrašą reikia pervadinti
 \addto\captionslithuanian{%
-    \renewcommand{\refname}{\v{S}altiniai}%
+    \renewcommand{\refname}{Literature}%
 }
 
 % Apibrėžiame ketvirto lygio skyrius
