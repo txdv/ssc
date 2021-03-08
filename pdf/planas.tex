@@ -62,17 +62,20 @@ Slow compilation speeds go against the very mantra of the short cycle times prom
 \subsection{Challenges and expected results}
 The goal of this bachelor thesis is to create a minimal compiler for a small subset of the Scala programming language.
 Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, the targeted compiler implementation in this thesis will support only the most basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
-Once a minimum viable implementation will have been written and performance metrics collected to satisfy the research needs for this thesis and given enough time, additional features will be added allowing for better evaluation.
+Once a minimum viable implementation will have been written and performance metrics collected to satisfy the research needs for this thesis and given enough time, additional features from the compiler specification will be added in order to improve the measurements results.
 
-The core idea of the thesis is to attempt granularize the translation unit size in order to increase preformance of subsequent compilations of the same source file with minimal source modifications.
+The core idea of the thesis is to granularize the translation unit size order to increase preformance of subsequent compilations of the same source file with minimal source modifications.
 
-A translation unit is the entire input of source code that will be compiled and usually compilers tend to translate the the entire input although most of the compilation output from a subsequent run could be reused from the previous one.
+A translation unit is the entire input of source code that is compiled and usually compilers re-translate the entire input and recreate the entire compilation output without utilizing previously generated code results.
+
 
 % Tyrimo Metodas
 \subsection{Investigation method}
+Time measurements in the millisecond range will be taken of subsequent compilation runs of the minimal compiler written written within this thesis and compared to compilations with this optimization enabled and disabled.
+In addition measurements against 
+
 % Darbo atlikimo procesas
 \subsection{Work process}
-% Used literature
 \subsection{Used literature}
 \end{samepage}
 
