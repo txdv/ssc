@@ -65,13 +65,12 @@ Since writing a compiler is a difficult task in itself and Scala is known to hav
 Once a minimum viable implementation will have been written and performance metrics collected to satisfy the research needs for this thesis and given enough time, additional features from the compiler specification will be added in order to improve the measurements results.
 
 When writing software developers tend to create only small changes in existing source files before running the compilation again for a quick feedback loop of introduced errors.
-A translation unit is the entire input of source code that is to produce a compilation output and is usually reprocessed in its entirity without consideration of previous outputs compilation outputs, hence even small changes require a complete recompilations which might be costly if the codebase is large.
+A translation unit is the entire input of source code that is used to produce a compilation output and is usually reprocessed in its entirity without consideration of previous outputs compilation outputs, hence even small changes in a giant class requires a complete recompilations of the entire class which might be costly if the codebase is large.
 
 The core idea of the thesis is to granularize the translation unit size order to increase preformance of subsequent compilations of the same source file with minimal source modifications to allow for an measurable speed improvement in this kind of feedback loop.
 
-
-Such granularization requires additional compiler code logic and makes the compiler logic more complicated.
-
+Such granularization requires additional compiler logic and might overcomplicate an already sophisticated computer program.
+Additional challgenges might arise when ensuring compilation output correctness and preserving compilation output similarity.
 
 % Tyrimo Metodas
 \subsection{Investigation method}
