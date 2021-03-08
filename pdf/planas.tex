@@ -75,8 +75,10 @@ Additional challgenges might arise when ensuring compilation output correctness 
 
 % Tyrimo Metodas
 \subsection{Investigation method}
-Time measurements in the millisecond range will be taken of subsequent compilation runs of the minimal compiler written written within this thesis and compared to compilations with this optimization enabled and disabled.
-In addition measurements against 
+Time measurements in the millisecond range will be taken of subsequent compilation runs changing only parts of the source code using the minimal compiler written in this thesis with the translation unit granularization feature enabled and disabled.
+
+Various source code input sizes and complexity of source code will be evaluated.
+A classic looking case study of average code complexicity will be chosen an emphasized, for example a translation unit with 5 classes and 10 methods in every class with a small change in a singular method between compilations and another measurement with a small change in a singular class.
 
 % Darbo atlikimo procesas
 \subsection{Work process}
