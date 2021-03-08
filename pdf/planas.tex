@@ -64,11 +64,13 @@ The goal of this bachelor thesis is to create a minimal compiler for a small sub
 Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, the targeted compiler implementation in this thesis will support only the most basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
 Once a minimum viable implementation will have been written and performance metrics collected to satisfy the research needs for this thesis and given enough time, additional features from the compiler specification will be added in order to improve the measurements results.
 
-When writing software developers tend to create only small changes in existing source files before running the compilation again for quick feedback loop of introduced errors.
+When writing software developers tend to create only small changes in existing source files before running the compilation again for a quick feedback loop of introduced errors.
 
-The core idea of the thesis is to granularize the translation unit size order to increase preformance of subsequent compilations of the same source file with minimal source modifications to allow for an improvement in this feedback loop.
+The core idea of the thesis is to granularize the translation unit size order to increase preformance of subsequent compilations of the same source file with minimal source modifications to allow for an measurable speed improvement in this kind of feedback loop.
 
 A translation unit is the entire input of source code that is compiled and is usually reprocessed in its entirity without consideration of previous outputs compilation outputs.
+
+Such granularization requires additional compiler code logic and makes the compiler logic more complicated.
 
 
 % Tyrimo Metodas
