@@ -46,17 +46,17 @@
 \section{Plan}
 %Tyrimo objektas ir aktualumas
 \subsection{Research object and actuality}
-The majority of the research done on compilers is focused on making compilers output optimized programs in terms of code execution speed and memory usage \cite{lopes2018future} while neglecting or wilfully sacrificing \cite{fast2019compilers} actual runtime performance of the compiler itself.
+The majority of the research done on compilers is focused on making compilers output optimized programs in terms of code execution speed and memory usage \cite{lopes2018future} while neglecting or willfully sacrificing \cite{fast2019compilers} actual runtime performance of the compiler itself.
 As computers get faster more resources are available, but programmers tend to utilize these newfound resources to make the implementation of programs simpler rather than making the programs faster\cite{Wirth1995}.
 
 Another vector of academic improvement within the compiler sphere is to add new features or utilize paradigms like dependent types or formal specifications\cite{RustVerification} in order to allow the compiler to do more sophisticated type checking and verification than classic type checking allows while significantly increasing runtime compilation .
 
-When assessing the adoption of a new programming language the runtime speed of the available compilers for a particular programming languages are often gauged as an important metric\cite{ScalaSlow} among other such as language complexicity, available libraries and spread of ecosystem.
-Dealing with enormous compilation times of huge projects can have negative effectives on the producitivity of programmers and even drive away people from an entire ecosystem \cite{ScalaReallySlow} \cite{ScalaSlow}.
+When assessing the adoption of a new programming language the runtime speed of the available compilers for a particular programming languages are often gauged as an important metric\cite{ScalaSlow} among other such as language complexity, available libraries and spread of ecosystem.
+Dealing with enormous compilation times of huge projects can have negative effects on the productivity of programmers and even drive away people from an entire ecosystem \cite{ScalaReallySlow} \cite{ScalaSlow}.
 
-Modern organizations moving towards continuous delivery practises called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their CI pipeline.
+Modern organizations moving towards continuous delivery practices called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their CI pipeline.
 % todo: change mantra maybe
-Slow compilation speeds go against the very mantra of the short cycle times promoted in DevOps and has spured creation and adoption of minimal programming language focused on compilation speed and productivitiy to counter the effects of giant code bases on the CI process\cite{TheGoProgrammingLanguage} \cite{GoGoogle}.
+Slow compilation speeds go against the very mantra of the short cycle times promoted in DevOps and has spurred creation and adoption of minimal programming language focused on compilation speed and productivity to counter the effects of giant code bases on the CI process\cite{TheGoProgrammingLanguage} \cite{GoGoogle}.
 
 % Keliami uždaviniai ir laukiami rezultatai
 \subsection{Challenges and expected results}
@@ -66,33 +66,33 @@ Once a minimum viable implementation will have been written and performance metr
 
 % todo: introduced errors?
 When writing software developers tend to create only small changes in existing source files before running the compilation again for a quick feedback loop of introduced errors.
-A translation unit is the entire input of source code that is used to produce a compilation output and is usually reprocessed in its entirity without consideration of previous outputs compilation outputs, hence even small changes in a giant class requires a complete recompilations of the entire class which might be costly if the codebase is large.
+A translation unit is the entire input of source code that is used to produce a compilation output and is usually reprocessed in its entirety without consideration of previous outputs compilation outputs, hence even small changes in a giant class requires a complete recompilation of the entire class which might be costly if the codebase is large.
 
-The core idea of the thesis is to granularize the translation unit size order to increase preformance of subsequent compilations of the same source file with minimal source modifications to allow for an measurable speed improvement in this kind of feedback loop.
+The core idea of the thesis is to granularize the translation unit size order to increase performance of subsequent compilations of the same source file with minimal source modifications to allow for an measurable speed improvement in this kind of feedback loop.
 
 Such granularization requires additional compiler logic and might overcomplicate an already sophisticated computer program.
-Additional challgenges might arise when ensuring compilation output correctness and preserving compilation output similarity.
-The lack of complex compiler features in the prototype might skew the results against the advantanges of granularization since complex compiler features incure the most significant compilation runtime penalties.
+Additional challenges might arise when ensuring compilation output correctness and preserving compilation output similarity.
+The lack of complex compiler features in the prototype might skew the results against the advantages of granularization since complex compiler features incur the most significant compilation runtime penalties.
 
 
 % Tyrimo Metodas
 \subsection{Investigation method}
-Time measurements in the millisecond range will be taken of subsequent compilation runs changing only parts of the source code using the protoype compiler written in this thesis with the translation unit granularization feature enabled and disabled.
+Time measurements in the millisecond range will be taken of subsequent compilation runs changing only parts of the source code using the prototype compiler written in this thesis with the translation unit granularization feature enabled and disabled.
 
 Various source code input sizes and complexity of source code will be evaluated.
-A classic looking case study of average code complexicity will be chosen, emphasized, discussed and evaluated, for example, a translation unit with 5 classes and 10 methods in every class with a small change in a singular method between compilations and another measurement with a small change in a singular class.
+A classic looking case study of average code complexity will be chosen, emphasized, discussed and evaluated, for example, a translation unit with 5 classes and 10 methods in every class with a small change in a singular method between compilations and another measurement with a small change in a singular class.
 
-An automated but definitive and consistent source code generation tool will be used to create consistently reproducable results for the given inputs listed in the following list.
+An automated but definitive and consistent source code generation tool will be used to create consistently reproducible results for the given inputs listed in the following list.
 
 \begin{itemize}
 	\item Number of classes in a translation unit
 	\item Number of methods in a method
 	\item Complexity/size of method
-	\item Change occuring on the method or class level
+	\item Change occurring on the method or class level
 	\item Granularization enabled or disabled
 \end{itemize}
 
-In addition the same measurements will be performend on the current 2.13 Scala compiler and the newest Dotty (Scala 3) compler.
+In addition the same measurements will be performed on the current 2.13 Scala compiler and the newest Dotty (Scala 3) compiler.
 These compilers re-translate the entire input therefore there will be no variance in the last metric, but the comparison to the measured results of the prototype compiler might give insights on possible performance gains if such a feature were implemented in these compilers.
 
 \pagebreak
@@ -101,9 +101,9 @@ These compilers re-translate the entire input therefore there will be no varianc
 First, the prototype compiler will be written as fast as possible since it is a central artifact in this thesis.
 
 Second, the granularization feature will be implemented on a class level first and additionally extended to a method level.
-The theoretical and possible extensivness of granularization of compilation units will be evaluated and documented.
+The theoretical and possible extensiveness of granularization of compilation units will be evaluated and documented.
 
-Third, the metric measurement tool will be created which performs the compilation runs and measurements with various inputs and compilers and generates reproducable outputs.
+Third, the metric measurement tool will be created which performs the compilation runs and measurements with various inputs and compilers and generates reproducible outputs.
 
 Before, during and after every of these steps the thesis document will be updated with the insights from accomplishing a each step.
 
