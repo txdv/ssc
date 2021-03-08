@@ -28,3 +28,6 @@ planb:
 	biber out/planas.bcf
 	xelatex -output-directory=out/ pdf/planas.tex
 	open out/planas.pdf
+
+aspell:
+	aspell check pdf/planas.tex
