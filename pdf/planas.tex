@@ -77,7 +77,7 @@ The lack of complex compiler features in the prototype might skew the results ag
 
 % Tyrimo Metodas
 \subsection{Investigation method}
-Time measurements in the millisecond range will be taken of subsequent compilation runs changing only parts of the source code using the minimal compiler written in this thesis with the translation unit granularization feature enabled and disabled.
+Time measurements in the millisecond range will be taken of subsequent compilation runs changing only parts of the source code using the protoype compiler written in this thesis with the translation unit granularization feature enabled and disabled.
 
 Various source code input sizes and complexity of source code will be evaluated.
 A classic looking case study of average code complexicity will be chosen, emphasized, discussed and evaluated, for example, a translation unit with 5 classes and 10 methods in every class with a small change in a singular method between compilations and another measurement with a small change in a singular class.
@@ -98,7 +98,7 @@ These compilers re-translate the entire input therefore there will be no varianc
 \pagebreak
 % Darbo atlikimo procesas
 \subsection{Work process}
-First, the minimal compiler will be written as fast as possible since it is a central artifact in this thesis.
+First, the prototype compiler will be written as fast as possible since it is a central artifact in this thesis.
 
 Second, the granularization feature will be implemented on a class level first and additionally extended to a method level.
 The theoretical and possible extensivness of granularization of compilation units will be evaluated and documented.
