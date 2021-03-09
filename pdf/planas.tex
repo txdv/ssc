@@ -41,9 +41,14 @@
 %     Padėkos asmenims ir/ar organizacijoms
 % \end{center}
 
+% first page is numerated
+
 \begin{samepage}
 %Planas
 \section{Plan}
+\subsection{Goal}
+Taskus isvardinti, uzdaviniai tam tikslui pasiekti.
+Ka ismoks skaitytojas.
 %Tyrimo objektas ir aktualumas
 \subsection{Research object and actuality}
 The majority of the research done on compilers is focused on making compilers output optimized programs in terms of code execution speed and memory usage \cite{lopes2018future} while neglecting or willfully sacrificing \cite{fast2019compilers} actual runtime performance of the compiler itself.
@@ -51,6 +56,7 @@ As computers get faster more resources are available, but programmers tend to ut
 
 Another vector of academic improvement within the compiler sphere is to add new features or utilize paradigms like dependent types or formal specifications\cite{RustVerification} in order to allow the compiler to do more sophisticated type checking and verification than classic type checking allows while significantly increasing runtime compilation .
 
+% ecosystem is bad
 When assessing the adoption of a new programming language the runtime speed of the available compilers for a particular programming languages are often gauged as an important metric\cite{ScalaSlow} among other such as language complexity, available libraries and spread of ecosystem.
 Dealing with enormous compilation times of huge projects can have negative effects on the productivity of programmers and even drive away people from an entire ecosystem \cite{ScalaReallySlow} \cite{ScalaSlow}.
 
@@ -74,7 +80,6 @@ Such granularization requires additional compiler logic and might overcomplicate
 Additional challenges might arise when ensuring compilation output correctness and preserving compilation output similarity.
 The lack of complex compiler features in the prototype might skew the results against the advantages of granularization since complex compiler features incur the most significant compilation runtime penalties.
 
-
 % Tyrimo Metodas
 \subsection{Investigation method}
 Time measurements in the millisecond range will be taken of subsequent compilation runs changing only parts of the source code using the prototype compiler written in this thesis with the translation unit granularization feature enabled and disabled.
@@ -97,6 +102,7 @@ These compilers re-translate the entire input therefore there will be no varianc
 
 \pagebreak
 % Darbo atlikimo procesas
+% numerate work process instead of writing first, second
 \subsection{Work process}
 First, the prototype compiler will be written as fast as possible since it is a central artifact in this thesis.
 
