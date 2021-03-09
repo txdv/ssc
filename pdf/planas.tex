@@ -67,8 +67,7 @@ Slow compilation speeds go against the very mantra of the short cycle times prom
 % Keliami uždaviniai ir laukiami rezultatai
 \subsection{Challenges and expected results}
 The goal of this bachelor thesis is to create a prototype compiler for a small subset of the Scala programming language.
-Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, the targeted compiler implementation in this thesis will support only the most basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
-Once a minimum viable implementation will have been written and performance metrics collected to satisfy the research needs for this thesis and given sufficient time until the deadline, additional features from the compiler specification might be added in order to improve the accuracy the results.
+Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, the targeted compiler implementation in this thesis will support only basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
 
 % todo: introduced errors?
 When writing software developers tend to create only small changes in existing source files before running the compilation again for a quick feedback loop of introduced errors.
@@ -97,25 +96,22 @@ An automated but definitive and consistent source code generation tool will be u
 	\item Granularization enabled or disabled
 \end{itemize}
 
-In addition the same measurements will be performed on the current 2.13 Scala compiler and the newest Dotty (Scala 3) compiler.
+In addition the same measurements will be performed on the current Scala 2.13 \cite{Scala2013} compiler.
 These compilers re-translate the entire input therefore there will be no variance in the last metric, but the comparison to the measured results of the prototype compiler might give insights on possible performance gains if such a feature were implemented in these compilers.
 
 \pagebreak
 % Darbo atlikimo procesas
 % numerate work process instead of writing first, second
 \subsection{Work process}
-First, the prototype compiler will be written as fast as possible since it is a central artifact in this thesis.
+\begin{itemize}
+	\item{The prototype compiler will be written since it is a central artifact in this thesis.}
+	\item{The granularization feature will be implemented on a class level first and additionally extended to a method level.
+The theoretical and possible extensiveness of granularization of compilation units will be evaluated and documented.}
 
-Second, the granularization feature will be implemented on a class level first and additionally extended to a method level.
-The theoretical and possible extensiveness of granularization of compilation units will be evaluated and documented.
+	\item{The metric measurement tool will be created which performs the compilation runs and measurements with various inputs and compilers and generates reproducible outputs.}
 
-Third, the metric measurement tool will be created which performs the compilation runs and measurements with various inputs and compilers and generates reproducible outputs.
+\end{itemize}
 
-Before, during and after every of these steps the thesis document will be updated with the insights from accomplishing a each step.
-
-Last, given enough time, more complex Scala language features will be implemented in order to achieve more realistic results and resulting measurements will be incorporated into the thesis.
-
-\subsection{Used literature}
 \end{samepage}
 
 \printbibliography[heading=bibintoc]  % Šaltinių sąraše nurodoma panaudota
