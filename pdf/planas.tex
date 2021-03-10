@@ -33,6 +33,7 @@
 
 \begin{document}
 \maketitle
+\setcounter{page}{2}
 
 %% Padėkų skyrius
 % \sectionnonumnocontent{}
@@ -60,18 +61,23 @@ Dealing with enormous compilation times of huge projects can have negative effec
 Modern organizations moving towards continuous delivery practices called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their CI pipeline.
 % todo: change mantra maybe
 Slow compilation speeds go against the very mantra of the short cycle times promoted in DevOps and has spurred creation and adoption of minimal programming language focused on compilation speed and productivity to counter the effects of giant code bases on the CI process\cite{TheGoProgrammingLanguage, GoGoogle}.
+
+\pagebreak
+
 \subsection{Goal}
-% dar paprasciau
-This thesis will implement compilation unit granularization in a compiler. The expected tasks are
+This thesis will analyze the effects of compilation unit granularization in a compiler on the compilation speed.
 
-\begin{itemize}
-\item palyginti esamus kompiliatorius
-\item sukurti kompiliatoriu
-\item validavima
-\end{itemize}
+It will be achieved by the following tasks:
 
-Expected results:
+\begin{enumerate}
+\item{Creation of a compiler.}
+\item{Implementation of compilation unit granularization.}
+\item{Correctness validation for the compiler.}
+\item{Measurements of the impact on performance.}
+\item{Performance measurement to existing compilers.}
+\end{enumerate}
 
+The expected results will be a compiler with compilation unit granularization and various performance measurements together with a comparison to an existing compiler.
 
 % Keliami uždaviniai ir laukiami rezultatai
 \subsection{Challenges and expected results}
@@ -111,15 +117,16 @@ These compilers re-translate the entire input therefore there will be no varianc
 \pagebreak
 % Darbo atlikimo procesas
 % numerate work process instead of writing first, second
+% paging
 \subsection{Work process}
-\begin{itemize}
+\begin{enumerate}
 	\item{The prototype compiler will be written since it is a central artifact in this thesis.}
 	\item{The granularization feature will be implemented on a class level first and additionally extended to a method level.
 The theoretical and possible extensiveness of granularization of compilation units will be evaluated and documented.}
 
 	\item{The metric measurement tool will be created which performs the compilation runs and measurements with various inputs and compilers and generates reproducible outputs.}
 
-\end{itemize}
+\end{enumerate}
 
 \end{samepage}
 
