@@ -1,24 +1,43 @@
 package lt.vu.mif.bentkus.bachelor.compiler
 
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.Version
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{Class, JavaType, AccessFlag}
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{Class, Method, JavaType, AccessFlag}
 import lt.vu.mif.bentkus.bachelor.compiler.lexer.Lexer
 import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
 import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.{Scala, Expression}
-import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.DefObject
+import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.{DefObject, DefMethod}
 import lt.vu.mif.bentkus.bachelor.compiler.span.Span
+import lt.vu.mif.bentkus.bachelor.compiler.misc.PrettyPrint
 
 import java.io.File
 import java.nio.file.Files
 
 object MainApp extends App {
-  def convert(expr: DefObject): Class = {
+  def convert(obj: DefObject): Class = {
     Class(
       version = Version(0, 59),
-      thisClass = JavaType.Class(expr.name),
+      thisClass = JavaType.Class(obj.name),
       superClass = JavaType.Class("java/lang/Object"),
-      methods = Seq.empty,
+      methods = {
+        val defMethods = obj.statements.filter(_.isInstanceOf[DefMethod]).map(_.asInstanceOf[DefMethod])
+
+        defMethods.map { defMethod =>
+          Method(
+            defMethod.name,
+            signature = null,
+            access = Set.empty,
+            code = None)
+        }
+      },
       attributes = Seq.empty)
+  }
+
+  def convert(method: DefMethod): Method = {
+    Method(
+      method.name,
+      signature = null,
+      access = Set.empty,
+      code = None)
   }
 
   def readFile(filename: String): Seq[Expression] = {
@@ -42,10 +61,10 @@ object MainApp extends App {
     }
   }
 
-  println {
+  {
     val statements = MainApp.readFile(args.head)
     val defObject = statements.head.asInstanceOf[DefObject]
-    println(defObject)
-    println(convert(defObject))
+    PrettyPrint.pformat(defObject)
+    PrettyPrint.pformat(convert(defObject))
   }
 }
