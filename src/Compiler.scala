@@ -22,14 +22,33 @@ object MainApp extends App {
         val defMethods = obj.statements.filter(_.isInstanceOf[DefMethod]).map(_.asInstanceOf[DefMethod])
 
         defMethods.map { defMethod =>
+          val sig =
+            Seq(convert(defMethod.returnType)) ++
+            defMethod.arguments.map(arg => convert(arg.argumentType))
+
           Method(
             defMethod.name,
-            signature = null,
+            signature = sig,
             access = Set.empty,
             code = None)
         }
       },
       attributes = Seq.empty)
+  }
+
+  def convert(stype: Expression.ScalaType): JavaType = {
+    stype match {
+      case Expression.SimpleType("Unit") =>
+        JavaType.Void
+      case Expression.SimpleType("String") =>
+        JavaType.Class("java/lang/String")
+      case Expression.GenericType("Array", Seq(generic)) =>
+        JavaType.Array(convert(generic))
+      case _ =>
+        println(stype)
+        ???
+    }
+
   }
 
   def convert(method: DefMethod): Method = {
