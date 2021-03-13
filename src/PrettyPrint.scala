@@ -63,11 +63,18 @@ object PrettyPrint {
           val indent = tab * depth
           val indent1 = tab * (depth + 1)
 
-          val fields = simple.fields.map { field =>
-            val nested = format(field.value)(depth + 1)
-            s"${field.name} = ${nested}"
-          }.mkString(",\n" + indent1)
-          simple.typeName + "(\n" + indent1 + fields + s"\n$indent)"
+          if (simple.depth <= 2 && simple.fields.size <= 5) {
+            simple.typeName + "(" + simple.fields.map { field =>
+              val nested = format(field.value)(depth + 1)
+              s"${field.name} = ${nested}"
+            }.mkString(", ") + ")"
+          } else {
+            val fields = simple.fields.map { field =>
+              val nested = format(field.value)(depth + 1)
+              s"${field.name} = ${nested}"
+            }.mkString(",\n" + indent1)
+            simple.typeName + "(\n" + indent1 + fields + s"\n$indent)"
+          }
         } else {
           if (simple.value == null) {
             "null"
@@ -76,10 +83,10 @@ object PrettyPrint {
           }
         }
       case collection: CollectionValue =>
-        if (collection.depth == 1 && collection.values.size <= 5) {
+        if (collection.depth <= 2 && collection.values.size <= 5) {
           "[" + collection.values.map(value => format(value)(depth + 1)).mkString(", ") + "]"
         } else {
-          indent + "[" +
+          indent + "[\n" +
             collection.values.foldLeft("") { case (str, value) =>
               str + indent1 + format(value)(depth + 1) + ",\n"
             } +
@@ -96,6 +103,8 @@ object MainApp extends App {
   case class Test2(c: Int, t: Test)
   case class Test3(t: Test2, a: Seq[Int])
 
+  val tests1 = Seq(Test(1, 2), Test(2, 3))
+
   val t1 = Test(a = 1, b = 2)
   val t2 = Test2(c = 3, t1)
   val t3 = Test3(t2, Seq(1, 2, 3))
@@ -110,4 +119,6 @@ object MainApp extends App {
   pformat(t1)
   pformat(t2)
   pformat(t3)
+
+  pformat(tests1)
 }
