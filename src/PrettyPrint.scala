@@ -1,70 +1,27 @@
 package lt.vu.mif.bentkus.bachelor.compiler.misc
 
-import scala.reflect.ClassTag
-
-case class Field(name: String, value: Value)
-case class Value(name: String, value: Any, fields: Seq[Field])
-
 object PrettyPrint {
-  import reflect.runtime.universe._
+  // https://stackoverflow.com/questions/15718506/scala-how-to-print-case-classes-like-pretty-printed-tree
+  def pformat(obj: Any, depth: Int = 0, paramName: Option[String] = None): Unit = {
 
-  // https://stackoverflow.com/questions/7525142/how-to-programmatically-determine-if-the-class-is-a-case-class-or-a-simple-class
-  def isCaseClass[T](o: T) = {
-    o.getClass.getInterfaces.contains(classOf[scala.Product])
-  }
+    val indent = "  " * depth
+    val prettyName = paramName.fold("")(x => s"$x: ")
+    val ptype = obj match {
+      case _: Iterable[Any] => ""
+      case obj: Product => obj.productPrefix
+      case null => "null"
+      case _ => obj.toString
+    }
 
-  def meta[T](obj: T)(implicit typeTag: TypeTag[T]): Value = {
-    meta2(obj, typeTag.tpe)
-  }
+    println(s"$indent$prettyName$ptype")
 
-  val noArgs = new Array[Object](0)
-
-  def meta2[T](obj: T, `type`: Type): Value = {
-    val name = obj.getClass.getSimpleName
-
-    val fields =
-      if (isCaseClass(obj)) {
-        val accessors = `type`.members.collect {
-          case m: MethodSymbol if m.isCaseAccessor => m
-        }
-
-        accessors.map { accessor =>
-          val method = obj.getClass.getMethod(accessor.name.toString)
-
-          val value = method.invoke(obj, noArgs:_*)
-
-
-          Field(accessor.name.toString, meta2(value, accessor.typeSignature))
-        }.toSeq
-      } else {
-        Seq.empty
-      }
-
-    Value(name, obj, fields)
-  }
-
-
-  private val tab = "  "
-
-  def pformat[T](obj: T)(implicit typeTag: TypeTag[T]): Unit = {
-    println(format(meta(obj)))
-
-  }
-
-  def format(value: Value)(implicit depth: Int = 0): String = {
-    if (value.fields.nonEmpty) {
-      val indent = tab * depth
-      val indent1 = tab * (depth + 1)
-
-      val fields = value.fields.map { field =>
-        val nested = format(field.value)(depth + 1)
-        s"${field.name} = ${nested}"
-      }.mkString(",\n" + indent1)
-
-
-      value.name + "(\n" + indent1 + fields + s"\n$indent)"
-    } else {
-      value.value.toString
+    obj match {
+      case seq: Iterable[Any] =>
+        seq.foreach(pformat(_, depth + 1))
+      case obj: Product =>
+        (obj.productIterator zip obj.productElementNames)
+          .foreach { case (subObj, paramName) => pformat(subObj, depth + 1, Some(paramName)) }
+      case _ =>
     }
   }
 }
@@ -79,6 +36,8 @@ object MainApp extends App {
 
   import PrettyPrint._
 
+  pformat(Seq(1, 2, 3, 4))
+  pformat(Array(1, 2, 3, 4))
   pformat(1)
   pformat("ASD")
   pformat(t1)
