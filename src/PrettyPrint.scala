@@ -86,7 +86,7 @@ object PrettyPrint {
         if (collection.depth <= 2 && collection.values.size <= 5) {
           "[" + collection.values.map(value => format(value)(depth + 1)).mkString(", ") + "]"
         } else {
-          indent + "[\n" +
+          "[\n" +
             collection.values.foldLeft("") { case (str, value) =>
               str + indent1 + format(value)(depth + 1) + ",\n"
             } +
@@ -121,4 +121,6 @@ object MainApp extends App {
   pformat(t3)
 
   pformat(tests1)
+
+  pformat(Test3(t2, Seq(1, 2, 3, 4, 5, 6)))
 }
