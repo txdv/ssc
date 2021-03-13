@@ -1,11 +1,25 @@
 package lt.vu.mif.bentkus.bachelor.compiler
 
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.Version
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{Class, Method, JavaType, AccessFlag}
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{
+  AccessFlag,
+  Class,
+  Code,
+  ConstString,
+  FieldRef,
+  JavaType,
+  Method,
+  MethodRef,
+  Op,
+}
 import lt.vu.mif.bentkus.bachelor.compiler.lexer.Lexer
 import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
 import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.{Scala, Expression}
-import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.{DefObject, DefMethod}
+import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.{
+  DefObject,
+  DefMethod,
+  Expr
+}
 import lt.vu.mif.bentkus.bachelor.compiler.span.Span
 import lt.vu.mif.bentkus.bachelor.compiler.misc.PrettyPrint
 
@@ -25,12 +39,11 @@ object MainApp extends App {
           val sig =
             Seq(convert(defMethod.returnType)) ++
             defMethod.arguments.map(arg => convert(arg.argumentType))
-
           Method(
             defMethod.name,
             signature = sig,
             access = Set.empty,
-            code = None)
+            code = defMethod.body.map(convertBody))
         }
       },
       attributes = Seq.empty)
@@ -48,7 +61,36 @@ object MainApp extends App {
         println(stype)
         ???
     }
+  }
 
+  def convertBody(expr: Expr): Code = {
+    import Expression._
+
+    val code = expr match {
+      case Func("println", Seq(Stri(arg))) =>
+        val printStream = JavaType.Class("java/io/PrintStream")
+
+        val systemOut = FieldRef(
+          JavaType.Class("java/lang/System"),
+          "out",
+          Seq(printStream))
+
+        val method = MethodRef(
+          printStream,
+          "println",
+          Seq(JavaType.Void, JavaType.Class("java/lang.String")))
+
+        Seq(
+          Op.getstatic(systemOut),
+          Op.ldc(ConstString(arg)),
+          Op.invoke(method, Op.invoke.virtual),
+        )
+      case _ =>
+        ???
+    }
+
+
+    Code(2, 1, code)
   }
 
   def convert(method: DefMethod): Method = {

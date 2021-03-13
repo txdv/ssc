@@ -25,7 +25,7 @@ object Expression {
     name: String,
     returnType: ScalaType,
     arguments: Seq[DefMethodArgument] = Seq.empty,
-    body: Seq[Expr] = Seq.empty) extends Statement
+    body: Option[Expr] = None) extends Statement
 
   case class DefMethodArgument(name: String, argumentType: ScalaType)
 
@@ -125,7 +125,7 @@ object Scala {
     returnType <- typeDef
     _ <- `=`
     expr <- expr.all
-  } yield DefMethod(name.value, returnType, arguments, body = Seq(expr))
+  } yield DefMethod(name.value, returnType, arguments, body = Some(expr))
 
   object expr {
     val number: Parser[Expr] = for {
