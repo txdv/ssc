@@ -148,6 +148,31 @@ case class Method(
   def arguments: Seq[JavaType] = signature.drop(1)
 }
 
+object Method {
+  val ObjectConstructor = MethodRef(
+    jclass = JavaType.Class("java/lang/Object"),
+    name = "<init>",
+    signature = Seq(JavaType.Void))
+
+  val DefaultConstructor = {
+    val code = Code(
+      stackSize = 1,
+      localsCount = 1,
+      ops = Seq(
+        Op.aload(0),
+        Op.invoke(ObjectConstructor, Op.invoke.special),
+        Op.Return,
+      ))
+
+    Method(
+      name = "<init>",
+      signature = Seq(JavaType.Void),
+      access = Set(AccessFlag.Public),
+      code = Some(code))
+  }
+
+}
+
 case class Class(
   version: Version,
   thisClass: JavaType.Class,

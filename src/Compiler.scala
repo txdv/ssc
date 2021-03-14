@@ -35,7 +35,9 @@ object MainApp extends App {
       methods = {
         val defMethods = obj.statements.filter(_.isInstanceOf[DefMethod]).map(_.asInstanceOf[DefMethod])
 
-        defMethods.map { defMethod =>
+        val defcon = Method.DefaultConstructor
+
+        defcon +: defMethods.map { defMethod =>
           val sig =
             Seq(convert(defMethod.returnType)) ++
             defMethod.arguments.map(arg => convert(arg.argumentType))
