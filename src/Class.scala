@@ -175,10 +175,64 @@ object Method {
 
 case class Class(
   version: Version,
+  access: Set[ClassAccessFlag],
   thisClass: JavaType.Class,
   superClass: JavaType.Class,
   methods: Seq[Method],
   attributes: Seq[Attribute])
+
+sealed trait ClassAccessFlag extends AccessFlag
+
+object ClassAccessFlag {
+
+  case object Public extends ClassAccessFlag {
+    val value: Int = 0x0001
+  }
+
+  case object Final extends ClassAccessFlag {
+    val value: Int = 0x0010
+  }
+
+  case object Super extends ClassAccessFlag {
+    val value: Int = 0x0020
+  }
+
+  case object Interface extends ClassAccessFlag {
+    val value: Int = 0x0200
+  }
+
+  case object Abstract extends ClassAccessFlag {
+    val value: Int = 0x0400
+  }
+
+  case object Synthetic extends ClassAccessFlag {
+    val value: Int = 0x1000
+  }
+
+  case object Annotation extends ClassAccessFlag {
+    val value: Int = 0x2000
+  }
+
+  case object Enum extends ClassAccessFlag {
+    val value: Int = 0x4000
+  }
+
+  val values = Set[ClassAccessFlag](
+    Public,
+    Final,
+    Super,
+    Interface,
+    Abstract,
+    Synthetic,
+    Annotation,
+    Enum,
+  )
+
+  def parse(accessFlags: Int): Set[ClassAccessFlag] = {
+    values.filter(_.isSet(accessFlags))
+  }
+
+}
 
 
 sealed trait Attribute {
@@ -353,6 +407,7 @@ object Converter {
 
     Class(
       version = classFile.version,
+      access = ClassAccessFlag.parse(classFile.accessFlags),
       thisClass = JavaType.Class(classFile.className(classFile.thisClass)),
       superClass = JavaType.Class(classFile.className(classFile.superClass)),
       methods,

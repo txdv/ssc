@@ -2,6 +2,7 @@ package lt.vu.mif.bentkus.bachelor.compiler
 
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.Version
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{
+  ClassAccessFlag,
   AccessFlag,
   Class,
   Code,
@@ -48,7 +49,8 @@ object MainApp extends App {
             code = defMethod.body.map(convertBody))
         }
       },
-      attributes = Seq.empty)
+      attributes = Seq.empty,
+      access = Set(ClassAccessFlag.Public, ClassAccessFlag.Super))
   }
 
   def convert(stype: Expression.ScalaType): JavaType = {
@@ -131,8 +133,9 @@ object MainApp extends App {
     val jclass = convert(defObject)
     PrettyPrint.pformat(defObject)
     PrettyPrint.pformat(jclass)
-    val result = classfile.higher.Materializer.bytes(jclass)
-    printBuffer(result)
+    val (head, body) = classfile.higher.Materializer.bytes(jclass)
+    printBuffer(head)
+    printBuffer(body)
   }
 
   def printBuffer(bb: java.nio.ByteBuffer): Unit = {
@@ -157,5 +160,6 @@ object MainApp extends App {
       val str = String.format("%02x ", Byte.box(value))
       print(str)
     }
+    println
   }
 }
