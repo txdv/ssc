@@ -381,7 +381,7 @@ object Converter {
     MethodRef(
       JavaType.Class(ref.constClass.stringName),
       nameAndType.stringName,
-      signature = JavaType.parse(nameAndType.stringType))
+      signature = lastElementAsFirst(JavaType.parse(nameAndType.stringType)))
   }
 
   private def getOpConst(index: Int)(implicit classFile: ClassFile): OpConst = {
