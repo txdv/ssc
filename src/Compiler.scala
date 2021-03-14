@@ -128,7 +128,34 @@ object MainApp extends App {
   {
     val statements = MainApp.readFile(args.head)
     val defObject = statements.head.asInstanceOf[DefObject]
+    val jclass = convert(defObject)
     PrettyPrint.pformat(defObject)
-    PrettyPrint.pformat(convert(defObject))
+    PrettyPrint.pformat(jclass)
+    val result = classfile.higher.Materializer.bytes(jclass)
+    printBuffer(result)
+  }
+
+  def printBuffer(bb: java.nio.ByteBuffer): Unit = {
+    val start = bb.position()
+    val end = bb.limit()
+    val arr = bb.array()
+
+    val longest = Math.max(String.format("%x", end).size, 2)
+
+    (start until end).foreach { i =>
+      if (i % 16 == 0) {
+        val prefix = String.format(s"%0${longest}x", Int.box(i))
+        val nl = if (i > 0) "\n" else ""
+        print(s"$nl$prefix: ")
+      } else if (i % 8 == 0 && i > 0) {
+        print("   ")
+      } else if (i % 4 == 0 && i > 0) {
+        print(" ")
+      }
+
+      val value = arr(i)
+      val str = String.format("%02x ", Byte.box(value))
+      print(str)
+    }
   }
 }

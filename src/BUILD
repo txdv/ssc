@@ -128,7 +128,7 @@ scala_test(
 scala_binary(
     name = "compiler",
     srcs = ["Compiler.scala"],
-    deps = [":scala", ":class", ":classfile", ":pretty_print"],
+    deps = [":scala", ":class", ":classfile", ":pretty_print", ":materializer"],
     scalacopts = fatal_warnings(),
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.MainApp")
 
@@ -138,3 +138,23 @@ scala_binary(
     deps = [],
     scalacopts = fatal_warnings(),
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.misc.MainApp")
+
+scala_library(
+    name = "bytestream",
+    srcs = ["ByteStream.scala"],
+    deps = [],
+    scalacopts = fatal_warnings())
+
+scala_library(
+    name = "materializer",
+    srcs = ["Materializer.scala"],
+    deps = [":bytestream", ":class", ":classfile"],
+    exports = [":bytestream", ":class", ":classfile"],
+    scalacopts = fatal_warnings())
+
+scala_binary(
+    name = "test",
+    srcs = ["Test.scala"],
+    deps = [],
+    scalacopts = fatal_warnings(),
+    main_class = "Test")
