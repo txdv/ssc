@@ -115,7 +115,7 @@ scala_binary(
 scala_binary(
     name = "class",
     srcs = ["Class.scala"],
-    deps = [":classfile"],
+    deps = [":classfile", ":pretty_print"],
     scalacopts = fatal_warnings(),
     main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MainApp")
 

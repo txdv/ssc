@@ -42,7 +42,7 @@ object MainApp extends App {
           Method(
             defMethod.name,
             signature = sig,
-            access = Set.empty,
+            access = Set(AccessFlag.Public),
             code = defMethod.body.map(convertBody))
         }
       },
@@ -84,6 +84,7 @@ object MainApp extends App {
           Op.getstatic(systemOut),
           Op.ldc(ConstString(arg)),
           Op.invoke(method, Op.invoke.virtual),
+          Op.Return,
         )
       case _ =>
         ???

@@ -31,3 +31,13 @@ planb:
 
 aspell:
 	aspell check pdf/planas.tex
+
+
+compile:
+	bazel run //src:compiler -- $(PWD)/src/test/Hello.scala
+
+reverse:
+	bazel run //src:classfile_app -- $(PWD)/src/test/Hello.class
+
+class:
+	bazel run //src:class -- $(PWD)/src/test/Hello.class

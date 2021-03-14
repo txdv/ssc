@@ -1,6 +1,7 @@
 package lt.vu.mif.bentkus.bachelor.compiler.classfile.higher
 
 import lt.vu.mif.bentkus.bachelor.compiler.span.Span
+import lt.vu.mif.bentkus.bachelor.compiler.misc.PrettyPrint
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.{
   AttributeInfo,
   Constant,
@@ -446,11 +447,5 @@ object MainApp extends App {
   val classFile = ClassFile.parse(bytes)
 
   val cl = Converter.convert(classFile)
-  cl.methods.foreach { method =>
-    println(s"${method.returnType} ${method.name}(${method.arguments})")
-    method.code.toSeq.flatMap(_.ops).foreach { op =>
-      print("  ")
-      println(op)
-    }
-  }
+  PrettyPrint.pformat(cl)
 }
