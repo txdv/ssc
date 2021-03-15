@@ -15,6 +15,9 @@ trait ByteStream {
   }
 
   def getBytes: ByteBuffer
+
+  def reserveInt: ByteBuffer
+  def reserveShort: ByteBuffer
 }
 
 class ByteBufferStream extends ByteStream {
@@ -39,5 +42,17 @@ class ByteBufferStream extends ByteStream {
 
   def getBytes: ByteBuffer = {
     ByteBuffer.wrap(buffer, 0, bb.position())
+  }
+
+  def reserveInt: ByteBuffer = {
+    val result = ByteBuffer.wrap(bb.array, bb.position(), 4)
+    bb.putInt(0)
+    result
+  }
+
+  def reserveShort: ByteBuffer = {
+    val result = ByteBuffer.wrap(bb.array, bb.position(), 2)
+    bb.putShort(0)
+    result
   }
 }

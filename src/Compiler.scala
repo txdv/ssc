@@ -45,7 +45,7 @@ object MainApp extends App {
           Method(
             defMethod.name,
             signature = sig,
-            access = Set(AccessFlag.Public),
+            access = Set(AccessFlag.Public, AccessFlag.Static),
             code = defMethod.body.map(convertBody))
         }
       },
@@ -82,7 +82,7 @@ object MainApp extends App {
         val method = MethodRef(
           printStream,
           "println",
-          Seq(JavaType.Void, JavaType.Class("java/lang.String")))
+          Seq(JavaType.Void, JavaType.Class("java/lang/String")))
 
         Seq(
           Op.getstatic(systemOut),
@@ -133,9 +133,19 @@ object MainApp extends App {
     val jclass = convert(defObject)
     PrettyPrint.pformat(defObject)
     PrettyPrint.pformat(jclass)
-    val (head, body) = classfile.higher.Materializer.bytes(jclass)
+    val m = new classfile.higher.Materializer
+    val (head, body) = m.bytes(jclass)
     printBuffer(head)
     printBuffer(body)
+
+    {
+      val fname = args.head.replaceFirst("\\.scala$", ".class")
+      val fc = new java.io.FileOutputStream(fname).getChannel()
+      fc.write(head)
+      fc.write(body)
+      fc.close()
+
+    }
   }
 
   def printBuffer(bb: java.nio.ByteBuffer): Unit = {

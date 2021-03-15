@@ -94,6 +94,19 @@ object JavaType {
         throw new Exception(s"invalid format ${a(0)}")
     }
   }
+
+
+  def descriptor(signature: Seq[JavaType]) = {
+    signature.toList match {
+      case Nil =>
+        ???
+      case returnType :: args =>
+        "(" +
+        args.map(_.value).mkString("") +
+        ")" +
+        returnType.value
+    }
+  }
 }
 
 case class Code(
@@ -259,6 +272,10 @@ sealed trait AccessFlag {
 object AccessFlag {
   case object Public extends AccessFlag {
     val value: Int = 0x0001
+  }
+
+  case object Static extends AccessFlag { // not sure if this belongs here
+    def value: Int = 0x0008
   }
 
   case object Private extends AccessFlag {

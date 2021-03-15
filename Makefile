@@ -34,10 +34,11 @@ aspell:
 
 
 compile:
-	bazel run //src:compiler -- $(PWD)/src/test/Hello.scala
+	bazel run //src:compiler -- $(PWD)/src/test/MainApp.scala
 
 reverse:
 	bazel run //src:classfile_app -- $(PWD)/src/test/Hello.class
 
 class:
 	bazel run //src:class -- $(PWD)/src/test/Hello.class
+	#bazel run //src:class -- $(PWD)/Hello.class

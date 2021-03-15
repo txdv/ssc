@@ -197,7 +197,7 @@ object ClassFile {
       case 0x08 => ConstString(bb.getShort)
       case 0x09 => FieldRef(bb.getShort, bb.getShort)
       case 0x0A => MethodRef(bb.getShort, bb.getShort)
-      case i => throw new Exception(i + " -> " + Span.toHex(i))
+      case i => throw new Exception(s"unknown i 0x${Span.toHex(i)} at pos ${bb.position()}")
     }
   }
 }
