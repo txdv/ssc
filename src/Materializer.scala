@@ -143,7 +143,7 @@ class Materializer {
       case aload(index) =>
         index match {
           case 0 => ByteArray(0x2a)
-
+          case _ => ???
         }
       case invoke(methodref, itype) =>
         val code = itype match {
@@ -161,6 +161,16 @@ class Materializer {
       case ldc(ConstString(str)) =>
         val index = const(Constant.ConstString(Constant.Utf8(str)))
         ByteArray(0x12, index & 0xff)
+      case iconst(value) =>
+        value match {
+          case -1 => ByteArray(0x02)
+          case 0 => ByteArray(0x03)
+          case 1 => ByteArray(0x04)
+          case 2 => ByteArray(0x05)
+          case 3 => ByteArray(0x06)
+          case 4 => ByteArray(0x07)
+          case 5 => ByteArray(0x08)
+        }
       case _ =>
         println(op)
         ???

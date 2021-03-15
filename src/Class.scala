@@ -133,6 +133,7 @@ object Op {
   }
   case class getstatic(field: FieldRef) extends Op
   case class ldc(const: OpConst) extends Op
+  case class iconst(value: Int) extends Op
   case class newobj(jclass: JavaType.Class) extends Op
   case object dup extends Op
 

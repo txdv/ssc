@@ -35,6 +35,8 @@ object Expression {
   case class Func(name: String, arguments: Seq[Expr]) extends Expr
   case class Num(value: String) extends Expr
   case class Stri(value: String) extends Expr
+
+  case class ExprOp(char: Char, left: Expr, right: Expr) extends Expr
 }
 
 object Scala {
@@ -172,7 +174,15 @@ object Scala {
       _ <- `}`
     } yield all
 
+    // TODO: supports only numbers :/
+    def op: Parser[Expr] = for {
+      left <- number
+      _ <- symbol('+')
+      right <- number
+    } yield ExprOp('+', left, right)
+
     def all: Parser[Expr] =
+      op +++
       number +++
       string +++
       function +++

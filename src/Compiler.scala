@@ -67,11 +67,25 @@ object MainApp extends App {
     }
   }
 
+  def const(expr: Expr): Op = {
+    import Expression._
+    expr match {
+      case Stri(arg) =>
+        Op.ldc(ConstString(arg))
+      case _: ExprOp =>
+        // TODO: evaluate expression
+        Op.iconst(2)
+      case _ =>
+        ???
+    }
+
+  }
+
   def convertBody(expr: Expr): Code = {
     import Expression._
 
     val code = expr match {
-      case Func("println", Seq(Stri(arg))) =>
+      case Func("println", Seq(arg)) =>
         val printStream = JavaType.Class("java/io/PrintStream")
 
         val systemOut = FieldRef(
@@ -82,11 +96,11 @@ object MainApp extends App {
         val method = MethodRef(
           printStream,
           "println",
-          Seq(JavaType.Void, JavaType.Class("java/lang/String")))
+          Seq(JavaType.Void, JavaType.Int))
 
         Seq(
           Op.getstatic(systemOut),
-          Op.ldc(ConstString(arg)),
+          const(arg),
           Op.invoke(method, Op.invoke.virtual),
           Op.Return,
         )
@@ -108,9 +122,17 @@ object MainApp extends App {
 
   def readFile(filename: String): Seq[Expression] = {
 
-    val content = Files.readAllBytes(new File(filename).toPath)
+    val content = Benchmark.gauge2("read") {
+      Files.readAllBytes(new File(filename).toPath)
+    }
 
-    val state = Parser.parseTokens(Scala.main, Lexer.lexAll(Span(content)).toList)
+    val lex = Benchmark.gauge2("lex") {
+      Lexer.lexAll(Span(content)).toList
+    }
+
+    val state = Benchmark.gauge2("parse") {
+      Parser.parseTokens(Scala.main, lex)
+    }
 
     val result = state
       .find { case (_, tokens) => tokens.isEmpty }
@@ -121,7 +143,8 @@ object MainApp extends App {
       state.zipWithIndex.foreach { case ((tree, tokens), i) =>
         println(s"$i.")
         println(s"\ttree: ${tree}")
-        println(s"\ttokens: ${tokens.mkString(",")}")
+        //println(s"\ttokens: ${tokens.mkString(",")}")
+        PrettyPrint.pformat(tokens)
       }
       throw new Exception("Failed parsing")
     }
@@ -130,11 +153,15 @@ object MainApp extends App {
   {
     val statements = MainApp.readFile(args.head)
     val defObject = statements.head.asInstanceOf[DefObject]
-    val jclass = convert(defObject)
+    val jclass = Benchmark.gauge2("ast") {
+      convert(defObject)
+    }
     PrettyPrint.pformat(defObject)
     PrettyPrint.pformat(jclass)
     val m = new classfile.higher.Materializer
-    val (head, body) = m.bytes(jclass)
+    val (head, body) = Benchmark.gauge2("class") {
+      m.bytes(jclass)
+    }
     printBuffer(head)
     printBuffer(body)
 
@@ -144,7 +171,7 @@ object MainApp extends App {
       fc.write(head)
       fc.write(body)
       fc.close()
-
+      Benchmark.print
     }
   }
 
@@ -171,5 +198,40 @@ object MainApp extends App {
       print(str)
     }
     println
+  }
+}
+
+import scala.concurrent.duration._
+object Benchmark {
+  var measurements = Seq.empty[(String, Duration)]
+
+  def gauge(f: => Unit): Duration = {
+    val now = System.nanoTime
+    f
+    val measurement = (System.nanoTime - now).nanos
+
+    measurement
+  }
+
+  def gauge(name: String, f: => Unit): Duration = {
+    val m = gauge(f)
+    measurements = measurements :+ (name -> m)
+    m
+  }
+
+  def gauge2[T](name: String)(f: => T): T = {
+    val now = System.nanoTime
+    val result = f
+    val measurement = (System.nanoTime - now).nanos
+    measurements = measurements :+ (name -> measurement)
+    result
+  }
+
+  def print(): Unit = {
+    measurements.foreach { case (k -> v) =>
+      println(s"$k\t${v.toMillis}")
+
+    }
+
   }
 }
