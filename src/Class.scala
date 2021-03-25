@@ -13,6 +13,7 @@ import lt.vu.mif.bentkus.bachelor.compiler.classfile.{
 }
 import java.nio.ByteBuffer
 
+
 sealed trait JavaType {
 
   val value: String
