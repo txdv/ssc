@@ -55,7 +55,7 @@ import SpanExtensions._
 
 
 object Lexer {
-  private val singleChars = Set('(', ')', '[', ']', '=', ',', '.', '+', '%', '{', '}', ':')
+  private val singleChars = Set('(', ')', '[', ']', '=', ',', '.', '+', '-', '*', '%', '{', '}', ':')
 
   private val special = Set('?', '!')
 

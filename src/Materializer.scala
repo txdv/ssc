@@ -13,6 +13,7 @@ object Constant {
   case class MethodRef(klass: Class, nameAndType: NameAndType) extends Constant
   case class FieldRef(klass: Class, nameAndType: NameAndType) extends Constant
   case class ConstString(str: Utf8) extends Constant
+  case class ConstInt(int: Int) extends Constant
 
 }
 
@@ -58,6 +59,9 @@ class Materializer {
           val string_index = const(utf8)
           head.putByte(8)
           head.putShort(string_index)
+        case Constant.ConstInt(n) =>
+          head.putByte(3)
+          head.putInt(n)
       } 
 
       hash.put(constant, constant_index.toShort)
@@ -170,6 +174,7 @@ class Materializer {
           case 3 => ByteArray(0x06)
           case 4 => ByteArray(0x07)
           case 5 => ByteArray(0x08)
+          case n => ByteArray(0x12, const(Constant.ConstInt(n)))
         }
       case _ =>
         println(op)

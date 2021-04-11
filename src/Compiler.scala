@@ -72,13 +72,31 @@ object MainApp extends App {
     expr match {
       case Stri(arg) =>
         Op.ldc(ConstString(arg))
-      case _: ExprOp =>
-        // TODO: evaluate expression
-        Op.iconst(2)
+      case Num(a) =>
+        Op.iconst(a.toInt)
       case _ =>
+        println(expr)
+        System.exit(0)
         ???
     }
+  }
 
+  def eval(expr: Expr): Expr = {
+    import Expression._
+    expr match {
+      case ExprOp('+', Num(a), Num(b)) =>
+        Num((a.toInt + b.toInt).toString)
+      case ExprOp('*', Num(a), Num(b)) =>
+        Num((a.toInt * b.toInt).toString)
+      case ExprOp('-', Num(a), Num(b)) =>
+        Num((a.toInt - b.toInt).toString)
+      case ExprOp('/', Num(a), Num(b)) =>
+        Num((a.toInt / b.toInt).toString)
+      case ExprOp('+', Stri(a), Stri(b)) =>
+        Stri(a + b)
+      case _ =>
+        expr
+    }
   }
 
   def convertBody(expr: Expr): Code = {
@@ -100,7 +118,7 @@ object MainApp extends App {
 
         Seq(
           Op.getstatic(systemOut),
-          const(arg),
+          const(eval(arg)),
           Op.invoke(method, Op.invoke.virtual),
           Op.Return,
         )

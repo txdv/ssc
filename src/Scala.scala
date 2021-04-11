@@ -44,6 +44,13 @@ object Scala {
 
   def symbol(ch: Char): Parser[LexerToken] = token(sat(Symbol(ch.toString)))
 
+  def symbol(chs: Seq[Char]): Parser[LexerToken] = token(sat2 {
+    case Symbol(ch) =>
+      chs.contains(ch)
+    case _ =>
+      false
+  })
+
   def identifierWithName(value: String): Parser[LexerToken] =
     token(sat(Identifier(value)))
 
@@ -177,9 +184,9 @@ object Scala {
     // TODO: supports only numbers :/
     def op: Parser[Expr] = for {
       left <- number
-      _ <- symbol('+')
+      Symbol(ch) <- symbol('+') +++ symbol('-') +++ symbol('*') +++ symbol('/')
       right <- number
-    } yield ExprOp('+', left, right)
+    } yield ExprOp(ch(0), left, right)
 
     def all: Parser[Expr] =
       op +++
