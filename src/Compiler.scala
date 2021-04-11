@@ -246,7 +246,7 @@ object MainApp extends App {
 
   {
     val statements = MainApp.readFile(args.head)
-    val defObject = statements.head.asInstanceOf[DefObject]
+    val defObject = statements.find(_.isInstanceOf[DefObject]).get.asInstanceOf[DefObject]
     val jclass = Benchmark.gauge2("ast") {
       convert(defObject)
     }
