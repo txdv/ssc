@@ -187,20 +187,30 @@ object Scala {
       string +++
       function
 
-    val basicOps =
-      symbol('+') +++ symbol('-') +++
-      symbol('*') +++ symbol('/')
+    val emptyToken = Parser.parserMonad.empty[LexerToken]
 
-    val ops: Parser[(Expr, Expr) => Expr] = for {
-      Symbol(sym) <- basicOps
-      p <- lift((a: Expr, b: Expr) => ExprOp(sym(0), a, b))
+    def ops(symbols: Seq[Char]): Parser[(Expr, Expr) => Expr] = for {
+      Symbol(sym) <- symbols.foldLeft(emptyToken) { case (parser, ch) =>
+        parser +++ symbol(ch)
+      }
+      p <- lift { (a, b) =>
+        ExprOp(sym(0), a, b)
+      }
     } yield p
 
-    val op: Parser[Expr] = chainl1(constants, ops)
+    val op: Parser[Expr] = chainl1(term, ops(Seq('+', '-')))
+    lazy val term: Parser[Expr] = chainl1(factor, ops(Seq('*', '/')))
 
-    def all: Parser[Expr] =
+    lazy val factor: Parser[Expr] = constants +++ (for {
+      _ <- symbol('(')
+      e <- op
+      _ <- symbol(')')
+    } yield e)
+
+    def all: Parser[Expr] = {
       op +++
       grouped
+    }
   }
 
   val statement: Parser[Expression] =

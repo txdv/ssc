@@ -153,6 +153,7 @@ class Materializer {
         val code = itype match {
           case invoke.virtual => 0xb6
           case invoke.special => 0xb7
+          case invoke.static => 0xb8
         }
         val index = const(convert(methodref))
         ByteArray(code, (index >> 8) & 0xff, index & 0xff)
@@ -176,8 +177,10 @@ class Materializer {
           case 5 => ByteArray(0x08)
           case n => ByteArray(0x12, const(Constant.ConstInt(n)))
         }
+      case Op.iadd =>
+        ByteArray(0x60)
       case _ =>
-        println(op)
+        println("missing op: $op")
         ???
     }
   }

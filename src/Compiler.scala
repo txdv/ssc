@@ -23,6 +23,8 @@ import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.{
 }
 import lt.vu.mif.bentkus.bachelor.compiler.span.Span
 import lt.vu.mif.bentkus.bachelor.compiler.misc.PrettyPrint
+import lt.vu.mif.bentkus.bachelor.compiler.classfile.types.runtime.Types
+
 
 import java.io.File
 import java.nio.file.Files
@@ -75,13 +77,16 @@ object MainApp extends App {
       case Num(a) =>
         Op.iconst(a.toInt)
       case _ =>
-        println(expr)
-        System.exit(0)
+        println(s"dont konw how to parse this: $expr")
         ???
     }
   }
 
   def eval(expr: Expr): Expr = {
+    evalCache(expr, Vector.empty)
+  }
+
+  def evalCache(expr: Expr, cache: Seq[Int]): Expr = {
     import Expression._
     expr match {
       case ExprOp('+', Num(a), Num(b)) =>
@@ -94,10 +99,76 @@ object MainApp extends App {
         Num((a.toInt / b.toInt).toString)
       case ExprOp('+', Stri(a), Stri(b)) =>
         Stri(a + b)
+      /*
+       * TODO:
+       * When we have something like
+       *        +
+       *       / \
+       *      +   2
+       *     / \
+       * f(1)   1
+       * we should be able to optimize to f(1) + 3
+       */
       case ExprOp(op, left, right) =>
-        eval(ExprOp(op, eval(left), eval(right)))
+        val hashCode = expr.hashCode
+        if (cache.contains(hashCode)) {
+          expr
+        } else {
+          val newCache = cache :+ hashCode
+
+          val res = ExprOp(op, eval(left), eval(right))
+
+          evalCache(res, newCache)
+
+        }
+      case Func(name, args) =>
+        Func(name, args.map(eval))
       case _ =>
         expr
+    }
+  }
+
+  val math = Types.resolve("java.lang.Math")
+
+  def genops(expr: Expr): Seq[Op] = {
+    import Expression._
+    expr match {
+      case Func(name, args) =>
+        val method = math.methods.find(_.name == name).get
+
+        args.flatMap(genops) :+
+          Op.invoke(method, Op.invoke.static)
+      case Stri(arg) =>
+        Seq(Op.ldc(ConstString(arg)))
+      case Num(a) =>
+        Seq(Op.iconst(a.toInt))
+      case ExprOp('+', left, right) =>
+        genops(left) ++ genops(right) :+ Op.iadd
+      case _ =>
+        ???
+    }
+  }
+
+  def a(b: Int): Int = {
+    b + 42
+  }
+
+  def guessType(expr: Expr): JavaType = {
+    import Expression._
+    expr match {
+      case _: Stri =>
+        JavaType.String
+      case _: Num =>
+        JavaType.Int
+      case Func(name, arguments) =>
+        val method = math.methods.find(_.name == name).get
+        method.returnType
+      case ExprOp(_, left, _) =>
+        guessType(left)
+      case _ =>
+        println("HERE:")
+        println(expr)
+        ???
     }
   }
 
@@ -115,32 +186,24 @@ object MainApp extends App {
 
         val argExpr = eval(arg)
 
-        val methodType = argExpr match {
-          case _: Stri =>
-            JavaType.String
-          case _: Num =>
-            JavaType.Int
-          case _ =>
-            ???
-        }
+        val methodType = guessType(argExpr)
 
         val method = MethodRef(
           printStream,
           "println",
           Seq(JavaType.Void, methodType))
 
-        Seq(
-          Op.getstatic(systemOut),
-          const(argExpr),
-          Op.invoke(method, Op.invoke.virtual),
-          Op.Return,
-        )
+        Seq.empty ++
+          Seq(Op.getstatic(systemOut)) ++
+          genops(argExpr) ++
+          Seq(Op.invoke(method, Op.invoke.virtual)) ++
+          Seq(Op.Return)
       case _ =>
         ???
     }
 
 
-    Code(2, 1, code)
+    Code(stackSize = 3, 1, code)
   }
 
   def convert(method: DefMethod): Method = {

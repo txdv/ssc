@@ -21,14 +21,35 @@ sealed trait JavaType {
 }
 
 object JavaType {
+  // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.2.1
+  case object Byte extends JavaType {
+    val value: String = "B"
+  }
+  case object Short extends JavaType {
+    val value: String = "S"
+  }
   case object Int extends JavaType {
     val value: String = "I"
+  }
+  case object Long extends JavaType {
+    // TODO: correct value
+    val value: String = "J"
+  }
+  case object Float extends JavaType {
+    // TODO: correct value
+    val value: String = "F"
+  }
+  case object Double extends JavaType {
+    val value: String = "D"
   }
   case object Char extends JavaType {
     val value: String = "C"
   }
   case object Void extends JavaType {
     val value: String = "V"
+  }
+  case object Boolean extends JavaType {
+    val value: String = "Z"
   }
 
   val String = Class("java/lang/String")
@@ -126,6 +147,8 @@ case class ConstString(value: String) extends OpConst
 sealed trait Op
 
 object Op {
+  case object iadd extends Op
+
   case class aload(index: Int) extends Op
   case class astore(index: Int) extends Op
   case object Return extends Op
@@ -134,6 +157,7 @@ object Op {
     sealed trait Type
     case object special extends Type
     case object virtual extends Type
+    case object static extends Type
   }
   case class getstatic(field: FieldRef) extends Op
   case class ldc(const: OpConst) extends Op
@@ -154,6 +178,9 @@ case class MethodRef(
   jclass: JavaType.Class,
   name: String,
   signature: Seq[JavaType])
+{
+  def returnType: JavaType = signature.head
+}
 
 case class Method(
   name: String,
