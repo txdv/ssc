@@ -111,14 +111,25 @@ object MainApp extends App {
           "out",
           Seq(printStream))
 
+        val argExpr = eval(arg)
+
+        val methodType = argExpr match {
+          case _: Stri =>
+            JavaType.Class("java/lang/String")
+          case _: Num =>
+            JavaType.Int
+          case _ =>
+            ???
+        }
+
         val method = MethodRef(
           printStream,
           "println",
-          Seq(JavaType.Void, JavaType.Int))
+          Seq(JavaType.Void, methodType))
 
         Seq(
           Op.getstatic(systemOut),
-          const(eval(arg)),
+          const(argExpr),
           Op.invoke(method, Op.invoke.virtual),
           Op.Return,
         )
