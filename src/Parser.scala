@@ -89,12 +89,15 @@ object Parser {
   }
 k
 */
+  def lift[A](value: A): Parser[A] =
+    Monad[Parser].pure[A](value)
+
   def one[A](parser: Parser[A]): Parser[Option[A]] = (for {
     a <- parser
-  } yield Option(a)) +++ Monad[Parser].pure[Option[A]](None)
+  } yield Option(a)) +++ lift(None)
 
   def many[A](parser: Parser[A]): Parser[List[A]] = {
-    many1(parser) +++ Monad[Parser].pure[List[A]](Nil)
+    many1(parser) +++ lift(Nil)
   }
 
   def many1[A](parser: Parser[A]): Parser[List[A]] = for {
@@ -103,7 +106,7 @@ k
   } yield a :: as
 
   def sepBy[A, B](parser: Parser[A], separator: Parser[B]): Parser[List[A]] = {
-    sepBy1(parser, separator) +++ Monad[Parser].pure[List[A]](Nil)
+    sepBy1(parser, separator) +++ lift(Nil)
   }
 
   def sepBy1[A, B](parser: Parser[A], separator: Parser[B]): Parser[List[A]] = for {
@@ -112,7 +115,7 @@ k
   } yield a :: as
 
   def sepByT[A, B](parser: Parser[A], separator: Parser[B]): Parser[List[A]] = {
-    sepByT1(parser, separator) +++ Monad[Parser].pure[List[A]](Nil)
+    sepByT1(parser, separator) +++ lift(Nil)
   }
 
   def sepByT1[A, B](parser: Parser[A], separator: Parser[B]): Parser[List[A]] = for {
@@ -122,7 +125,7 @@ k
   } yield a :: as
 
   def chainl[A](parser: Parser[A], opParser: Parser[(A, A) => A], value: A): Parser[A] = {
-    chainl1(parser, opParser) +++ Monad[Parser].pure[A](value)
+    chainl1(parser, opParser) +++ lift(value)
   }
 
   def chainl1[A](parser: Parser[A], opParser: Parser[(A, A) => A]): Parser[A] = {
@@ -130,7 +133,7 @@ k
       f <- opParser
       b <- parser
       r <- rest(f(v, b))
-    } yield r) +++ Monad[Parser].pure[A](v)
+    } yield r) +++ lift(v)
 
     for {
       a <- parser

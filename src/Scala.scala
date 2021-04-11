@@ -181,17 +181,33 @@ object Scala {
       _ <- `}`
     } yield all
 
-    // TODO: supports only numbers :/
     def op: Parser[Expr] = for {
-      left <- number
-      Symbol(ch) <- symbol('+') +++ symbol('-') +++ symbol('*') +++ symbol('/')
-      right <- number
-    } yield ExprOp(ch(0), left, right)
+      left <- number +++ string
+      opt <- one[LexerToken] {
+        symbol('+') +++
+        symbol('-') +++
+        symbol('*') +++
+        symbol('/')
+      }
+      g <- opt.map { token =>
+        token match {
+          case Symbol(op) =>
+            for {
+              right <- number +++ string
+            } yield {
+              ExprOp(op(0), left, right)
+            }
+          case _ => ???
+        }
+      } getOrElse {
+        lift(left)
+      }
+    } yield {
+      g
+    }
 
     def all: Parser[Expr] =
       op +++
-      number +++
-      string +++
       function +++
       grouped
   }

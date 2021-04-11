@@ -257,6 +257,12 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     })
   }
 
+  "expr.op" should "parse \"1\" * \"2\"" in {
+    "\"1\" * \"2\"".ast(Scala.expr.all) should be (Some {
+      ExprOp('*', Stri("1"), Stri("2"))
+    })
+  }
+
   "expr.function" should "parse println(1 + 2)" in {
     val expected = Func("println", Seq(ExprOp('+', Num("1"), Num("2"))))
     "println(1 + 2)".ast(Scala.expr.function) should be (Some(expected))
