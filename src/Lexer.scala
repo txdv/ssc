@@ -92,7 +92,7 @@ object Lexer {
   }
 
   def lexAll(buffer: Span): Seq[LexerToken] = {
-    var result: Seq[LexerToken] = Seq.empty
+    var result = Vector.empty[LexerToken]
     var buf: Span = buffer
 
     do {
