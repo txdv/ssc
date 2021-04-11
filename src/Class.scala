@@ -31,6 +31,9 @@ object JavaType {
     val value: String = "V"
   }
 
+  val String = Class("java/lang/String")
+  val Object = Class("java/lang/Object")
+
   case class Class(namespace: String) extends JavaType {
     val tmp = namespace.split("/").reverse
 

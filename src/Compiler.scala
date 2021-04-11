@@ -58,7 +58,7 @@ object MainApp extends App {
       case Expression.SimpleType("Unit") =>
         JavaType.Void
       case Expression.SimpleType("String") =>
-        JavaType.Class("java/lang/String")
+        JavaType.String
       case Expression.GenericType("Array", Seq(generic)) =>
         JavaType.Array(convert(generic))
       case _ =>
@@ -115,7 +115,7 @@ object MainApp extends App {
 
         val methodType = argExpr match {
           case _: Stri =>
-            JavaType.Class("java/lang/String")
+            JavaType.String
           case _: Num =>
             JavaType.Int
           case _ =>
