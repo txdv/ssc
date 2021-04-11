@@ -94,6 +94,8 @@ object MainApp extends App {
         Num((a.toInt / b.toInt).toString)
       case ExprOp('+', Stri(a), Stri(b)) =>
         Stri(a + b)
+      case ExprOp(op, left, right) =>
+        eval(ExprOp(op, eval(left), eval(right)))
       case _ =>
         expr
     }

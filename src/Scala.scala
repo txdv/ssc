@@ -181,34 +181,25 @@ object Scala {
       _ <- `}`
     } yield all
 
-    def op: Parser[Expr] = for {
-      left <- number +++ string
-      opt <- one[LexerToken] {
-        symbol('+') +++
-        symbol('-') +++
-        symbol('*') +++
-        symbol('/')
-      }
-      g <- opt.map { token =>
-        token match {
-          case Symbol(op) =>
-            for {
-              right <- number +++ string
-            } yield {
-              ExprOp(op(0), left, right)
-            }
-          case _ => ???
-        }
-      } getOrElse {
-        lift(left)
-      }
-    } yield {
-      g
-    }
+
+    val constants: Parser[Expr] =
+      number +++
+      string +++
+      function
+
+    val basicOps =
+      symbol('+') +++ symbol('-') +++
+      symbol('*') +++ symbol('/')
+
+    val ops: Parser[(Expr, Expr) => Expr] = for {
+      Symbol(sym) <- basicOps
+      p <- lift((a: Expr, b: Expr) => ExprOp(sym(0), a, b))
+    } yield p
+
+    val op: Parser[Expr] = chainl1(constants, ops)
 
     def all: Parser[Expr] =
       op +++
-      function +++
       grouped
   }
 
