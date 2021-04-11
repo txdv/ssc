@@ -167,6 +167,7 @@ object Op {
 
   case class if_acmpne(offset: Int) extends Op
   case class goto(offset: Int) extends Op
+  case class bipush(byte: Byte) extends Op
 }
 
 case class FieldRef(

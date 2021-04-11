@@ -69,19 +69,6 @@ object MainApp extends App {
     }
   }
 
-  def const(expr: Expr): Op = {
-    import Expression._
-    expr match {
-      case Stri(arg) =>
-        Op.ldc(ConstString(arg))
-      case Num(a) =>
-        Op.iconst(a.toInt)
-      case _ =>
-        println(s"dont konw how to parse this: $expr")
-        ???
-    }
-  }
-
   def eval(expr: Expr): Expr = {
     evalCache(expr, Vector.empty)
   }
@@ -141,7 +128,12 @@ object MainApp extends App {
       case Stri(arg) =>
         Seq(Op.ldc(ConstString(arg)))
       case Num(a) =>
-        Seq(Op.iconst(a.toInt))
+        val num = a.toInt
+        if (num <= 255) {
+          Seq(Op.bipush(num.toByte))
+        } else {
+          Seq(Op.iconst(a.toInt))
+        }
       case ExprOp('+', left, right) =>
         genops(left) ++ genops(right) :+ Op.iadd
       case _ =>

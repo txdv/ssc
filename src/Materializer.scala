@@ -179,6 +179,8 @@ class Materializer {
         }
       case Op.iadd =>
         ByteArray(0x60)
+      case bipush(byte) =>
+        ByteArray(0x10, byte)
       case _ =>
         println("missing op: $op")
         ???
