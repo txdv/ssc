@@ -75,4 +75,14 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     """ } should be ("3\n")
   }
+
+  "Compiler" should "add together numbers" in {
+    compileAndRun("MainApp") { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println(1 + 2)
+        }
+      }
+    """ } should be ("3\n")
+  }
 }
