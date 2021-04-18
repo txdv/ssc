@@ -46,7 +46,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     baos.toString
   }
 
-  "Compiler" should "compile" in {
+  "Compiler" should "println string" in {
     compileAndRun("MainApp") { """
       object MainApp {
         def main(args: Array[String]): Unit = {
@@ -54,5 +54,25 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
         }
       }
     """ } should be ("Hello World!\n")
+  }
+
+  "Compiler" should "concat string" in {
+    compileAndRun("MainApp") { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println("Hello" + " " + "World!")
+        }
+      }
+    """ } should be ("Hello World!\n")
+  }
+
+  "Compiler" should "add together numbers" in {
+    compileAndRun("MainApp") { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println(1 + 2)
+        }
+      }
+    """ } should be ("3\n")
   }
 }
