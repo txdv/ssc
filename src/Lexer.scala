@@ -20,6 +20,14 @@ object LexerToken {
   case class Str(value: String) extends LexerToken {
     val unquoted = value.substring(1, value.length - 1)
   }
+
+  case object If extends LexerToken {
+    val value: String = "if"
+
+  }
+  case object Else extends LexerToken {
+    val value: String = "else"
+  }
 }
 
 import LexerToken._
@@ -59,6 +67,21 @@ object Lexer {
 
   private val special = Set('?', '!')
 
+  val keywords = Map(
+    "if" -> If,
+    "else" -> Else,
+    "true" -> Bool("true"),
+    "false" -> Bool("false"),
+  )
+
+  //val keywordLetters = keywords.map { case (k, v) => k(0) }.toArray
+
+  def isKeyword(buffer: Span): Boolean = {
+    keywords.find { case (prefix, _) =>
+      buffer.startsWith(prefix)
+    }.nonEmpty
+  }
+
   // TODO: question marks are weird in scala
   // do something more appropriate
   def isIdentifier(ch: Char): Boolean =
@@ -71,12 +94,11 @@ object Lexer {
 
     if (ch.isWhitespace) {
       buffer.takeWhile(_.isWhitespace).map(_.to[Whitespace])
-    } else if (ch == 't' && buffer.startsWith("true")) {
-      val split = buffer.split(4)
-      (Bool("true"), split.suffix)
-    } else if (ch == 'f' && buffer.startsWith("false")) {
-      val split = buffer.split(5)
-      (Bool("false"), split.suffix)
+    } else if (isKeyword(buffer)) {
+      val (prefix, token) = keywords.find { case (prefix, _) =>
+        buffer.startsWith(prefix)
+      }.get
+      (token, buffer.split(token.value.length).suffix)
     } else if (special.contains(ch)) {
       buffer.takeWhile(special.contains).map(_.to[Identifier])
     } else if (ch.isLetter) {

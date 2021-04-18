@@ -38,6 +38,8 @@ object Expression {
   case class Bool(value: Boolean) extends Expr
 
   case class ExprOp(char: Char, left: Expr, right: Expr) extends Expr
+
+  case class If(cond: Expr, left: Expr, right: Expr) extends Expr
 }
 
 object Scala {
@@ -174,6 +176,16 @@ object Scala {
       }
     }
 
+    val ifExpr: Parser[Expr] = for {
+      _ <- token(sat(LexerToken.If))
+      _ <- `(`
+      cond <- all
+      _ <- `)`
+      left <- all
+      _ <- token(sat(LexerToken.Else))
+      right <- all
+    } yield If(cond, left, right).asInstanceOf[Expr]
+
     val expressionGroup = for {
       _ <- `(`
       expressions <- sepBy(expr.all, `,`)
@@ -186,12 +198,12 @@ object Scala {
       _ <- `}`
     } yield all
 
-
     val constants: Parser[Expr] =
       number +++
       string +++
       bool +++
-      function
+      function +++
+      ifExpr
 
     val emptyToken = Parser.parserMonad.empty[LexerToken]
 

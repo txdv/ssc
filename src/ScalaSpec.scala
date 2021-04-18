@@ -272,4 +272,10 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     val expected = Func("println", Seq(ExprOp('+', Num("1"), Num("2"))))
     "println(1 + 2)".ast(Scala.expr.function) should be (Some(expected))
   }
+
+  "expr.ifExpr" should "parse if (true) 1 else 2" in {
+    val expected = Expression.If(Expression.Bool(true), Num("1"), Num("2"))
+    //"if (true) 1 else 2".ast(Scala.expr.ifExpr) should be (Some(expected))
+    "if (true) 1 else 2".ast(Scala.expr.ifExpr) should be (Some(expected))
+  }
 }

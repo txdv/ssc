@@ -114,6 +114,10 @@ object ScalaCompiler {
           evalCache(res, newCache)
 
         }
+      case If(Bool(true), left, _) =>
+        left
+      case If(Bool(false), _, right) =>
+        right
       case Func(name, args) =>
         Func(name, args.map(eval))
       case _ =>
@@ -178,6 +182,8 @@ object ScalaCompiler {
         method.returnType
       case ExprOp(_, left, _) =>
         guessType(left)
+      case If(cond, left, right) =>
+        ???
       case _ =>
         println("HERE:")
         println(expr)
