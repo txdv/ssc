@@ -76,13 +76,13 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     """ } should be ("3\n")
   }
 
-  "Compiler" should "add together numbers" in {
+  "Compiler" should "add grouped numbers" in {
     compileAndRun("MainApp") { """
       object MainApp {
         def main(args: Array[String]): Unit = {
-          println(1 + 2)
+          println(2 * (3 + 4))
         }
       }
-    """ } should be ("3\n")
+    """ } should be ("14\n")
   }
 }
