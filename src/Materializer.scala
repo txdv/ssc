@@ -14,8 +14,9 @@ object Constant {
   case class FieldRef(klass: Class, nameAndType: NameAndType) extends Constant
   case class ConstString(str: Utf8) extends Constant
   case class ConstInt(int: Int) extends Constant
-
 }
+
+case class ClassFile(head: ByteBuffer, body: ByteBuffer)
 
 // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.3
 class Materializer {
@@ -71,7 +72,7 @@ class Materializer {
     }
   }
 
-  def bytes(jclass: Class): (ByteBuffer, ByteBuffer) = {
+  def bytes(jclass: Class): ClassFile = {
     head.putInt(0xCAFEBABE)
     head.putShort(jclass.version.minor)
     head.putShort(jclass.version.major)
@@ -82,7 +83,7 @@ class Materializer {
 
     constantPoolCount.putShort(constant_index.toShort)
 
-    (head.getBytes, body.getBytes)
+    ClassFile(head.getBytes, body.getBytes)
   }
 
   private def write(jclass: Class): ByteBufferStream = {

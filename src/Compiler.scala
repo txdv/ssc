@@ -1,5 +1,6 @@
 package lt.vu.mif.bentkus.bachelor.compiler
 
+
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.Version
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{
   ClassAccessFlag,
@@ -12,6 +13,7 @@ import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{
   Method,
   MethodRef,
   Op,
+  ClassFile,
 }
 import lt.vu.mif.bentkus.bachelor.compiler.lexer.Lexer
 import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
@@ -29,7 +31,7 @@ import lt.vu.mif.bentkus.bachelor.compiler.classfile.types.runtime.Types
 import java.io.File
 import java.nio.file.Files
 
-object MainApp extends App {
+object Compiler {
   def convert(obj: DefObject): Class = {
     Class(
       version = Version(0, 59),
@@ -220,11 +222,14 @@ object MainApp extends App {
   }
 
   def readFile(filename: String): Seq[Expression] = {
-
     val content = Benchmark.gauge2("read") {
       Files.readAllBytes(new File(filename).toPath)
     }
 
+    parseBytes(content)
+  }
+
+  def parseBytes(content: Array[Byte]): Seq[Expression] = {
     val lex = Benchmark.gauge2("lex") {
       Lexer.lexAll(Span(content)).toList
     }
@@ -246,31 +251,6 @@ object MainApp extends App {
         PrettyPrint.pformat(tokens)
       }
       throw new Exception("Failed parsing")
-    }
-  }
-
-  {
-    val statements = MainApp.readFile(args.head)
-    val defObject = statements.find(_.isInstanceOf[DefObject]).get.asInstanceOf[DefObject]
-    val jclass = Benchmark.gauge2("ast") {
-      convert(defObject)
-    }
-    PrettyPrint.pformat(defObject)
-    PrettyPrint.pformat(jclass)
-    val m = new classfile.higher.Materializer
-    val (head, body) = Benchmark.gauge2("class") {
-      m.bytes(jclass)
-    }
-    printBuffer(head)
-    printBuffer(body)
-
-    {
-      val fname = args.head.replaceFirst("\\.scala$", ".class")
-      val fc = new java.io.FileOutputStream(fname).getChannel()
-      fc.write(head)
-      fc.write(body)
-      fc.close()
-      Benchmark.print
     }
   }
 
@@ -297,6 +277,37 @@ object MainApp extends App {
       print(str)
     }
     println
+  }
+
+  def main(args: Array[String]): Unit = {
+    val statements = readFile(args.head)
+    val defObject = statements.find(_.isInstanceOf[DefObject]).get.asInstanceOf[DefObject]
+    val jclass = Benchmark.gauge2("ast") {
+      convert(defObject)
+    }
+    PrettyPrint.pformat(defObject)
+    PrettyPrint.pformat(jclass)
+    val m = new classfile.higher.Materializer
+    val cf = Benchmark.gauge2("class") {
+      m.bytes(jclass)
+    }
+
+    val fname = args.head.replaceFirst("\\.scala$", ".class")
+    writeFile(fname, cf)
+
+    Benchmark.print
+  }
+
+  def debug(classFile: ClassFile): Unit = {
+    printBuffer(classFile.head)
+    printBuffer(classFile.body)
+  }
+
+  def writeFile(name: String, classFile: ClassFile): Unit = {
+    val fc = new java.io.FileOutputStream(name).getChannel()
+    fc.write(classFile.head)
+    fc.write(classFile.body)
+    fc.close()
   }
 }
 
