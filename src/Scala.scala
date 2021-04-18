@@ -37,7 +37,7 @@ object Expression {
   case class Stri(value: String) extends Expr
   case class Bool(value: Boolean) extends Expr
 
-  case class ExprOp(char: Char, left: Expr, right: Expr) extends Expr
+  case class ExprOp(char: String, left: Expr, right: Expr) extends Expr
 
   case class If(cond: Expr, left: Expr, right: Expr) extends Expr
 }
@@ -212,7 +212,7 @@ object Scala {
         parser +++ symbol(ch)
       }
       p <- lift { (a, b) =>
-        ExprOp(sym(0), a, b)
+        ExprOp(sym, a, b)
       }
     } yield p
 

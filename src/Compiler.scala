@@ -78,19 +78,19 @@ object ScalaCompiler {
   def evalCache(expr: Expr, cache: Seq[Int]): Expr = {
     import Expression._
     expr match {
-      case ExprOp('+', Num(a), Num(b)) =>
+      case ExprOp("+", Num(a), Num(b)) =>
         Num((a.toInt + b.toInt).toString)
-      case ExprOp('*', Num(a), Num(b)) =>
+      case ExprOp("*", Num(a), Num(b)) =>
         Num((a.toInt * b.toInt).toString)
-      case ExprOp('-', Num(a), Num(b)) =>
+      case ExprOp("-", Num(a), Num(b)) =>
         Num((a.toInt - b.toInt).toString)
-      case ExprOp('/', Num(a), Num(b)) =>
+      case ExprOp("/", Num(a), Num(b)) =>
         Num((a.toInt / b.toInt).toString)
-      case ExprOp('+', Stri(a), Stri(b)) =>
+      case ExprOp("+", Stri(a), Stri(b)) =>
         Stri(a + b)
-      case ExprOp('+', Stri(a), Num(b)) =>
+      case ExprOp("+", Stri(a), Num(b)) =>
         Stri(a + b)
-      case ExprOp('+', Stri(a), Bool(value)) =>
+      case ExprOp("+", Stri(a), Bool(value)) =>
         Stri(a + value)
       /*
        * TODO:
@@ -151,7 +151,7 @@ object ScalaCompiler {
         }
       case Bool(value) =>
         Seq(if (value) Op.iconst(1) else Op.iconst(0))
-      case ExprOp('+', left, right) =>
+      case ExprOp("+", left, right) =>
         guessType(left) match {
           case JavaType.Int =>
             genops(left) ++ genops(right) :+ Op.iadd
