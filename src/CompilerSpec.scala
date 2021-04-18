@@ -136,4 +136,14 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     """ } should be ("0\n")
   }
+
+  "Compiler" should "==" in {
+    compileAndRun { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println(1 == 2)
+        }
+      }
+    """ } should be ("0\n")
+  }
 }

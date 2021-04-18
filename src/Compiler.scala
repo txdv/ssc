@@ -34,7 +34,7 @@ import java.nio.file.Files
 object ScalaCompiler {
   def convert(obj: DefObject): Class = {
     Class(
-      version = Version(0, 59),
+      version = Version(0, 58),
       thisClass = JavaType.Class(obj.name),
       superClass = JavaType.Class("java/lang/Object"),
       methods = {
@@ -159,6 +159,15 @@ object ScalaCompiler {
             ???
 
         }
+      case ExprOp("==", left, right) =>
+        val i = 0
+        genops(left) ++ genops(right) ++ Seq(
+          Op.if_icmpne(7 + i),
+          Op.iconst(1),
+          Op.goto(4 + i),
+          Op.iconst(0),
+        )
+        //println(s"$left $right")
       case _ =>
         ???
     }

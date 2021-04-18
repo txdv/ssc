@@ -54,6 +54,15 @@ object Scala {
       false
   })
 
+  def strSymbol(strings: Seq[String]): Parser[LexerToken] = token {
+    sat2 {
+      case Symbol(string) =>
+        strings.contains(string)
+      case _ =>
+        false
+    }
+  }
+
   def identifierWithName(value: String): Parser[LexerToken] =
     token(sat(Identifier(value)))
 
@@ -207,6 +216,14 @@ object Scala {
 
     val emptyToken = Parser.parserMonad.empty[LexerToken]
 
+    def ops2(symbols: Seq[String]): Parser[(Expr, Expr) => Expr] = for {
+      Symbol(sym) <- strSymbol(symbols)
+      p <- lift { (a, b) =>
+        ExprOp(sym, a, b)
+      }
+    } yield p
+
+
     def ops(symbols: Seq[Char]): Parser[(Expr, Expr) => Expr] = for {
       Symbol(sym) <- symbols.foldLeft(emptyToken) { case (parser, ch) =>
         parser +++ symbol(ch)
@@ -216,7 +233,8 @@ object Scala {
       }
     } yield p
 
-    val op: Parser[Expr] = chainl1(term, ops(Seq('+', '-')))
+    val op: Parser[Expr] = chainl1(term1, ops2(Seq("==")))
+    lazy val term1: Parser[Expr] = chainl1(term, ops(Seq('+', '-')))
     lazy val term: Parser[Expr] = chainl1(factor, ops(Seq('*', '/')))
 
     lazy val factor: Parser[Expr] = constants +++ (for {

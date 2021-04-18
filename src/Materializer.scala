@@ -208,8 +208,12 @@ class Materializer {
         ByteArray(0x60)
       case bipush(byte) =>
         ByteArray(0x10, byte)
+      case if_icmpne(offset) =>
+         ByteArray(0xa0, (offset >> 8) & 0xff, offset & 0xff)
+      case goto(offset) =>
+         ByteArray(0xa7, (offset >> 8) & 0xff, offset & 0xff)
       case _ =>
-        println("missing op: $op")
+        println(s"missing op: $op")
         ???
     }
   }

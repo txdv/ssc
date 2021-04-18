@@ -61,4 +61,8 @@ class LexerSpec extends AnyFlatSpec with should.Matchers {
   it should "else" in {
     lex("else") should be (Seq(Else))
   }
+
+  it should "==" in {
+    lex("==") should be (Seq(Symbol("==")))
+  }
 }

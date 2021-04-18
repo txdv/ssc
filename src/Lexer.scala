@@ -28,6 +28,8 @@ object LexerToken {
   case object Else extends LexerToken {
     val value: String = "else"
   }
+
+  case class Operator(value: String) extends LexerToken
 }
 
 import LexerToken._
@@ -63,15 +65,16 @@ import SpanExtensions._
 
 
 object Lexer {
-  private val singleChars = Set('(', ')', '[', ']', '=', ',', '.', '+', '-', '*', '%', '{', '}', ':')
+  private val singleChars = Set("(", ")", "[", "]", "=", ",", ".", "+", "-", "*", "%", "{", "}", ":")
 
-  private val special = Set('?', '!')
+  private val special = Set("?", "!")
 
   val keywords = Map(
     "if" -> If,
     "else" -> Else,
     "true" -> Bool("true"),
     "false" -> Bool("false"),
+    "==" -> Symbol("=="),
   )
 
   //val keywordLetters = keywords.map { case (k, v) => k(0) }.toArray
@@ -99,11 +102,11 @@ object Lexer {
         buffer.startsWith(prefix)
       }.get
       (token, buffer.split(token.value.length).suffix)
-    } else if (special.contains(ch)) {
-      buffer.takeWhile(special.contains).map(_.to[Identifier])
+    } else if (special.contains(ch.toString)) {
+      buffer.takeWhile(c => special.contains(c.toString)).map(_.to[Identifier])
     } else if (ch.isLetter) {
       buffer.takeWhile(isIdentifier).map(_.to[Identifier])
-    } else if (singleChars.contains(ch)) {
+    } else if (singleChars.contains(ch.toString)) {
       buffer.takeChar.map(_.to[Symbol])
     } else if (ch == '"') {
       // TODO: support escaping
