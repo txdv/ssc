@@ -11,10 +11,11 @@ import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.{
 import collection.JavaConverters._
 
 class CompilerSpec extends AnyFlatSpec with should.Matchers {
-  def compileAndRun(name: String)(code: String): String = {
+  def compileAndRun(code: String): String = {
     val codeBytes = code.getBytes
     val statements = ScalaCompiler.parseBytes(codeBytes)
     val defObject = statements.find(_.isInstanceOf[DefObject]).get.asInstanceOf[DefObject]
+    val name = defObject.name
     val objDef = ScalaCompiler.convert(defObject)
     val m = new classfile.higher.Materializer
     val classFile = m.bytes(objDef)
@@ -47,7 +48,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "Compiler" should "println string" in {
-    compileAndRun("MainApp") { """
+    compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
           println("Hello World!")
@@ -57,7 +58,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "Compiler" should "concat string" in {
-    compileAndRun("MainApp") { """
+    compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
           println("Hello" + " " + "World!")
@@ -67,7 +68,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "Compiler" should "add together numbers" in {
-    compileAndRun("MainApp") { """
+    compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
           println(1 + 2)
@@ -77,7 +78,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "Compiler" should "add grouped numbers" in {
-    compileAndRun("MainApp") { """
+    compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
           println(2 * (3 + 4))
