@@ -16,7 +16,33 @@ object Constant {
   case class ConstInt(int: Int) extends Constant
 }
 
-case class ClassFile(head: ByteBuffer, body: ByteBuffer)
+case class ClassFile(head: ByteBuffer, body: ByteBuffer) {
+  def getBytes: Array[Byte] = {
+    val headLength = head.limit()
+    val bodyLength = body.limit()
+
+    val length: Int = headLength + bodyLength
+
+    val result = new Array[Byte](length)
+
+    // src, srcPos, dest, destPos, length
+    System.arraycopy(
+      head.array(),
+      0,
+      result,
+      0,
+      headLength)
+
+    System.arraycopy(
+      body.array(),
+      0,
+      result,
+      headLength,
+      bodyLength)
+
+    result
+  }
+}
 
 // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.3
 class Materializer {

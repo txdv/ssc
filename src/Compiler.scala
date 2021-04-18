@@ -31,7 +31,7 @@ import lt.vu.mif.bentkus.bachelor.compiler.classfile.types.runtime.Types
 import java.io.File
 import java.nio.file.Files
 
-object Compiler {
+object ScalaCompiler {
   def convert(obj: DefObject): Class = {
     Class(
       version = Version(0, 59),
@@ -342,6 +342,5 @@ object Benchmark {
       println(s"$k\t${v.toMillis}")
 
     }
-
   }
 }

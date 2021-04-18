@@ -130,12 +130,12 @@ scala_binary(
     srcs = ["Compiler.scala"],
     deps = [":scala", ":class", ":classfile", ":pretty_print", ":materializer", ":type"],
     scalacopts = fatal_warnings(),
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.Compiler")
+    main_class = "lt.vu.mif.bentkus.bachelor.compiler.ScalaCompiler")
 
 scala_test(
     name = "compiler_spec",
-    srcs = ["CompilerSpec.scala"],
-    deps = [":class"],
+    srcs = ["CompilerSpec.scala", "ByteClassLoader.java"],
+    deps = [":compiler", ":scala", "materializer"],
     scalacopts = fatal_warnings())
 
 scala_binary(
