@@ -86,6 +86,8 @@ object MainApp extends App {
         Num((a.toInt / b.toInt).toString)
       case ExprOp('+', Stri(a), Stri(b)) =>
         Stri(a + b)
+      case ExprOp('+', Stri(a), Num(b)) =>
+        Stri(a + b)
       /*
        * TODO:
        * When we have something like
@@ -121,7 +123,12 @@ object MainApp extends App {
     import Expression._
     expr match {
       case Func(name, args) =>
-        val method = math.methods.find(_.name == name).get
+        val methods = math.methods.filter(_.name == name)
+        val method = methods.head
+
+        if (args.size != method.signature.size - 1) {
+          throw new Exception(s"Expected ${args.size} arguments, but got ${method.signature.size}")
+        }
 
         args.flatMap(genops) :+
           Op.invoke(method, Op.invoke.static)
@@ -135,7 +142,13 @@ object MainApp extends App {
           Seq(Op.iconst(a.toInt))
         }
       case ExprOp('+', left, right) =>
-        genops(left) ++ genops(right) :+ Op.iadd
+        guessType(left) match {
+          case JavaType.Int =>
+            genops(left) ++ genops(right) :+ Op.iadd
+          case _ =>
+            ???
+
+        }
       case _ =>
         ???
     }
@@ -195,7 +208,7 @@ object MainApp extends App {
     }
 
 
-    Code(stackSize = 3, 1, code)
+    Code(stackSize = 5, 1, code)
   }
 
   def convert(method: DefMethod): Method = {
