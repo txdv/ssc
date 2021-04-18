@@ -6,6 +6,7 @@ import matchers._
 import LexerToken._
 
 class LexerSpec extends AnyFlatSpec with should.Matchers {
+  import Lexer.{lexAll => lex}
 
   "Lexer" should "lex identifiers and whitespaces" in {
     Lexer.lexAll("hello world") should be (Seq(
@@ -43,5 +44,13 @@ class LexerSpec extends AnyFlatSpec with should.Matchers {
 
   it should "treat ??? as identifier" in {
     Lexer.lexAll("???") should be (Seq(Identifier("???")))
+  }
+
+  it should "lex true" in {
+    lex("true") should be (Seq(Bool("true")))
+  }
+
+  it should "lex false" in {
+    lex("true") should be (Seq(Bool("true")))
   }
 }

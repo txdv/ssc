@@ -263,6 +263,11 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     })
   }
 
+  "expr.op" should "parse booleans" in {
+    "true".ast(Scala.expr.all) should be (Some(Expression.Bool(true)))
+    "false".ast(Scala.expr.all) should be (Some(Expression.Bool(false)))
+  }
+
   "expr.function" should "parse println(1 + 2)" in {
     val expected = Func("println", Seq(ExprOp('+', Num("1"), Num("2"))))
     "println(1 + 2)".ast(Scala.expr.function) should be (Some(expected))

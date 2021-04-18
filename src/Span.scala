@@ -47,6 +47,15 @@ case class Span(start: Int, end: Int, buffer: Array[Byte]) {
 
   def toHex: String =
     buffer.map(Span.toHex).mkString
+
+  def startsWith(prefix: String): Boolean = {
+    (0 to prefix.length - 1).foreach { i =>
+      if (char(i + start) != prefix(i)) {
+        return false
+      }
+    }
+    true
+  }
 }
 
 case class SpanSplit(prefix: Span, suffix: Span) {

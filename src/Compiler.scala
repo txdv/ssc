@@ -90,6 +90,8 @@ object ScalaCompiler {
         Stri(a + b)
       case ExprOp('+', Stri(a), Num(b)) =>
         Stri(a + b)
+      case ExprOp('+', Stri(a), Bool(value)) =>
+        Stri(a + value)
       /*
        * TODO:
        * When we have something like
@@ -143,6 +145,8 @@ object ScalaCompiler {
         } else {
           Seq(Op.iconst(a.toInt))
         }
+      case Bool(value) =>
+        Seq(if (value) Op.iconst(1) else Op.iconst(0))
       case ExprOp('+', left, right) =>
         guessType(left) match {
           case JavaType.Int =>
@@ -167,6 +171,8 @@ object ScalaCompiler {
         JavaType.String
       case _: Num =>
         JavaType.Int
+      case _: Bool =>
+        JavaType.Boolean
       case Func(name, arguments) =>
         val method = math.methods.find(_.name == name).get
         method.returnType

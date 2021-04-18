@@ -35,6 +35,7 @@ object Expression {
   case class Func(name: String, arguments: Seq[Expr]) extends Expr
   case class Num(value: String) extends Expr
   case class Stri(value: String) extends Expr
+  case class Bool(value: Boolean) extends Expr
 
   case class ExprOp(char: Char, left: Expr, right: Expr) extends Expr
 }
@@ -145,6 +146,10 @@ object Scala {
       ident <- identifier
     } yield Ident(ident.value)
 
+    val bool: Parser[Expr] = for {
+      bool <- token(sat[LexerToken.Bool])
+    } yield Bool(bool.value == "true")
+
     /*
     val function: Parser[Expr] = for {
       func <- sat[Identifier]
@@ -185,6 +190,7 @@ object Scala {
     val constants: Parser[Expr] =
       number +++
       string +++
+      bool +++
       function
 
     val emptyToken = Parser.parserMonad.empty[LexerToken]

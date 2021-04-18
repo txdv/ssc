@@ -71,6 +71,12 @@ object Lexer {
 
     if (ch.isWhitespace) {
       buffer.takeWhile(_.isWhitespace).map(_.to[Whitespace])
+    } else if (ch == 't' && buffer.startsWith("true")) {
+      val split = buffer.split(4)
+      (Bool("true"), split.suffix)
+    } else if (ch == 'f' && buffer.startsWith("false")) {
+      val split = buffer.split(5)
+      (Bool("false"), split.suffix)
     } else if (special.contains(ch)) {
       buffer.takeWhile(special.contains).map(_.to[Identifier])
     } else if (ch.isLetter) {

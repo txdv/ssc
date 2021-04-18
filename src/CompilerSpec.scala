@@ -86,4 +86,34 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     """ } should be ("14\n")
   }
+
+  "Compiler" should "true" in {
+    compileAndRun { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println(true)
+        }
+      }
+    """ } should be ("true\n")
+  }
+
+  "Compiler" should "false" in {
+    compileAndRun { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println(false)
+        }
+      }
+    """ } should be ("false\n")
+  }
+
+  "Compiler" should "concat string and bool" in {
+    compileAndRun { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println("Hello " + false)
+        }
+      }
+    """ } should be ("Hello false\n")
+  }
 }
