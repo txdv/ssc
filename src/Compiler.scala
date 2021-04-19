@@ -127,7 +127,29 @@ object ScalaCompiler {
 
   val math = Types.resolve("java.lang.Math")
 
-  def genops(expr: Expr): Seq[Op] = {
+  case class StackMap(offset: Int, stack: Seq[String])
+  case class GenCode(stackSize: Int, ops: Seq[Op], stackMap: Seq[StackMap]) {
+    def +(other: GenCode): GenCode = {
+      GenCode(
+        stackSize + other.stackSize,
+        ops ++ other.ops,
+        stackMap ++ other.stackMap)
+    }
+  }
+
+  object GenCode {
+    val Empty = GenCode(stackSize = 0, ops = Seq.empty, stackMap = Seq.empty)
+
+    def op(op: Op, stackSize: Int = 0): GenCode = {
+      GenCode(stackSize, ops = Seq(op), stackMap = Seq.empty)
+    }
+
+    def ops(ops: Seq[Op], stackSize: Int = 0): GenCode = {
+      GenCode(stackSize, ops, stackMap = Seq.empty)
+    }
+  }
+
+  def genops(expr: Expr): GenCode = {
     import Expression._
     expr match {
       case Func(name, args) =>
@@ -138,36 +160,37 @@ object ScalaCompiler {
           throw new Exception(s"Expected ${args.size} arguments, but got ${method.signature.size}")
         }
 
-        args.flatMap(genops) :+
-          Op.invoke(method, Op.invoke.static)
+        args.map(genops).foldLeft(GenCode.Empty)(_ + _) +
+          GenCode.op(Op.invoke(method, Op.invoke.static))
       case Stri(arg) =>
-        Seq(Op.ldc(ConstString(arg)))
+        GenCode.op(Op.ldc(ConstString(arg)), stackSize = 1)
       case Num(a) =>
         val num = a.toInt
         if (num <= 255) {
-          Seq(Op.bipush(num.toByte))
+          GenCode.op(Op.bipush(num.toByte), stackSize = 1)
         } else {
-          Seq(Op.iconst(a.toInt))
+          GenCode.op(Op.iconst(a.toInt), stackSize = 1)
         }
       case Bool(value) =>
-        Seq(if (value) Op.iconst(1) else Op.iconst(0))
+        val op = if (value) Op.iconst(1) else Op.iconst(0)
+        GenCode.op(op, stackSize = 1)
       case ExprOp("+", left, right) =>
+        ???
         guessType(left) match {
           case JavaType.Int =>
-            genops(left) ++ genops(right) :+ Op.iadd
+            genops(left) + genops(right) + GenCode.op(Op.iadd)
           case _ =>
             ???
 
         }
       case ExprOp("==", left, right) =>
         val i = 0
-        genops(left) ++ genops(right) ++ Seq(
+        genops(left) + genops(right) + GenCode.ops(Seq(
           Op.if_icmpne(7 + i),
           Op.iconst(1),
           Op.goto(4 + i),
           Op.iconst(0),
-        )
-        //println(s"$left $right")
+        ))
       case _ =>
         ???
     }
@@ -221,17 +244,16 @@ object ScalaCompiler {
           "println",
           Seq(JavaType.Void, methodType))
 
-        Seq.empty ++
-          Seq(Op.getstatic(systemOut)) ++
-          genops(argExpr) ++
-          Seq(Op.invoke(method, Op.invoke.virtual)) ++
-          Seq(Op.Return)
+        GenCode.op(Op.getstatic(systemOut), stackSize = 1) +
+        genops(argExpr) +
+        GenCode.op(Op.invoke(method, Op.invoke.virtual)) +
+        GenCode.op(Op.Return)
       case _ =>
         ???
     }
 
 
-    Code(stackSize = 5, 1, code)
+    Code(stackSize = code.stackSize, 1, code.ops)
   }
 
   def convert(method: DefMethod): Method = {
