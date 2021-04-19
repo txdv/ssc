@@ -7,6 +7,8 @@ import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{
   AccessFlag,
   Class,
   Code,
+  StackFrame,
+  StackElement,
   ConstString,
   FieldRef,
   JavaType,
@@ -127,7 +129,7 @@ object ScalaCompiler {
 
   val math = Types.resolve("java.lang.Math")
 
-  def genops(expr: Expr): Code = {
+  def genops(expr: Expr, stack: Seq[StackFrame] = Seq.empty): Code = {
     import Expression._
     expr match {
       case Func(name, args) =>
@@ -138,7 +140,7 @@ object ScalaCompiler {
           throw new Exception(s"Expected ${args.size} arguments, but got ${method.signature.size}")
         }
 
-        args.map(genops).foldLeft(Code.empty)(_ + _) +
+        args.map(a => genops(a)).foldLeft(Code.empty)(_ + _) +
           Code.op(Op.invoke(method, Op.invoke.static))
       case Stri(arg) =>
         Code.op(Op.ldc(ConstString(arg)), stackSize = 1)
@@ -162,19 +164,22 @@ object ScalaCompiler {
 
         }
       case ExprOp("==", left, right) =>
-        genops(left) + genops(right) + Code.ops(Seq(
-          Op.if_icmpne(7),
-          Op.iconst(1),
-          Op.goto(4),
-          Op.iconst(0),
-        ))
+        val pre = genops(left) + genops(right)
+
+        val newStack =
+          stack.map(_.addOffset(pre.codeSize + 7)) ++
+          stack.map(_.add(pre.codeSize + 8, StackElement.Type(JavaType.Int)))
+
+        pre +
+          Code.ops(Seq(
+            Op.if_icmpne(7),
+            Op.iconst(1),
+            Op.goto(4),
+            Op.iconst(0),
+          )).withStackMap(newStack)
       case _ =>
         ???
     }
-  }
-
-  def a(b: Int): Int = {
-    b + 42
   }
 
   def guessType(expr: Expr): JavaType = {
@@ -203,7 +208,7 @@ object ScalaCompiler {
   def convertBody(expr: Expr): Code = {
     import Expression._
 
-    val code = expr match {
+    expr match {
       case Func("println", Seq(arg)) =>
         val printStream = JavaType.Class("java/io/PrintStream")
 
@@ -221,16 +226,15 @@ object ScalaCompiler {
           "println",
           Seq(JavaType.Void, methodType))
 
-        Code.op(Op.getstatic(systemOut), stackSize = 1) +
-        genops(argExpr) +
+        Code.op(Op.getstatic(systemOut), stackSize = 1, localsCount = 1) +
+        genops(argExpr, Seq(
+          StackFrame(offset = 3, Seq(StackElement.Type(systemOut.signature.head)))
+        )) +
         Code.op(Op.invoke(method, Op.invoke.virtual)) +
         Code.op(Op.Return)
       case _ =>
         ???
     }
-
-
-    Code(stackSize = code.stackSize, localsCount = 1, code.ops, Seq.empty)
   }
 
   def convert(method: DefMethod): Method = {

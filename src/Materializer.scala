@@ -163,9 +163,87 @@ class Materializer {
 
       // exception_table_length
       body.putShort(0)
+
+
+      //body.putShort(0) // attributes_count
       // attribute_info
-      body.putShort(0)
+      if (code.stackMap.size > 0) {
+        body.putShort(1)
+        writeCodeAttributes(body, code)
+      } else {
+        body.putShort(0)
+      }
     }
+  }
+
+  private def writeCodeAttributes(body: ByteBufferStream, code: Code): Unit = {
+
+    body.putShort(const(Constant.Utf8("StackMapTable")))
+
+    val attributeLength = body.reserveInt
+    val codeStart = body.bb.position()
+
+    body.putShort(code.stackMap.size)
+
+    if (code.stackMap.size > 0) {
+      body.putByte(80)
+      body.putByte(7) // object
+
+      code.stackMap(0).elements.map { element =>
+        writeElement(body, element)
+      }
+    }
+
+    if (code.stackMap.size > 1) {
+      body.putByte(255) // type
+      body.putShort(0) // offset delta
+      body.putShort(0) // number_of_locals
+      body.putShort(2) // number_of_stack_items
+
+      code.stackMap(1).elements.foreach { element =>
+        writeElement(body, element)
+      }
+    }
+
+    val codeEnd = body.bb.position()
+
+    println(s"code length: ${codeEnd - codeStart}")
+
+    attributeLength.putInt(codeEnd - codeStart)
+  }
+
+  /*
+  val result = code.stackMap(0).elements.head match {
+    case StackElement.Type(jtype) =>
+      jtype match {
+        case jclass: JavaType.Class =>
+          convert(jclass)
+        case _ =>
+          ???
+
+      }
+      //const(convert(jtype))
+    case _ =>
+      ???
+  }
+  val index = const(result)
+
+  body.putShort(index)
+  */
+  private def writeElement(body: ByteBufferStream, element: StackElement): Int = element match {
+    case StackElement.Type(jtype) =>
+      jtype match {
+        case jclass: JavaType.Class =>
+          body.putByte(7)
+          body.putShort(const(convert(jclass)))
+          3
+        case JavaType.Int =>
+          body.putByte(1)
+          1
+        case _ => ???
+      }
+    case _ =>
+      ???
   }
 
   def opBytes(op: Op): Array[Byte] = {
@@ -221,7 +299,6 @@ class Materializer {
   def ByteArray(bytes: Int*): Array[Byte] = {
     bytes.map(_.toByte).toArray
   }
-
 
   def convert(jclass: JavaType.Class): Constant.Class = {
     Constant.Class(Constant.Utf8(jclass.namespace))

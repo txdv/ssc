@@ -134,7 +134,25 @@ object JavaType {
   }
 }
 
-case class StackFrame(offset: Int)
+sealed trait StackElement
+object StackElement {
+  case class Ref(ref: FieldRef) extends StackElement
+  case class Type(jtype: JavaType) extends StackElement
+}
+
+case class StackFrame(offset: Int, elements: Seq[StackElement]) {
+  def addOffset(additional: Int): StackFrame = {
+    StackFrame(offset + additional, elements)
+  }
+
+  def addElement(element: StackElement): StackFrame = {
+    StackFrame(offset, elements :+ element)
+  }
+
+  def add(additional: Int, element: StackElement): StackFrame = {
+    StackFrame(offset + additional, elements :+ element)
+  }
+}
 
 case class Code(
   stackSize: Int,
@@ -153,13 +171,19 @@ case class Code(
   def withStackSize(newStackSize: Int): Code = {
     this.copy(stackSize = newStackSize)
   }
+
+  def withStackMap(newStackMap: Seq[StackFrame]): Code = {
+    this.copy(stackMap = newStackMap)
+  }
+
+  val codeSize: Int = ops.map(Op.size).sum
 }
 
 object Code {
   val empty = Code(stackSize = 0, localsCount = 0, ops = Seq.empty, stackMap = Seq.empty)
 
-  def op(op: Op, stackSize: Int = 0): Code = {
-    Code(stackSize, localsCount = 0, ops = Seq(op), stackMap = Seq.empty)
+  def op(op: Op, stackSize: Int = 0, localsCount: Int = 0): Code = {
+    Code(stackSize, localsCount, ops = Seq(op), stackMap = Seq.empty)
   }
 
   def ops(ops: Seq[Op]): Code = {
@@ -199,6 +223,25 @@ object Op {
   case class if_icmpne(offset: Int) extends Op
   case class goto(offset: Int) extends Op
 
+  def size(op: Op): Int = {
+    op match {
+      case Op.iadd => 1
+      case aload(index) =>
+        if (index >= 0 && index <= 3) 1 else 2
+      case invoke(_, itype) => 3
+      case Op.Return => 1
+      case getstatic(_) => 3
+      case bipush(_) => 1
+      case if_icmpne(_) => 3
+      case iconst(value) =>
+        if ((value >= 0 && value <= 5) || (value == -1)) 1 else 3
+      case goto(_) => 3
+      case ldc(_) => 2
+      case _ =>
+        println(s"missing: $op")
+        ???
+    }
+  }
 }
 
 case class FieldRef(
