@@ -162,11 +162,10 @@ object ScalaCompiler {
 
         }
       case ExprOp("==", left, right) =>
-        val i = 0
         genops(left) + genops(right) + Code.ops(Seq(
-          Op.if_icmpne(7 + i),
+          Op.if_icmpne(7),
           Op.iconst(1),
-          Op.goto(4 + i),
+          Op.goto(4),
           Op.iconst(0),
         ))
       case _ =>
