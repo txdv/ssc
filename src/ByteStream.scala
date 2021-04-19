@@ -18,6 +18,31 @@ trait ByteStream {
 
   def reserveInt: ByteBuffer
   def reserveShort: ByteBuffer
+
+  def trackLength: LengthTracker
+
+  def position(): Int
+}
+
+trait LengthTracker {
+  def resolve(): Unit
+}
+
+case class LengthTrackerImpl(bs: ByteStream) extends LengthTracker {
+  private var resolved = false
+  private var placeholder = bs.reserveInt
+  private val start = bs.position()
+
+  def resolve(): Unit = {
+    if (resolved) {
+      throw new Exception("already resolved")
+    }
+    val end = bs.position()
+    val length = end - start
+
+    resolved = true
+    placeholder.putInt(length)
+  }
 }
 
 class ByteBufferStream extends ByteStream {
@@ -54,5 +79,13 @@ class ByteBufferStream extends ByteStream {
     val result = ByteBuffer.wrap(bb.array, bb.position(), 2)
     bb.putShort(0)
     result
+  }
+
+  def position(): Int = {
+    bb.position()
+  }
+
+  def trackLength: LengthTracker = {
+    LengthTrackerImpl(this)
   }
 }

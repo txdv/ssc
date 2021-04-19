@@ -145,34 +145,31 @@ class Materializer {
 
     method.code.foreach { code =>
       body.putShort(const(Constant.Utf8("Code")))
-      val attributeLength = body.reserveInt
+      val attributeLength = body.trackLength
 
       body.putShort(code.stackSize)
       body.putShort(code.localsCount)
-      val codeLength = body.reserveInt
+      val codeLength = body.trackLength
 
-      var codeSize = 0
       code.ops.foreach { op =>
         val bytes = opBytes(op)
         body.putBytes(bytes)
-        codeSize += bytes.size
       }
 
-      codeLength.putInt(codeSize)
-      attributeLength.putInt(codeSize + 12)
+      codeLength.resolve()
 
       // exception_table_length
       body.putShort(0)
 
 
-      //body.putShort(0) // attributes_count
-      // attribute_info
       if (code.stackMap.size > 0) {
         body.putShort(1)
         writeCodeAttributes(body, code)
       } else {
         body.putShort(0)
       }
+
+      attributeLength.resolve()
     }
   }
 
