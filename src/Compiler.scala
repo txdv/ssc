@@ -146,7 +146,9 @@ object ScalaCompiler {
         Code.op(Op.ldc(ConstString(arg)), stackSize = 1)
       case Num(a) =>
         val num = a.toInt
-        if (num <= 255) {
+        if (num <= 3) {
+          Code.op(Op.iconst(num), stackSize = 1)
+        } else if (num <= 255) {
           Code.op(Op.bipush(num.toByte), stackSize = 1)
         } else {
           Code.op(Op.iconst(a.toInt), stackSize = 1)

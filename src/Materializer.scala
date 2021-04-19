@@ -177,14 +177,12 @@ class Materializer {
 
     body.putShort(const(Constant.Utf8("StackMapTable")))
 
-    val attributeLength = body.reserveInt
-    val codeStart = body.bb.position()
+    val attributeLength = body.trackLength
 
     body.putShort(code.stackMap.size)
 
     if (code.stackMap.size > 0) {
       body.putByte(80)
-      body.putByte(7) // object
 
       code.stackMap(0).elements.map { element =>
         writeElement(body, element)
@@ -202,41 +200,19 @@ class Materializer {
       }
     }
 
-    val codeEnd = body.bb.position()
-
-    println(s"code length: ${codeEnd - codeStart}")
-
-    attributeLength.putInt(codeEnd - codeStart)
+    attributeLength.resolve()
   }
 
-  /*
-  val result = code.stackMap(0).elements.head match {
-    case StackElement.Type(jtype) =>
-      jtype match {
-        case jclass: JavaType.Class =>
-          convert(jclass)
-        case _ =>
-          ???
-
-      }
-      //const(convert(jtype))
-    case _ =>
-      ???
-  }
-  val index = const(result)
-
-  body.putShort(index)
-  */
-  private def writeElement(body: ByteBufferStream, element: StackElement): Int = element match {
+  private def writeElement(body: ByteBufferStream, element: StackElement): Unit = element match {
     case StackElement.Type(jtype) =>
       jtype match {
         case jclass: JavaType.Class =>
           body.putByte(7)
-          body.putShort(const(convert(jclass)))
-          3
+          val target = const(convert(jclass))
+          println(s"target: $target")
+          body.putShort(target)
         case JavaType.Int =>
           body.putByte(1)
-          1
         case _ => ???
       }
     case _ =>
