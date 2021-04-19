@@ -134,10 +134,38 @@ object JavaType {
   }
 }
 
+case class StackFrame(offset: Int)
+
 case class Code(
   stackSize: Int,
   localsCount: Int,
-  ops: Seq[Op])
+  ops: Seq[Op],
+  stackMap: Seq[StackFrame]) {
+
+  def +(other: Code): Code = {
+    Code(
+      stackSize + other.stackSize,
+      localsCount + other.localsCount,
+      ops ++ other.ops,
+      stackMap ++ other.stackMap)
+  }
+
+  def withStackSize(newStackSize: Int): Code = {
+    this.copy(stackSize = newStackSize)
+  }
+}
+
+object Code {
+  val empty = Code(stackSize = 0, localsCount = 0, ops = Seq.empty, stackMap = Seq.empty)
+
+  def op(op: Op, stackSize: Int = 0): Code = {
+    Code(stackSize, localsCount = 0, ops = Seq(op), stackMap = Seq.empty)
+  }
+
+  def ops(ops: Seq[Op]): Code = {
+    Code(stackSize = 0, localsCount = 0, ops, stackMap = Seq.empty)
+  }
+}
 
 
 sealed trait OpConst
@@ -211,7 +239,8 @@ object Method {
         Op.aload(0),
         Op.invoke(ObjectConstructor, Op.invoke.special),
         Op.Return,
-      ))
+      ),
+      stackMap = Seq.empty)
 
     Method(
       name = "<init>",
@@ -476,7 +505,8 @@ object Converter {
         Code(
           maxStack,
           maxLocals,
-          instructions.map(instr => convert(instr)(classFile)))
+          instructions.map(instr => convert(instr)(classFile)),
+          stackMap = Seq.empty)
       }
     }
   }
