@@ -146,7 +146,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     """ } should be ("0\n")
   }
-/*
+
   "Compiler" should "==" in {
     compileAndRun { """
       object MainApp {
@@ -154,7 +154,6 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
           println(addExact(1, 2) == 3)
         }
       }
-    """ } should be ("0\n")
+    """ } should be ("true\n")
   }
-*/
 }
