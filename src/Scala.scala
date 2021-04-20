@@ -100,7 +100,7 @@ object Scala {
   val `:` = symbol(':')
   val `=` = symbol('=')
 
-  val fullIdentifier = token(sepBy(sat[Identifier], `.`))
+  val fullIdentifier = sepBy(token(sat[Identifier]), `.`)
 
   def typeDef: Parser[ScalaType] = for {
     name <- identifier

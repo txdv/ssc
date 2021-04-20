@@ -40,8 +40,10 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
   }
 
-  "import" should "parse an import only if the imported name is on one line" in {
-    "import some.other\n.value123".ast(Scala.`import`) should be (None)
+  "import" should "parse import with new lines inbetween" in {
+    "import some\n.other\n.value123\n".ast(Scala.`import`) should be (Some(
+      Import("some.other.value123")
+    ))
   }
 
   "main" should "parse a singular import" in {
