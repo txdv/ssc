@@ -117,7 +117,15 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "expr" should "parse symbol identifier reference" in {
-    "???".ast(Scala.expr.ident) should be (Some(Ident("???")))
+    "???".ast(Scala.fidentifier) should be (Some(Ident("???")))
+  }
+
+  "fidentifier" should "parse simple identifier" in {
+    "lvl1".ast(Scala.fidentifier) should be (Some(Ident("lvl1")))
+  }
+
+  "fidentifier" should "not parse empty" in {
+    " ".ast(Scala.fidentifier) should be (None)
   }
 
   "defObject" should "parse empty object definition" in {

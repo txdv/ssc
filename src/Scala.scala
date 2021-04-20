@@ -100,7 +100,12 @@ object Scala {
   val `:` = symbol(':')
   val `=` = symbol('=')
 
-  val fullIdentifier = sepBy(token(sat[Identifier]), `.`)
+  val fullIdentifier = sepBy1(identifier, `.`)
+
+  val fidentifier: Parser[Ident] = for {
+    ident <- fullIdentifier
+    fullname = ident.map(_.value).mkString(".")
+  } yield Ident(fullname)
 
   def typeDef: Parser[ScalaType] = for {
     name <- identifier
@@ -170,35 +175,22 @@ object Scala {
       number <- token(sat[Number])
     } yield Num(number.value)
 
-    val ident: Parser[Expr] = for {
-      ident <- identifier
-    } yield Ident(ident.value)
-
     val bool: Parser[Expr] = for {
       bool <- token(sat[LexerToken.Bool])
     } yield Bool(bool.value == "true")
-
-    /*
-    val function: Parser[Expr] = for {
-      func <- sat[Identifier]
-      _ <- `(`
-      arguments <- sepBy(expr.all, `,`)
-      _ <- `)`
-    } yield Func(func.value, arguments)
-    */
 
     val string: Parser[Expr] = for {
       string <- token(sat[Str])
     } yield Stri(string.unquoted)
 
     val function: Parser[Expr] = for {
-      name <- identifier
+      fullname <- fidentifier
       args <- one(expressionGroup)
     } yield {
       args.map { args =>
-        Func(name.value, args)
+        Func(fullname.asInstanceOf[Ident].name, args)
       } getOrElse {
-        Ident(name.value)
+        fullname
       }
     }
 
