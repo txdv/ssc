@@ -162,7 +162,7 @@ case class Code(
 
   def +(other: Code): Code = {
     Code(
-      stackSize + other.stackSize,
+      Math.max(stackSize, other.stackSize),
       localsCount + other.localsCount,
       ops ++ other.ops,
       stackMap ++ other.stackMap)
@@ -170,6 +170,10 @@ case class Code(
 
   def withStackSize(newStackSize: Int): Code = {
     this.copy(stackSize = newStackSize)
+  }
+
+  def addStackSize(additional: Int): Code = {
+    withStackSize(stackSize + additional)
   }
 
   def withStackMap(newStackMap: Seq[StackFrame]): Code = {

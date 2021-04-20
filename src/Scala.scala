@@ -29,17 +29,34 @@ object Expression {
 
   case class DefMethodArgument(name: String, argumentType: ScalaType)
 
-  sealed trait Expr extends Statement
+  sealed trait Expr extends Statement {
+    val depth: Int
+  }
 
-  case class Ident(name: String) extends Expr
-  case class Func(name: String, arguments: Seq[Expr]) extends Expr
-  case class Num(value: String) extends Expr
-  case class Stri(value: String) extends Expr
-  case class Bool(value: Boolean) extends Expr
+  case class Ident(name: String) extends Expr {
+    val depth: Int = 1
 
-  case class ExprOp(char: String, left: Expr, right: Expr) extends Expr
+  }
+  case class Func(name: String, arguments: Seq[Expr]) extends Expr {
+    val depth: Int = 1
+  }
+  case class Num(value: String) extends Expr {
+    val depth: Int = 1
+  }
+  case class Stri(value: String) extends Expr {
+    val depth: Int = 1
+  }
+  case class Bool(value: Boolean) extends Expr {
+    val depth: Int = 1
+  }
 
-  case class If(cond: Expr, left: Expr, right: Expr) extends Expr
+  case class ExprOp(char: String, left: Expr, right: Expr) extends Expr {
+    val depth: Int = left.depth + right.depth
+  }
+
+  case class If(cond: Expr, left: Expr, right: Expr) extends Expr {
+    val depth: Int = 1
+  }
 }
 
 object Scala {

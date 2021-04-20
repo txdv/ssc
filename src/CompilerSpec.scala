@@ -77,6 +77,16 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     """ } should be ("3\n")
   }
 
+  "Compiler" should "add together multiple numbers" in {
+    compileAndRun { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println(1 + 2 + 3 + 4 + 5)
+        }
+      }
+    """ } should be ("15\n")
+  }
+
   "Compiler" should "add grouped numbers" in {
     compileAndRun { """
       object MainApp {
@@ -136,14 +146,15 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     """ } should be ("0\n")
   }
-
+/*
   "Compiler" should "==" in {
     compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
-          println(1 == 2)
+          println(addExact(1, 2) == 3)
         }
       }
     """ } should be ("0\n")
   }
+*/
 }

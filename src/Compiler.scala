@@ -38,7 +38,7 @@ object ScalaCompiler {
     Class(
       version = Version(0, 58),
       thisClass = JavaType.Class(obj.name),
-      superClass = JavaType.Class("java/lang/Object"),
+      superClass = JavaType.Object,
       methods = {
         val defMethods = obj.statements.filter(_.isInstanceOf[DefMethod]).map(_.asInstanceOf[DefMethod])
 
@@ -157,16 +157,16 @@ object ScalaCompiler {
         val op = if (value) Op.iconst(1) else Op.iconst(0)
         Code.op(op, stackSize = 1)
       case ExprOp("+", left, right) =>
-        ???
         guessType(left) match {
           case JavaType.Int =>
-            genops(left) + genops(right) + Code.op(Op.iadd)
-          case _ =>
+            genops(left) + genops(right) + Code.op(Op.iadd).withStackSize(expr.depth)
+          case leftType =>
+            println(s"left type: $leftType")
             ???
-
         }
       case ExprOp("==", left, right) =>
         val pre = genops(left) + genops(right)
+          .withStackSize(2)
 
         val newStack =
           stack.map(_.addOffset(pre.codeSize + 7)) ++
@@ -179,7 +179,8 @@ object ScalaCompiler {
             Op.goto(4),
             Op.iconst(0),
           )).withStackMap(newStack)
-      case _ =>
+      case err =>
+        println(s"error: $err")
         ???
     }
   }
@@ -196,6 +197,8 @@ object ScalaCompiler {
       case Func(name, arguments) =>
         val method = math.methods.find(_.name == name).get
         method.returnType
+      case ExprOp("==", _, _) =>
+        JavaType.Boolean
       case ExprOp(_, left, _) =>
         guessType(left)
       case If(cond, left, right) =>
@@ -228,12 +231,14 @@ object ScalaCompiler {
           "println",
           Seq(JavaType.Void, methodType))
 
-        Code.op(Op.getstatic(systemOut), stackSize = 1, localsCount = 1) +
+        val res = Code.op(Op.getstatic(systemOut), stackSize = 1, localsCount = 1) +
         genops(argExpr, Seq(
           StackFrame(offset = 3, Seq(StackElement.Type(systemOut.signature.head)))
         )) +
         Code.op(Op.invoke(method, Op.invoke.virtual)) +
         Code.op(Op.Return)
+
+        res.addStackSize(1)
       case _ =>
         ???
     }

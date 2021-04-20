@@ -192,7 +192,13 @@ class Materializer {
     if (code.stackMap.size > 1) {
       body.putByte(255) // type
       body.putShort(0) // offset delta
-      body.putShort(0) // number_of_locals
+
+      body.putShort(1) // number_of_locals
+
+      val a = JavaType.Array(JavaType.String)
+      val tmp = StackElement.Type(a)
+      writeElement(body, tmp)
+
       body.putShort(2) // number_of_stack_items
 
       code.stackMap(1).elements.foreach { element =>
@@ -209,10 +215,13 @@ class Materializer {
         case jclass: JavaType.Class =>
           body.putByte(7)
           val target = const(convert(jclass))
-          println(s"target: $target")
           body.putShort(target)
         case JavaType.Int =>
           body.putByte(1)
+        case jarray: JavaType.Array =>
+          body.putByte(7)
+          val target = const(convert(jarray))
+          body.putShort(target)
         case _ => ???
       }
     case _ =>
@@ -275,6 +284,10 @@ class Materializer {
 
   def convert(jclass: JavaType.Class): Constant.Class = {
     Constant.Class(Constant.Utf8(jclass.namespace))
+  }
+
+  def convert(jarray: JavaType.Array): Constant.Class = {
+    Constant.Class(Constant.Utf8(jarray.value))
   }
 
   def convert(methodRef: MethodRef): Constant.MethodRef = {
