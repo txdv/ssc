@@ -159,13 +159,6 @@ scala_library(
     scalacopts = fatal_warnings())
 
 scala_binary(
-    name = "test",
-    srcs = ["Test.scala"],
-    deps = [],
-    scalacopts = fatal_warnings(),
-    main_class = "Test")
-
-scala_binary(
     name = "type",
     srcs = ["type.scala"],
     deps = [":class", ":pretty_print"],
