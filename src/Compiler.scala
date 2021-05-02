@@ -127,18 +127,33 @@ object ScalaCompiler {
     }
   }
 
-  val math = Types.resolve("java.lang.Math")
+  import lt.vu.mif.bentkus.bachelor.compiler.classfile.types.runtime.ClassObj
+
+  case class Context(map: Map[String, ClassObj]) {
+    def findMethods(f: Expression.Func): Seq[MethodRef] = {
+      for {
+        namespace <- f.namespace.headOption.toSeq
+        types <- map.get(namespace).toSeq
+        methods <- types.methods.filter(_.name == f.methodName)
+      } yield methods
+    }
+
+    def find(f: Expression.Func): Option[MethodRef] = {
+      None
+    }
+  }
+
+  val ns = Context(Map(
+    "Math" -> Types.resolve("java.lang.Math"),
+  ))
+
 
   def genops(expr: Expr, stack: Seq[StackFrame] = Seq.empty): Code = {
     import Expression._
     expr match {
-      case Func(name, args) =>
-        val methods = math.methods.filter(_.name == name)
-        val method = methods.head
-
-        if (args.size != method.signature.size - 1) {
-          throw new Exception(s"Expected ${args.size} arguments, but got ${method.signature.size}")
-        }
+      case f: Func =>
+        val method = ns.findMethods(f).head
+        val args = f.arguments
 
         args.map(a => genops(a)).foldLeft(Code.empty)(_ + _) +
           Code.op(Op.invoke(method, Op.invoke.static))
@@ -194,8 +209,9 @@ object ScalaCompiler {
         JavaType.Int
       case _: Bool =>
         JavaType.Boolean
-      case Func(name, arguments) =>
-        val method = math.methods.find(_.name == name).get
+      case f: Func =>
+        //val method = math.methods.find(_.name == name).get
+        val method = ns.findMethods(f).head
         method.returnType
       case ExprOp("==", _, _) =>
         JavaType.Boolean

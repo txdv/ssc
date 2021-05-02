@@ -35,9 +35,19 @@ object Expression {
 
   case class Ident(name: String) extends Expr {
     val depth: Int = 1
-
   }
+
   case class Func(name: String, arguments: Seq[Expr]) extends Expr {
+    val namespace: Seq[String] = {
+      val total = name.split("\\.")
+      total.take(total.length - 1)
+    }
+
+    val methodName: String = {
+      val total = name.split("\\.")
+      total.last
+    }
+
     val depth: Int = 1
   }
   case class Num(value: String) extends Expr {

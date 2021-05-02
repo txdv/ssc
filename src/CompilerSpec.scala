@@ -156,4 +156,14 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     """ } should be ("true\n")
   }
+
+  "Compiler" should "stack depth check" in {
+    compileAndRun { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          println(addExact(1, 2) == addExact(2, 3) + addExact(4, 5))
+        }
+      }
+    """ } should be ("false\n")
+  }
 }
