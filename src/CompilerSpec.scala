@@ -151,7 +151,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
-          println(addExact(1, 2) == 3)
+          println(Math.addExact(1, 2) == 3)
         }
       }
     """ } should be ("true\n")
@@ -161,9 +161,10 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
-          println(addExact(1, 2) == addExact(2, 3) + addExact(4, 5))
+          println(Math.addExact(1, 2) == Math.addExact(2, 3) + Math.addExact(4, 5))
         }
       }
     """ } should be ("false\n")
   }
+
 }
