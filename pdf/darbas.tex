@@ -12,6 +12,18 @@
 \usepackage{listings}
 \usepackage{subfig}
 \usepackage{wrapfig}
+\usepackage{listings}
+
+\lstset {
+  language=Scala,
+  basicstyle=\footnotesize,
+  numbers=left,
+  stepnumber=1,
+  showstringspaces=false,
+  tabsize=1,
+  breaklines=true,
+  breakatwhitespace=false,
+}
 
 % Titulinio aprašas
 \university{Vilniaus universitetas}
@@ -42,9 +54,8 @@
 % \end{center}
 
 \sectionnonumnocontent{Summary}
-This thesis presents a way on how to optimize a compiler procedure.
+This thesis presents an approach on how to speed up compilation in a day to day programming scenario, benchmarks the performance improvements with various inputs and compares the gathered performance metrics to an already existing compiler.
 
-goal is to create a compiler and optimize an aspect of the compiler so it becomes faster.
 \keywords{keyword 1, keyword 2, keyword 3, keyword 4, keyword 5}
 
 \sectionnonumnocontent{Santrauka}
@@ -63,6 +74,8 @@ goal is to create a compiler and optimize an aspect of the compiler so it become
 
 \section{Chapter 1}
 \subsection{This is an awesome compiler}
+
+\lstinputlisting[language=Scala, linewidth=12cm]{./code/lazylist.scala}
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}

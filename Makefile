@@ -30,7 +30,7 @@ planb:
 	open out/planas.pdf
 
 aspell:
-	aspell check pdf/planas.tex
+	aspell check pdf/darbas.tex
 
 
 compile:
