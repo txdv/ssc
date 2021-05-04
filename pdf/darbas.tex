@@ -108,7 +108,7 @@ A Scala source file can contain multiple class definitions in a singular and due
 The compiler creates in total 4 corresponding .class files as depicted in Listing \ref{img:Expression}.
 The classes all depend on the same trait definition called Expression, which is an empty interface in Java called a Marker Interface \cite{10.5555/1407381}, however there is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
 
-Under normal circumstances the compiler will recompile all 4 classes, even though modifications are present only within one class.
+When running the compiler with the source file displayed in \ref{multidef} as the input, the compiler will recompile all 4 classes, even though new modifications might be present only within one class because the minimal translation unit is the entire source file.
 In the given examples the classes are trivial and the performance penalty doing so are also small.
 
 \begin{figure}[H]
