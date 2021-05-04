@@ -93,12 +93,15 @@ The Java language forces the programmer to define every Java class in its own fi
 A .class file contains all the Java bytecode generated from the Java source file, a condensed representation of the a Java class in a high level format which is abstract and does not target any specific target architecture, but an abstract architecture called the Java Virtual Machine (JVM).
 Code targeting the JVM can be then executed provided a Java runtime is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
 
-The Java bytecode is much more abstract and closer to the original representation of a class than the generated object containing assembly are.
+% todo: maybe later?
+The Java bytecode is much more abstract and conceptually closer to the original representation of a class than the generated object files containing assembly are.
+Java class methods are basically sections in .class file which contain Java bytecode - the implementation of the methods functionality.
+This high level representation makes granularization of translation units much more convient, because it is possible to map such methods directly to an entire section within the class file.
 
+Scala also targets the JVM, however it does not share the limitation of one class per source file that Java has.
+A Scala source file can contain multiple class definitions in a singular and due to the possibility to define class in a very concise manner developers gravitate towards multiple class definitions per file.
 
-
-
-%\lstinputlisting[language=Scala, linewidth=12cm]{./code/lazylist.scala}
+\lstinputlisting[language=Scala, linewidth=18cm]{./code/caseclass.scala}
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
