@@ -67,6 +67,8 @@ Results are then compared to the classic compiler and conclusions are drawn.
 \keywords{Compilers, Translation Unit, Compiler optimization}
 
 \sectionnonumnocontent{Santrauka}
+% TODO: translation in lithuanian
+
 % Nurodomi iki 5 svarbiausių temos raktinių žodžių (terminų).
 % Vienas terminas gali susidėti iš kelių žodžių.
 \raktiniaizodziai{Transliavimas, Transliavimo optimizacijos}
@@ -80,10 +82,23 @@ Results are then compared to the classic compiler and conclusions are drawn.
 \subsectionnonum{Contributions}
 \subsectionnonum{Outline}
 
-\section{Chapter 1}
-\subsection{This is an awesome compiler}
+\section{Optimization}
+\subsection{Translation Unit}
+The classic aproach of compilers is to read an entire source file and generate a corresponding output file with the translated code.
 
-\lstinputlisting[language=Scala, linewidth=12cm]{./code/lazylist.scala}
+For example in C++ and C source files with the extensions .cpp or .c are compiled to an intermediate object file with the extension .o, containing the generated assembly code of a specific target architecture, x86, ARM, etc.
+Once all source files are compiled into object files, all object files are combined together with optional resources into a singular output file called the executable.
+
+The Java language forces the programmer to define every Java class in its own file and every .java file is then compiled to a .class file, which can be later packaged to .jar files together with additional resources for easier deployment.
+A .class file contains all the Java bytecode generated from the Java source file, a condensed representation of the a Java class in a high level format which is abstract and does not target any specific target architecture, but an abstract architecture called the Java Virtual Machine (JVM).
+Code targeting the JVM can be then executed provided a Java runtime is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
+
+The Java bytecode is much more abstract and closer to the original representation of a class than the generated object containing assembly are.
+
+
+
+
+%\lstinputlisting[language=Scala, linewidth=12cm]{./code/lazylist.scala}
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
@@ -103,6 +118,9 @@ This is the result.
 
 \textbf{AST} - Abstract Syntax Tree
 
+\textbf{JVM} - Java Virtual Machine
+
+\textbf{JIT} - Just In Time
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
