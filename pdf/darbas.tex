@@ -56,10 +56,13 @@
 \sectionnonumnocontent{Summary}
 This thesis presents an approach on how to speed up compilation in a day to day programming scenario, benchmarks the performance improvements with various inputs and compares the gathered performance metrics to an already existing compiler.
 
-Classic compilers treat a source file as an atomic translation unit in their compilation pipeline, the proposed approach tries to leverage the structure of modern programing language to granularize the translation unit in order to improve recompilation times for classic development workloads.
+Classic compilers treat a source file as an atomic translation unit in their compilation pipeline, the proposed approach tries to leverage the structure of modern programming languages to granularize the translation unit in order to improve recompilation times for classic development workloads.
 
 The chosen target language is a subset of the Scala programming language.
 Instead of modifying the standard Scala compiler to accomodate the proposed approach, a compiler is written from scratch in order to have simple program enabling straigtforward modifications for an easier accomodation of the proposed approach.
+
+The performance of the compiler is measured with the approach enabled and disabled, various dynamic inputs are generated with different compilation unit sizes.
+In the end the results are compared to the classic compiler and conclusions are drawn.
 
 \keywords{Compilers, Translation Unit, Compiler optimization}
 
