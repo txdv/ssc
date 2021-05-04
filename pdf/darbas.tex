@@ -103,7 +103,22 @@ A Scala source file can contain multiple class definitions in a singular and due
 
 % listings https://tex.stackexchange.com/questions/321843/using-labels-for-lstinputlisting
 
-\lstinputlisting[language=Scala, linewidth=18cm, label={multidef}, caption={An interface and 3 class definitions in a singular source file}]{./code/caseclass.scala}
+\lstinputlisting[language=Scala, linewidth=18cm, label={multidef}, caption={An interface and 3 class definitions in a singular source file}]{./code/Expression.scala}
+
+The compiler creates in total 4 corresponding .class files as depicted in Listing \ref{img:Expression}.
+The classes all depend on the same trait definition called Expression, which is an empty interface in Java called a Marker Interface \cite{10.5555/1407381}, however there is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
+
+Under normal circumstances the compiler will recompile all 4 classes, even though modifications are present only within one class.
+In the given examples the classes are trivial and the performance penalty doing so are also small.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/Expression}
+    \caption{Compilation result of Listing \ref{multidef}}
+    \label{img:Expression}
+\end{figure}
+
+One might argue that multiple sizeable class implementations with multiple methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield miniscule benefits outside of tailored benchmarks, but the opposite is the truth.
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
