@@ -95,8 +95,8 @@ Code targeting the JVM can be then executed provided a Java runtime is present o
 
 % todo: maybe later?
 Java bytecode is much more abstract and conceptually closer to the original representation of a class than the generated object files containing assembly are.
-Java class methods are basically sections in .class file which contain Java bytecode - the implementation of the methods functionality.
-This high level representation makes granularization of translation units much more convient, because it is possible to map such methods directly to an entire section within the class file.
+Java class methods are basically sections in a .class file which wrap Java bytecode - the implementation of the methods functionality.
+This high level representation makes granularization of translation units much more convient, because it is possible to map a method directly to an entire section within the class file.
 
 Scala also targets the JVM, however it does not share the limitation of one class per source file that Java has.
 A Scala source file can contain multiple class definitions in a singular and due to the possibility to define class in a very concise manner developers gravitate towards multiple class definitions per file.
