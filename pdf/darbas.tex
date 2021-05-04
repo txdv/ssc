@@ -19,11 +19,11 @@
 \institute{Informatikos institutas}  % Užkomentavus šią eilutę - institutas neįtraukiamas į titulinį
 \department{Programų sistemų bakalauro studijų programa}
 \papertype{Bakalauro baigiamasis darbas}
-\title{Programų sistemų kūrimo metodų tyrimas}
-\titleineng{Investigation Methods of Software Development}
+\title{Translation Unit Granularization}
+\titleineng{Kompiliatoriaus transliuojamo vieneto smulkinimas}
 \author{Andrius Bentkus}
 % \secondauthor{Vardonis Pavardonis}   % Pridėti antrą autorių
-\supervisor{asist. dr. Vytauts Valaitis}
+\supervisor{asist. dr. Vytautas Valaitis}
 \reviewer{doc. dr. Vardauskas Pavardauskas}
 \date{Vilnius – \the\year}
 
@@ -41,63 +41,32 @@
 %     Padėkos asmenims ir/ar organizacijoms
 % \end{center}
 
+\sectionnonumnocontent{Summary}
+This thesis presents a way on how to optimize a compiler procedure.
+
+goal is to create a compiler and optimize an aspect of the compiler so it becomes faster.
+\keywords{keyword 1, keyword 2, keyword 3, keyword 4, keyword 5}
+
 \sectionnonumnocontent{Santrauka}
-Glaustai aprašomas darbo turinys: pristatoma nagrinėta problema ir padarytos
-išvados. Santraukos apimtis ne didesnė nei 0,5 puslapio. Santraukų gale
-nurodomi darbo raktiniai žodžiai. 
 % Nurodomi iki 5 svarbiausių temos raktinių žodžių (terminų).
 % Vienas terminas gali susidėti iš kelių žodžių.
-\raktiniaizodziai{raktinis žodis 1, raktinis žodis 2, raktinis žodis 3, raktinis žodis 4, raktinis žodis 5}   
+\raktiniaizodziai{Transliavimas, Transliavimo optimizacija}
 
-\sectionnonumnocontent{Summary}
-Santrauka anglų kalba. Santraukos apimtis ne didesnė nei 0,5 puslapio.
-\keywords{keyword 1, keyword 2, keyword 3, keyword 4, keyword 5}
 
 \tableofcontents
 
-\sectionnonum{Įvadas}
-Įvade nurodomas darbo tikslas ir uždaviniai, kuriais bus įgyvendinamas tikslas,
-aprašomas temos aktualumas, apibrėžiamas tiriamasis objektas akcentuojant
-neapibrėžtumą, kuris bus išspręstas darbe, aptariamos teorinės darbo prielaidos
-bei metodika, apibūdinami su tema susiję literatūros ar kitokie šaltiniai,
-temos analizės tvarka, darbo atlikimo aplinkybės, pateikiama žinių apie
-naudojamus instrumentus (programas ir kt., jei darbe yra eksperimentinė dalis).
-Darbo įvadas neturi būti dėstymo santrauka. Įvado apimtis 2 -- 4 puslapiai.
+\sectionnonum{Introduction}
 
-\section{Medžiagos darbo tema dėstymo skyriai}
-Medžiagos darbo tema dėstymo skyriuose išsamiai pateikiamos nagrinėjamos temos
-detalės: pradiniai duomenys, jų analizės ir apdorojimo metodai, sprendimų
-įgyvendinimas, gautų rezultatų apibendrinimas.
+\subsectionnonum{Overview}
+\subsectionnonum{Contributions}
+\subsectionnonum{Outline}
 
-Medžiaga turi būti dėstoma aiškiai, pateikiant argumentus. Tekste dėstomas
-trečiuoju asmeniu, t.y. rašoma ne „aš manau“, bet „autorius mano“, „autoriaus
-nuomone“. Reikėtų vengti informacijos nesuteikiančių frazių, pvz., „...kaip jau
-buvo minėta...“, „...kaip visiems žinoma...“ ir pan., vengti grožinės
-literatūros ar publicistinio stiliaus, gausių metaforų ar panašių meninės
-išraiškos priemonių.
+\section{Chapter 1}
+\subsection{This is an awesome compiler}
 
-Skyriai gali turėti poskyrius ir smulkesnes sudėtines dalis, kaip punktus ir
-papunkčius.
-
-\subsection{Poskyris}
-Citavimo pavyzdžiai: cituojamas vienas šaltinis \cite{PvzStraipsnLt}; cituojami
-keli šaltiniai \cite{PvzStraipsnEn, PvzKonfLt, PvzKonfEn, PvzKnygLt, PvzKnygEn,
-PvzElPubLt, PvzElPubEn, PvzMagistrLt, PvzPhdEn}.
-
-\subsubsection{Skirsnis}
-\subsubsubsection{Straipsnis}
-\subsubsection{Skirsnis}
-\section{Skyrius}
-\subsection{Poskyris}
-\subsection{Poskyris}
-
-\sectionnonum{Rezultatai ir išvados}
-Rezultatų ir išvadų dalyje išdėstomi pagrindiniai darbo rezultatai (kažkas
-išanalizuota, kažkas sukurta, kažkas įdiegta), toliau pateikiamos išvados
-(daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos
-rekomendacijos, akcentuojamos naujovės). Rezultatai ir išvados pateikiami
-sunumeruotų (gali būti hierarchiniai) sąrašų pavidalu. Darbo rezultatai turi
-atitikti darbo tikslą.
+\sectionnonum{Results and conclusion}
+\subsectionnonum{Results}
+This is the result.
 
 \printbibliography[heading=bibintoc]  % Šaltinių sąraše nurodoma panaudota
 % literatūra, kitokie šaltiniai. Abėcėlės tvarka išdėstomi darbe panaudotų
@@ -109,10 +78,10 @@ atitikti darbo tikslą.
 % Jei tokių nuorodų reikia, pateikti jas tekste.
 
 % \sectionnonum{Sąvokų apibrėžimai}
-\sectionnonum{Santrumpos}
-Sąvokų apibrėžimai ir santrumpų sąrašas sudaromas tada, kai darbo tekste
-vartojami specialūs paaiškinimo reikalaujantys terminai ir rečiau sutinkamos
-santrumpos.
+\sectionnonum{Acronyms}
+
+\textbf{AST} - Abstract Syntax Tree
+
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
