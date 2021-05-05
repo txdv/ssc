@@ -82,8 +82,7 @@ Results are then compared to the classic compiler and conclusions are drawn.
 \subsectionnonum{Contributions}
 \subsectionnonum{Outline}
 
-\section{Optimization}
-\subsection{Translation Unit}
+\section{Translation Unit}
 The classic approach of compilers is to read an entire source file and generate a corresponding output file with the translated code.
 
 For example in C++ and C source files with the extensions .cpp or .c are compiled to an intermediate object file with the extension .o, containing the generated assembly code of a specific target architecture, x86, ARM, etc.
@@ -119,14 +118,24 @@ In the given examples the classes are trivial and the performance when recompili
 \end{figure}
 
 One might argue that multiple sizeable class implementations with numerous methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield minuscule benefits outside of tailored benchmarks, but the opposite is the truth. % todo: replace but a the opposite is true.
-In the following example a rather standard usage of the unit testing library specs2 is shown.
+In the following example a typical usage of a popular Scala unit testing library Specs2 \cite{Specs2Github} is shown.
+
+\lstinputlisting[language=Scala, linewidth=18cm, label={code:specs2code}, caption={Standard usage of Specs2}]{./specs2/SampleTest.scala}
+
+Scala developers tend to use use many language features to create a Domain Specific Language (DSL) for visually pleasing code.
+% TODO: maybe explain, but reword for sure
+Because many Scala compiler feature are in play in this example, the details are quite intricate, but the result is that for each test case shown in the example \ref{code:specs2code} (first test, second test) a stand alone .class compilation output is created (SampleTest\$\$annon\$1.class, \$SampleTest\$\$anon\$2.class).
+Having many unit tests in a sophisticated codebase can therefore prolong the compilation process significantly, to a point where an iterative development process becomes impractical.
+Compilation times longer than a minute can be easily surpassed when meticulously writing Unit tests in a Test Drive Development (TDD) environment.
+
+TDD also promotes writing tests as a playground to explore code approaches and feasibility before writing the actual code, as such long compilation times of unit tests can make such an approach impractical.
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
 This is the result.
 
-\printbibliography[heading=bibintoc]  % Šaltinių sąraše nurodoma panaudota
-% literatūra, kitokie šaltiniai. Abėcėlės tvarka išdėstomi darbe panaudotų
+
+
 % (cituotų, perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
 % bibliografiniai aprašai. Šaltinių sąrašas spausdinamas iš naujo puslapio.
 % Aprašai pateikiami netransliteruoti. Šaltinių sąraše negali būti tokių
@@ -142,6 +151,10 @@ This is the result.
 \textbf{JVM} - Java Virtual Machine
 
 \textbf{JIT} - Just In Time
+
+\textbf{DSL} - Domain Specific Language
+
+\textbf{TDD} - Test Driven Development
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai

@@ -1,4 +1,3 @@
-import org.specs2.matcher.Matcher
 import org.specs2.mock.Mockito
 import org.specs2.mutable.SpecificationWithJUnit
 import org.specs2.specification.Scope
