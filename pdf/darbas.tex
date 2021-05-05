@@ -109,7 +109,7 @@ The compiler creates in total 4 corresponding .class files as depicted in Listin
 The classes all depend on the same trait definition called Expression, which is an empty interface in Java called a Marker Interface \cite{10.5555/1407381}, however there is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
 
 When running the compiler with the source file displayed in \ref{multidef} as the input, the compiler will recompile all 4 classes, even though new modifications might be present only within one class because the minimal translation unit is the entire source file.
-In the given examples the classes are trivial and the performance penalty doing so are also small.
+In the given examples the classes are trivial and the performance when recompiling is negligible.
 
 \begin{figure}[H]
     \centering
@@ -119,8 +119,7 @@ In the given examples the classes are trivial and the performance penalty doing 
 \end{figure}
 
 One might argue that multiple sizeable class implementations with numerous methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield miniscule benefits outside of tailored benchmarks, but the opposite is the truth. % todo: replace but a the opposite is true.
-
-Scalas features to create is utilized
+In the following example a rather standard usage of the unit testing library specs2 is shown.
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
