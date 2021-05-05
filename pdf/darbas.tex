@@ -59,9 +59,9 @@ This thesis presents an approach on how to speed up compilation in a day to day 
 Classic compilers treat a source file as an atomic translation unit in their compilation pipeline, the proposed approach tries to leverage the structure of modern programming languages to granularize the translation unit in order to improve recompilation times for classic development workloads.
 
 The chosen target language is a subset of the Scala programming language.
-Instead of modifying the standard Scala compiler to accomodate the proposed approach, a compiler is written from scratch in order to have simple program enabling straigtforward modifications for an easier accomodation of the proposed approach.
+Instead of modifying the standard Scala compiler to accommodate the proposed approach, a compiler is written from scratch in order to have simple program enabling straightforward modifications for an easier accommodation of the proposed approach.
 
-Performance measurements of the prototype compiler are taken with the approach enabled and disabled, various dynamic inputs are generated with different compilation unit sizes to gain insights in the effectivness of the approach.
+Performance measurements of the prototype compiler are taken with the approach enabled and disabled, various dynamic inputs are generated with different compilation unit sizes to gain insights in the effectiveness of the approach.
 Results are then compared to the classic compiler and conclusions are drawn.
 
 \keywords{Compilers, Translation Unit, Compiler optimization}
@@ -84,7 +84,7 @@ Results are then compared to the classic compiler and conclusions are drawn.
 
 \section{Optimization}
 \subsection{Translation Unit}
-The classic aproach of compilers is to read an entire source file and generate a corresponding output file with the translated code.
+The classic approach of compilers is to read an entire source file and generate a corresponding output file with the translated code.
 
 For example in C++ and C source files with the extensions .cpp or .c are compiled to an intermediate object file with the extension .o, containing the generated assembly code of a specific target architecture, x86, ARM, etc.
 Once all source files are compiled into object files, all object files are combined together with optional resources into a singular output file called the executable.
@@ -96,7 +96,7 @@ Code targeting the JVM can be then executed provided a Java runtime is present o
 % todo: maybe later?
 Java bytecode is much more abstract and conceptually closer to the original representation of a class than the generated object files containing assembly are.
 Java class methods are basically sections in a .class file \cite{JvmMethods} which wrap Java bytecode - the implementation of the methods functionality.
-This high level representation makes granularization of translation units much more convient, because it is possible to map a method directly to an entire section within the class file.
+This high level representation makes granularization of translation units much more convenient, because it is possible to map a method directly to an entire section within the class file.
 
 Scala also targets the JVM, however it does not share the limitation of one class per source file that Java has.
 A Scala source file can contain multiple class definitions in a singular and due to the possibility to define class in a very concise manner developers gravitate towards multiple class definitions per file \ref{multidef}.
@@ -118,7 +118,7 @@ In the given examples the classes are trivial and the performance when recompili
     \label{img:Expression}
 \end{figure}
 
-One might argue that multiple sizeable class implementations with numerous methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield miniscule benefits outside of tailored benchmarks, but the opposite is the truth. % todo: replace but a the opposite is true.
+One might argue that multiple sizeable class implementations with numerous methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield minuscule benefits outside of tailored benchmarks, but the opposite is the truth. % todo: replace but a the opposite is true.
 In the following example a rather standard usage of the unit testing library specs2 is shown.
 
 \sectionnonum{Results and conclusion}
