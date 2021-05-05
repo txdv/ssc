@@ -4,16 +4,17 @@ import org.specs2.mutable.SpecificationWithJUnit
 import org.specs2.specification.Scope
 
 class SampleTest extends SpecificationWithJUnit with Mockito {
-  "group" should {
-    "test1" in new Context {
-      1 must_=== 2
+  "test group" should {
+    "first test" in new Context {
+      one must_=== 1
     }
 
-    "test2" in new Context {
-      1 must_=== 2
+    "second test" in new Context {
+      (one + one) must_=== 2
     }
   }
 
   trait Context extends Scope {
+    val one = 1
   }
 }
