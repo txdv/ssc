@@ -63,6 +63,15 @@ maven_install(
     artifacts = [
         "org.typelevel:cats-core_2.13:jar:2.4.1",
         "org.scalaz:scalaz-core_2.13:jar:7.3.0-M32",
+        "org.specs2:specs2-core_2.13:jar:4.11.0",
+        "org.specs2:specs2-matcher_2.13:jar:4.11.0",
+        "org.specs2:specs2-mock_2.13:jar:4.11.0",
+        "org.specs2:specs2-junit_2.13:jar:4.11.0",
+        "org.specs2:specs2-analysis_2.13:jar:4.11.0",
+        "org.specs2:specs2-common_2.13:jar:4.11.0",
+        "org.specs2:specs2-fp_2.13:jar:4.11.0",
+        "org.mockito:mockito-core:jar:3.9.0",
+        "org.hamcrest:hamcrest-all:jar:1.3",
     ],
     repositories = [
         "https://jcenter.bintray.com/",
