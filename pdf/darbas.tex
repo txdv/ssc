@@ -183,6 +183,16 @@ Compilation times longer than a minute can be easily surpassed when meticulously
 TDD also promotes writing tests as a playground to explore approaches and test code feasibility before writing the actual code, therefore long compilation times of unit tests can make such an approach impractical.
 There are many reasons why such an optimization might improve usage of a compiler and increase the development experience of a developer.
 
+\section{Compiler}
+At the start of the bachelor thesis a thorough investigation was made to analyze how the current Scala compiler works \cite{ScalaGithub} and if it is feasible to apply the targeted optimizations.
+The investigation took very long and yielded little results, the codebase was too humongous and complicated too understand, the compiler too featured packed to adjust with the target objectives.
+Without the help of a mentor with high proefficieny in the Scala codebase and taking the scope of the bachelor thesis into account, it was deemded too complicated to undergo such a task.
+
+Instead of adjusting an already existing compiler, a compiler was written from scratch with an iterative approach.
+Writing a minimal compiler allows one to get rid of all of the baggage that comes up with a big and mature compiler and it allows the developer to just focus on the actual task.
+
+
+
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
 This is the result.
@@ -238,5 +248,7 @@ This is the result.
   \end{tabular}}
   \label{tab:table example}
 \end{table}
+
+\printbibliography[heading=bibintoc]
 
 \end{document}
