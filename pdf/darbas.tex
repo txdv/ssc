@@ -199,6 +199,11 @@ A small compiler written from scratch allows the author to focus on the most imp
 In order to ensure that a new feature addition doesn't impact the overall behavior of the compiler every feature needs to be tested for correctness.
 The multi-pass nature of the official Scala compiler makes reasoning about correctness difficult, because it is a non trivial undertaking to reason about how caching in one pass might affect functionality the subsequent passes.
 
+\textbf{Simplicitly and transparency} - a small compiler is simple and easy to reason about.
+Writing one from scratch means that the entirity of the compiler is understood which enables better reasoning.
+New features are easier to add because of a complete understanding.
+Debugging is much more pleasant since the number of affected features is smaller.
+
 \textbf{Accuracy} - the results might be skewed since it the self written compiler implements only a handful of features of the official language standard.
 This can go both ways.
 
@@ -209,6 +214,16 @@ Being able to reuse computation instead of redoing these kind of workloads might
 
 On the other hand, adding a multitude of features might slow down general compilation speeds of the compiler.
 In ideal programming scenarios features that are not used but are implemented should not add any significant slow down to execution speeds, but code bases are rarely ideal.
+
+\subsection{Implementation}
+Creating a compiler from scratch for a non trivial small language is a significant task.
+% todo: need citation?
+Programming languages have become quite complex, containing multiple paradigms.
+Each language feature on its on might look simple and be easy to understand but putting another cog in an already complex machine can prove to be difficult.
+
+% todo: cite
+Object Oriented Programming (OOP) has become quite obiquitess and is a base line feature that most of programming languages have.
+Many developers are proefficient in at least one programming language supporting OOP and the most popular programming languages utilize OOP very prominently.
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
@@ -235,6 +250,8 @@ This is the result.
 \textbf{DSL} - Domain Specific Language
 
 \textbf{TDD} - Test Driven Development
+
+\textbf{OOP} - Object Oriented Programming
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
