@@ -208,7 +208,7 @@ Debugging is much more pleasant since the number of affected features is smaller
 This can go both ways.
 
 % todo: add references (
-Some of elaborate Scala features like type-driven implicits and mixing multiple traits are computationally very intensive.
+Some elaborate Scala features like type-driven implicits and mixing multiple traits are computationally very intensive.
 The former needs to recurs in a nonterministic way on distinct implicit types in order to find a correct type inheritance path while the latter creates a proxy method in a target classes for every method within a mixed in non trivial trait.
 Being able to reuse computation instead of redoing these kind of workloads might add significant performance boosts.
 
@@ -224,6 +224,23 @@ Each language feature on its on might look simple and be easy to understand but 
 % todo: cite
 Object Oriented Programming (OOP) has become quite obiquitess and is a base line feature that most of programming languages have.
 Many developers are proefficient in at least one programming language supporting OOP and the most popular programming languages utilize OOP very prominently.
+
+\subsection{Language}
+The target compiler programming language is Scala.
+%Scala mixes multiple OOP and functional programming paradigms extensively creating a feature rich environment for developers.
+%Functions in Scala are values and all values are objects which
+Scala mixes OOP and functional programming paradigm to create a feature rich environment for developers.
+Functions in Scala are values and all values are objects which seems
+
+% https://data-flair.training/blogs/scala-features-comprehensive-guide/
+The language aims to be concise and aesthetically pleasing utilizing features such as comprehensive type inference to minimize verbosity.
+Functional aspects are prominently represented with a lightweight syntax for anonymous functions, higher order functions, currying, lazy evaluation, Algebraic Data Types (ADT), higher order functions, pattern matching.
+
+% https://livebook.manning.com/book/scala-in-depth/chapter-10/3
+% http://englishonlineclub.com/pdf/Scala%20in%20Depth%20[EnglishOnlineClub.com].pdf
+Scala is a programming language targeting the Java Virtual Machine (JVM).
+Running on the JVM allows Scala easily to utilzie existing Java code, which is a tremendous advantage because utilizing existing Java code opens
+The opposite however is not always true since Scala has a lot of features which can not be directly translated to JVM bytecode which is the underlying instruction set powering the JVM.
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
@@ -252,6 +269,8 @@ This is the result.
 \textbf{TDD} - Test Driven Development
 
 \textbf{OOP} - Object Oriented Programming
+
+\textbf{ADT} - Algebraic Data Type
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
