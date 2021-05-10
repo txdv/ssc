@@ -169,7 +169,7 @@ In the given examples the classes are trivial and the performance when recompili
     \label{img:Expression}
 \end{figure}
 
-One might argue that multiple sizeable class implementations with numerous methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield minuscule benefits outside of tailored benchmarks, but the opposite is the truth. % todo: replace but a the opposite is true.
+One might argue that multiple sizable class implementations with numerous methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield minuscule benefits outside of tailored benchmarks, but the opposite is the truth. % todo: replace but a the opposite is true.
 In the following example a typical usage of a popular Scala unit testing library Specs2 \cite{Specs2Github} is shown.
 
 \lstinputlisting[language=Scala, linewidth=18cm, label={code:specs2code}, caption={Standard usage of Specs2}]{./specs2/SampleTest.scala}
@@ -186,25 +186,25 @@ There are many reasons why such an optimization might improve usage of a compile
 \section{Compiler}
 At the start of the bachelor thesis a thorough investigation was made to analyze how the official Scala compiler works \cite{ScalaGithub} and if it is feasible to apply the targeted optimizations to it.
 The investigation took very long and yielded little results, the codebase was too humongous and complicated too understand, the compiler too featured packed to adjust with the target objectives.
-Without the help of a mentor with high proefficieny in the official Scala compiler codebase and taking the scope of the bachelor thesis into account, it was deemded too complicated to undergo such a task.
+Without the help of a mentor with high proficiency in the official Scala compiler codebase and taking the scope of the bachelor thesis into account, it was deemed too complicated to undergo such a task.
 
 Instead of adjusting an already existing compiler, a compiler was written from scratch with an iterative approach.
-In the following numerous advantages and disatvantages of this method are expressed.
+In the following numerous advantages and disadvantages of this method are expressed.
 
 \textbf{Flexibility} - big mature compilers are right and harder to change, they have accumulated a lot of code which needs to be adjusted for every modification.
 The official Scala compiler has a complex pipeline with multiple passes and figuring out where what the best point of incision is a difficult task.
 A small compiler written from scratch allows the author to focus on the most important aspects.
 
-\textbf{Correctness} - ensuring that a new feature is correctly implemented in a sizeable code base is an immense undertaking.
-In order to ensure that a new feature addition doesn't impact the overall behaviour of the compiler every feature needs to be tested for correctness.
-The multipass nature of the official Scala compiler makes reasoning about correctness difficult, because it is a non trivial undertaking to reason about how caching in one pass might affect functionality the subsequent passes.
+\textbf{Correctness} - ensuring that a new feature is correctly implemented in a sizable code base is an immense undertaking.
+In order to ensure that a new feature addition doesn't impact the overall behavior of the compiler every feature needs to be tested for correctness.
+The multi-pass nature of the official Scala compiler makes reasoning about correctness difficult, because it is a non trivial undertaking to reason about how caching in one pass might affect functionality the subsequent passes.
 
-\textbf{Accuracy} - the results might be scewed since it the self written compiler implements only a handful of features of the official language standard.
+\textbf{Accuracy} - the results might be skewed since it the self written compiler implements only a handful of features of the official language standard.
 This can go both ways.
 
 % todo: add references (
 Some of elaborate Scala features like type-driven implicits and mixing multiple traits are computationally very intensive.
-The former needs to recurse undeterministically on distinct implicit types in order to find a correct type inheritance path while the latter creates a proxy method in a target classes for every method within a mixed in non trivial trait.
+The former needs to recurs in a nonterministic way on distinct implicit types in order to find a correct type inheritance path while the latter creates a proxy method in a target classes for every method within a mixed in non trivial trait.
 Being able to reuse computation instead of redoing these kind of workloads might add significant performance boosts.
 
 On the other hand, adding a multitude of features might slow down general compilation speeds of the compiler.
