@@ -238,10 +238,15 @@ The opposite however is not always true since Scala has a lot of features which 
 \subsection{Implementation}
 Creating a compiler from scratch for a non trivial small language is a significant task.
 % todo: need citation?
-Programming languages have become quite complex, containing multiple paradigms and Scala is certainly one of them.
+Programming languages have become quite complex containing multiple paradigms.
+Scala is also a language with a stagering amount of features that increases the overall complexity of a compiler.
 Each language feature on its on might look simple and be easy to understand but putting another cog in an already complex machine can prove to be difficult.
 
-Instead of writing the entire compiler from scratch at once containing all features a more coservative approach was taken.
+Not only does Scala have a multitude of features but some of the features are quite complex like macros, implicit type conversion and summoning, pattern matching, higher kinded types and type lambdas allowing a user of the language to implement language constructs \cite{Scala2Union, ShapelessGithub} which are challenging to understand even for experienced Scala developers and moreso difficult to implement.
+
+Instead of writing the entire compiler from scratch at once containing all features a more coservative approach is taken.
+The approach starts out with the most simplistic compiler imaginable, compiling the a bare minimum example of the target programming language, a simple "Hello World" program and then incrementally adding features \cite{IncrementalCompiler}.
+
 
 Talk like half a page of the parser.
 
