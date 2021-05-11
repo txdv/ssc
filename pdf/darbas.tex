@@ -215,22 +215,15 @@ Being able to reuse computation instead of redoing these kind of workloads might
 On the other hand, adding a multitude of features might slow down general compilation speeds of the compiler.
 In ideal programming scenarios features that are not used but are implemented should not add any significant slow down to execution speeds, but code bases are rarely ideal.
 
-\subsection{Implementation}
-Creating a compiler from scratch for a non trivial small language is a significant task.
-% todo: need citation?
-Programming languages have become quite complex, containing multiple paradigms.
-Each language feature on its on might look simple and be easy to understand but putting another cog in an already complex machine can prove to be difficult.
-
-% todo: cite
-Object Oriented Programming (OOP) has become quite obiquitess and is a base line feature that most of programming languages have.
-Many developers are proefficient in at least one programming language supporting OOP and the most popular programming languages utilize OOP very prominently.
-
 \subsection{Language}
 The target compiler programming language is Scala.
 %Scala mixes multiple OOP and functional programming paradigms extensively creating a feature rich environment for developers.
 %Functions in Scala are values and all values are objects which
-Scala mixes OOP and functional programming paradigm to create a feature rich environment for developers.
+Scala mixes object oriented programming (OOP)  and functional programming paradigms to create a feature rich environment for developers.
 Functions in Scala are values and all values are objects, a smart way to seamlessly integrate both paradigms in a potent mix.
+
+OOP has become quite obiquitess and is a base line feature that most of programming languages have.
+Many developers are proefficient in at least one programming language supporting OOP and the most popular programming languages utilize OOP very prominently.
 
 % https://data-flair.training/blogs/scala-features-comprehensive-guide/
 The language aims to be concise and aesthetically pleasing utilizing features such as comprehensive type inference to minimize verbosity.
@@ -241,6 +234,21 @@ Functional aspects are prominently represented with a lightweight syntax for ano
 Scala is a programming language targeting the Java Virtual Machine (JVM).
 Running on the JVM allows Scala easily to utilzie existing Java code, which is a tremendous advantage because utilizing existing Java code opens access to a plathora of well maintained libraries targeting a wide range of needs.
 The opposite however is not always true since Scala has a lot of features which can not be directly translated to JVM bytecode which is the underlying instruction set powering the JVM.
+
+\subsection{Implementation}
+Creating a compiler from scratch for a non trivial small language is a significant task.
+% todo: need citation?
+Programming languages have become quite complex, containing multiple paradigms and Scala is certainly one of them.
+Each language feature on its on might look simple and be easy to understand but putting another cog in an already complex machine can prove to be difficult.
+
+Instead of writing the entire compiler from scratch at once containing all features a more coservative approach was taken.
+
+Talk like half a page of the parser.
+
+% todo: cite
+
+\subsection{Iterative approach}
+Creating an entire compile
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
