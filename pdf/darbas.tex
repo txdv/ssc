@@ -245,8 +245,11 @@ Each language feature on its on might look simple and be easy to understand but 
 Not only does Scala have a multitude of features but some of the features are quite complex like macros, implicit type conversion and summoning, pattern matching, higher kinded types and type lambdas allowing a user of the language to implement language constructs \cite{Scala2Union, ShapelessGithub} which are challenging to understand even for experienced Scala developers and moreso difficult to implement.
 
 Instead of writing the entire compiler from scratch at once containing all features a more coservative approach is taken.
-The approach starts out with the most simplistic compiler imaginable, compiling the a bare minimum example of the target programming language, a simple "Hello World" program and then incrementally adding features \cite{IncrementalCompiler}.
+The approach starts out with the most simplistic compiler imaginable, compiling the a bare minimum example of the target programming language, a simple "Hello World" (listing \ref{code:helloworld}) program and then incrementally adding features \cite{IncrementalCompiler}.
 
+\lstinputlisting[language=Scala, linewidth=18cm, label={code:helloworld}, caption={"Hello World" in Scala}]{./code/HelloWorld.scala}
+
+Afterwards every feature that is needed is for the thesis is implemented keeping the set of features concise while allowing to prove the thesis goal.
 
 Talk like half a page of the parser.
 
