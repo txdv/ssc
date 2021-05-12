@@ -2200,6 +2200,7 @@
     <bcf:citekey order="15">Predef</bcf:citekey>
     <bcf:citekey order="16">IncrementalCompiler</bcf:citekey>
     <bcf:citekey order="17">ScalaSpec</bcf:citekey>
+    <bcf:citekey order="18">MonadicParsing</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

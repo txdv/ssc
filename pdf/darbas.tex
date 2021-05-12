@@ -259,11 +259,28 @@ The compiler follows a classic compiler design with a frontend, the parser, an i
 
 \subsubsection{Frontend}
 
-The parser starts with a classical lexical analysis step.
+The frontend starts with a classical lexical analysis step.
 The entire content of a file is loaded at once into memory to avoid dealing with continous invocations of slow kernel file system application programming interface (API) calls.
-Characters are grouped into tokens and a stream of tokens is produced with special meaning attached to the tokens in accordance with the Scala langauge specification \cite{ScalaSpec}, keywords of the language have special tokens to represent them and numbers and identifiers generic ones.
+Characters are grouped into tokens and a stream of tokens is produced with special meaning attached to each token in accordance with the Scala language specification \cite{ScalaSpec}.
+Keywords of the language have special tokens to represent them and numbers and identifiers generic ones.
 
-%Tokenization is when specific language keywords get translated so special symbols and free standing identifiers are wrapped into a class. 
+This is followed by a parser which transforms the sequence of tokens into an abstract syntax tree (AST).
+The chosen approach is heavily inspired by a functional programming approach called "Monadic Parsing" \cite{MonadicParsing}.
+
+Monadic parsing is an approach when monadic properties of data structes are being utilized very extensively to create a parsing mechanism that has a rather simple and concise data structure it operates on, the parser.
+A parser is a transformation of a token stream to a list of results, with each result containing the parser product and a tail token stream.
+
+Simple parsers can be easily defined on their own.
+Utilizing monad composition, more complex parsers can then be created by combining simple parsers.
+A classic functional programming approach to deal with complexity also widely known as a bottom-up approach.
+
+% Scala has a very extensive functional programming community which enables with a fix.
+
+Scala
+  - has a very nice functional programming community, wich provides a lot of functional programming libraries like cats, scalaz with support for mondas
+	- show a simple parser eaxmple
+	- show a combined parser example
+% scala is mentioned here https://en.wikipedia.org/wiki/API
 
 \subsubsection{Intermediate representation}
 
