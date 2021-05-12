@@ -113,6 +113,7 @@ The expected results will be a compiler with compilation unit granularization an
 
 \subsectionnonum{Challenges and expected results}
 The goal of this bachelor thesis is to create a prototype compiler for a small subset of the Scala programming language.
+%todo: consider using features of Scala instead of ScalaSpec
 Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, the targeted compiler implementation in this thesis will support only basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
 
 % todo: introduced errors?
@@ -258,7 +259,9 @@ The compiler follows a classic compiler design with a frontend, the parser, an i
 
 \subsubsection{Frontend}
 
-The parser is pretrailed by a classical lexical analysis step which simply groups the input stream of characters into a stream of tokens and assigns a special meaning in accordance with the Scala language specification.
+The parser starts with a classical lexical analysis step.
+The entire content of a file is loaded at once into memory to avoid dealing with continous invocations of slow kernel file system application programming interface (API) calls.
+Characters are grouped into tokens and a stream of tokens is produced with special meaning attached to the tokens in accordance with the Scala langauge specification \cite{ScalaSpec}, keywords of the language have special tokens to represent them and numbers and identifiers generic ones.
 
 %Tokenization is when specific language keywords get translated so special symbols and free standing identifiers are wrapped into a class. 
 
@@ -296,6 +299,8 @@ This is the result.
 \textbf{OOP} - Object Oriented Programming
 
 \textbf{ADT} - Algebraic Data Type
+
+\textbf{API} - Application Programming Interface
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
