@@ -245,18 +245,15 @@ Each language feature on its on might look simple and be easy to understand but 
 Not only does Scala have a multitude of features but some of the features are quite complex like macros, implicit type conversion and summoning, pattern matching, higher kinded types and type lambdas allowing a user of the language to implement language constructs \cite{Scala2Union, ShapelessGithub} which are challenging to understand even for experienced Scala developers and moreso difficult to implement.
 
 Instead of writing the entire compiler from scratch at once containing all features a more coservative approach is taken.
-The approach starts out with the most simplistic compiler imaginable, compiling the a bare minimum example of the target programming language, a simple "Hello World" (listing \ref{code:helloworld}) program and then incrementally adding features \cite{IncrementalCompiler}.
+The approach starts out with the most simplistic compiler imaginable, compiling a bare minimum example of the target programming language, a simple "Hello World" program (listing \ref{code:helloworld}).
 
 \lstinputlisting[language=Scala, linewidth=18cm, label={code:helloworld}, caption={"Hello World" in Scala}]{./code/HelloWorld.scala}
 
 Afterwards every feature that is needed is for the thesis is implemented keeping the set of features concise while allowing to prove the thesis goal.
+This allows us to deal with the complexity of Scala on a per demand basis, only features that are absolutely required are implemented.
 
-Talk like half a page of the parser.
+Parser - The implementation is quite simple featuring a simple tokenizer which 
 
-% todo: cite
-
-\subsection{Iterative approach}
-Creating an entire compile
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
@@ -293,30 +290,6 @@ This is the result.
 % parengta, medžiaga. Savarankiški priedai gali būti pateikiami ir
 % kompaktiniame diske. Priedai taip pat numeruojami ir vadinami. Darbo tekstas
 % su priedais susiejamas nuorodomis.
-
-\section{Neuroninio tinklo struktūra}
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.5]{img/MLP}
-    \caption{Paveikslėlio pavyzdys}
-    \label{img:mlp}
-\end{figure}
-
-
-\section{Eksperimentinio palyginimo rezultatai}
-% tablesgenerator.com - converts calculators (e.g. excel) tables to LaTeX
-\begin{table}[H]\footnotesize
-  \centering
-  \caption{Lentelės pavyzdys}
-  {\begin{tabular}{|l|c|c|} \hline
-    Algoritmas & $\bar{x}$ & $\sigma^{2}$ \\
-    \hline
-    Algoritmas A  & 1.6335    & 0.5584       \\
-    Algoritmas B  & 1.7395    & 0.5647       \\
-    \hline
-  \end{tabular}}
-  \label{tab:table example}
-\end{table}
 
 \printbibliography[heading=bibintoc]
 
