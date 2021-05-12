@@ -2197,6 +2197,8 @@
     <bcf:citekey order="13">ScalaGithub</bcf:citekey>
     <bcf:citekey order="14">Scala2Union</bcf:citekey>
     <bcf:citekey order="14">ShapelessGithub</bcf:citekey>
+    <bcf:citekey order="15">Predef</bcf:citekey>
+    <bcf:citekey order="16">IncrementalCompiler</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

@@ -249,10 +249,22 @@ The approach starts out with the most simplistic compiler imaginable, compiling 
 
 \lstinputlisting[language=Scala, linewidth=18cm, label={code:helloworld}, caption={"Hello World" in Scala}]{./code/HelloWorld.scala}
 
+% Context resolution
+Identifier resolution is also ommited in the minimal first implementation, the function identifier "println" definition is hardcoded in the compiler at first instead of creating an identifier resolution mechanism which would include all identifiers from Predef\$ in every compilation unit \cite{Predef}.
 Afterwards every feature that is needed is for the thesis is implemented keeping the set of features concise while allowing to prove the thesis goal.
-This allows us to deal with the complexity of Scala on a per demand basis, only features that are absolutely required are implemented.
+This allows us to deal with the complexity of Scala on a per demand basis, only features that are required are implemented incrementally to keep overall complexity down \cite{IncrementalCompiler}.
 
-Parser - The implementation is quite simple featuring a simple tokenizer which 
+The compiler follows a classic compiler design with a frontend, the parser, an intermediate representation and the backend, code generation targeting the JVM and Java byte code.
+
+\subsubsection{Frontend}
+
+The parser is pretrailed by a classical lexical analysis step which simply groups the input stream of characters into a stream of tokens and assigns a special meaning in accordance with the Scala language specification.
+
+%Tokenization is when specific language keywords get translated so special symbols and free standing identifiers are wrapped into a class. 
+
+\subsubsection{Intermediate representation}
+
+\subsubsection{Backend}
 
 
 \sectionnonum{Results and conclusion}
