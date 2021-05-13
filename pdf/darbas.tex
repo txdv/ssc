@@ -270,19 +270,45 @@ The chosen approach is heavily inspired by a functional programming approach cal
 Monadic parsing is an approach when monadic properties of data structes are being utilized very extensively to create a parsing mechanism that has a rather simple and concise data structure it operates on, the parser.
 A parser is a transformation of a token stream to a list of results, with each result containing the parser product and a tail token stream.
 
-Simple parsers can be easily defined on their own.
-Utilizing monad composition, more complex parsers can then be created by combining simple parsers.
+Simple parsers can be easily defined on their own (lst. \ref{code:SimpleParser})
+
+% https://tex.stackexchange.com/questions/35155/lstlisting-in-two-columns
+
+\noindent\begin{minipage}{.45\textwidth}
+
+\lstinputlisting[language=Scala, linewidth=7cm, label={code:SimpleParser}, caption={Parsing a token}]{./code/Number.scala}
+%\lstlisting[language=Scala, linewidth=10cm, label={code:SimpleParser}, caption={Parsing a token}]{./code/Number.scala}
+%\begin{lstlisting}[caption=code 1,frame=tlrb]{Name}
+%void code()
+%{
+%
+%}
+%\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}{.45\textwidth}
+
+\lstinputlisting[language=Scala, linewidth=10cm, label={code:ComplexParser}, caption={Parsing an import}]{./code/Import.scala}
+%\begin{lstlisting}[caption=code 2,frame=tlrb]{Name}
+%void code()
+%{
+%
+%}
+%\end{lstlisting}
+\end{minipage}
+
+Complex parsers can be easily created by combining simple parsers (lst. \ref{code:ComplexParser}).
+Utilizing monad composition and Scalas for comprehension the solution is terse and compact.
 A classic functional programming approach to deal with complexity also widely known as a bottom-up approach.
 
-% Scala has a very extensive functional programming community which enables with a fix.
-
-Scala
-  - has a very nice functional programming community, wich provides a lot of functional programming libraries like cats, scalaz with support for mondas
-	- show a simple parser eaxmple
-	- show a combined parser example
+%Scala
+%  - has a very nice functional programming community, wich provides a lot of functional programming libraries like cats, scalaz with support for mondas
+%	- show a simple parser eaxmple
+%	- show a combined parser example
 % scala is mentioned here https://en.wikipedia.org/wiki/API
 
 \subsubsection{Intermediate representation}
+
+The intermedia representation is basically a bunch of case classes.
 
 \subsubsection{Backend}
 
@@ -290,7 +316,6 @@ Scala
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
 This is the result.
-
 
 
 % (cituotų, perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
