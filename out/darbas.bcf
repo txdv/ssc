@@ -2191,18 +2191,18 @@
     <bcf:citekey order="8">TheGoProgrammingLanguage</bcf:citekey>
     <bcf:citekey order="8">GoGoogle</bcf:citekey>
     <bcf:citekey order="9">ScalaSpec</bcf:citekey>
-    <bcf:citekey order="10">JvmMethods</bcf:citekey>
-    <bcf:citekey order="11">10.5555/1407381</bcf:citekey>
-    <bcf:citekey order="12">Specs2Github</bcf:citekey>
-    <bcf:citekey order="13">ScalaGithub</bcf:citekey>
-    <bcf:citekey order="14">Scala2Union</bcf:citekey>
-    <bcf:citekey order="14">ShapelessGithub</bcf:citekey>
-    <bcf:citekey order="15">Predef</bcf:citekey>
-    <bcf:citekey order="16">IncrementalCompiler</bcf:citekey>
-    <bcf:citekey order="17">ScalaSpec</bcf:citekey>
-    <bcf:citekey order="18">MonadicParsing</bcf:citekey>
-    <bcf:citekey order="19">scalaz</bcf:citekey>
-    <bcf:citekey order="20">ClassFileFormat</bcf:citekey>
+    <bcf:citekey order="10">ScalaGithub</bcf:citekey>
+    <bcf:citekey order="11">Scala2Union</bcf:citekey>
+    <bcf:citekey order="11">ShapelessGithub</bcf:citekey>
+    <bcf:citekey order="12">Predef</bcf:citekey>
+    <bcf:citekey order="13">IncrementalCompiler</bcf:citekey>
+    <bcf:citekey order="14">ScalaSpec</bcf:citekey>
+    <bcf:citekey order="15">MonadicParsing</bcf:citekey>
+    <bcf:citekey order="16">scalaz</bcf:citekey>
+    <bcf:citekey order="17">ClassFileFormat</bcf:citekey>
+    <bcf:citekey order="18">JvmMethods</bcf:citekey>
+    <bcf:citekey order="19">10.5555/1407381</bcf:citekey>
+    <bcf:citekey order="20">Specs2Github</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">

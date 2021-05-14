@@ -137,55 +137,6 @@ A classic looking case study of average code complexity will be chosen, emphasiz
 
 An automated but definitive and consistent source code generation tool will be used to create consistently reproducible results for the given inputs listed in the following list.
 
-\section{Translation Unit}
-The classic approach of compilers is to read an entire source file and generate a corresponding output file with the translated code.
-
-For example in C++ and C source files with the extensions .cpp or .c are compiled to an intermediate object file with the extension .o, containing the generated assembly code of a specific target architecture, x86, ARM, etc.
-Once all source files are compiled into object files, all object files are combined together with optional resources into a singular output file called the executable.
-
-The Java language forces the programmer to define every Java class in its own file and every .java file is then compiled to a .class file, which can be later packaged to .jar files together with additional resources for easier deployment.
-A .class file contains all the Java bytecode generated from the Java source file, a condensed representation of the a Java class in a high level format which is abstract and does not target any specific target architecture, but an abstract architecture called the Java Virtual Machine (JVM).
-Code targeting the JVM can be then executed provided a Java runtime is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
-
-% todo: maybe later?
-Java bytecode is much more abstract and conceptually closer to the original representation of a class than the generated object files containing assembly are.
-Java class methods are basically sections in a .class file \cite{JvmMethods} which wrap Java bytecode - the implementation of the methods functionality.
-This high level representation makes granularization of translation units much more convenient, because it is possible to map a method directly to an entire section within the class file.
-
-Scala also targets the JVM, however it does not share the limitation of one class per source file that Java has.
-A Scala source file can contain multiple class definitions in a singular and due to the possibility to define class in a very concise manner developers gravitate towards multiple class definitions per file \ref{multidef}.
-
-% listings https://tex.stackexchange.com/questions/321843/using-labels-for-lstinputlisting
-
-\lstinputlisting[language=Scala, linewidth=18cm, label={multidef}, caption={An interface and 3 class definitions in a singular source file}]{./code/Expression.scala}
-
-The compiler creates in total 4 corresponding .class files as depicted in Listing \ref{img:Expression}.
-The classes all depend on the same trait definition called Expression, which is an empty interface in Java called a Marker Interface \cite{10.5555/1407381}, however there is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
-
-When running the compiler with the source file displayed in \ref{multidef} as the input, the compiler will recompile all 4 classes, even though new modifications might be present only within one class because the minimal translation unit is the entire source file.
-In the given examples the classes are trivial and the performance when recompiling is negligible.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.6]{img/Expression}
-    \caption{Compilation result of Listing \ref{multidef}}
-    \label{img:Expression}
-\end{figure}
-
-One might argue that multiple sizable class implementations with numerous methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield minuscule benefits outside of tailored benchmarks, but the opposite is the truth. % todo: replace but a the opposite is true.
-In the following example a typical usage of a popular Scala unit testing library Specs2 \cite{Specs2Github} is shown.
-
-\lstinputlisting[language=Scala, linewidth=18cm, label={code:specs2code}, caption={Standard usage of Specs2}]{./specs2/SampleTest.scala}
-
-Scala developers tend to use use many language features to create a Domain Specific Language (DSL) for visually pleasing code.
-% TODO: maybe explain, but reword for sure
-Because many Scala compiler feature are in play in this example, the details are quite intricate, but the result is that for each test case shown in the example \ref{code:specs2code} (first test, second test) a stand alone .class compilation output is created (SampleTest\$\$annon\$1.class, \$SampleTest\$\$anon\$2.class).
-Having many unit tests in a sophisticated codebase can therefore prolong the compilation process significantly, to a point where an iterative development process becomes impractical.
-Compilation times longer than a minute can be easily surpassed when meticulously writing Unit tests in a Test Drive Development (TDD) environment.
-
-TDD also promotes writing tests as a playground to explore approaches and test code feasibility before writing the actual code, therefore long compilation times of unit tests can make such an approach impractical.
-There are many reasons why such an optimization might improve usage of a compiler and increase the development experience of a developer.
-
 \section{Compiler}
 At the start of the bachelor thesis a thorough investigation was made to analyze how the official Scala compiler works \cite{ScalaGithub} and if it is feasible to apply the targeted optimizations to it.
 The investigation took very long and yielded little results, the codebase was too humongous and complicated too understand, the compiler too featured packed to adjust with the target objectives.
@@ -315,6 +266,56 @@ As such it has a an explicit notion of classes and groups functionality of class
 Other machine architectures such as x86-64, ARM and Sparc do not have a notion of classes with fields and methods, references to other classes.
 Compilers directly compiling to these kind of architectures need to map their high-level language constructs to a much more simplistic instructions, which have only a concept of registers and a linear memory model.
 This requires a lot of additional work, but in our case the JVM takes care of this job.
+
+\section{Translation Unit}
+The classic approach of compilers is to read an entire source file and generate a corresponding output file with the translated code.
+
+For example in C++ and C source files with the extensions .cpp or .c are compiled to an intermediate object file with the extension .o, containing the generated assembly code of a specific target architecture, x86, ARM, etc.
+Once all source files are compiled into object files, all object files are combined together with optional resources into a singular output file called the executable.
+
+The Java language forces the programmer to define every Java class in its own file and every .java file is then compiled to a .class file, which can be later packaged to .jar files together with additional resources for easier deployment.
+A .class file contains all the Java bytecode generated from the Java source file, a condensed representation of the a Java class in a high level format which is abstract and does not target any specific target architecture, but an abstract architecture called the Java Virtual Machine (JVM).
+Code targeting the JVM can be then executed provided a Java runtime is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
+
+% todo: maybe later?
+Java bytecode is much more abstract and conceptually closer to the original representation of a class than the generated object files containing assembly are.
+Java class methods are basically sections in a .class file \cite{JvmMethods} which wrap Java bytecode - the implementation of the methods functionality.
+This high level representation makes granularization of translation units much more convenient, because it is possible to map a method directly to an entire section within the class file.
+
+Scala also targets the JVM, however it does not share the limitation of one class per source file that Java has.
+A Scala source file can contain multiple class definitions in a singular and due to the possibility to define class in a very concise manner developers gravitate towards multiple class definitions per file \ref{multidef}.
+
+% listings https://tex.stackexchange.com/questions/321843/using-labels-for-lstinputlisting
+
+\lstinputlisting[language=Scala, linewidth=18cm, label={multidef}, caption={An interface and 3 class definitions in a singular source file}]{./code/Expression.scala}
+
+The compiler creates in total 4 corresponding .class files as depicted in Listing \ref{img:Expression}.
+The classes all depend on the same trait definition called Expression, which is an empty interface in Java called a Marker Interface \cite{10.5555/1407381}, however there is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
+
+When running the compiler with the source file displayed in \ref{multidef} as the input, the compiler will recompile all 4 classes, even though new modifications might be present only within one class because the minimal translation unit is the entire source file.
+In the given examples the classes are trivial and the performance when recompiling is negligible.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/Expression}
+    \caption{Compilation result of Listing \ref{multidef}}
+    \label{img:Expression}
+\end{figure}
+
+One might argue that multiple sizable class implementations with numerous methods contained in a singular source file are rare in actual code bases and optimizing for this case would yield minuscule benefits outside of tailored benchmarks, but the opposite is the truth. % todo: replace but a the opposite is true.
+In the following example a typical usage of a popular Scala unit testing library Specs2 \cite{Specs2Github} is shown.
+
+\lstinputlisting[language=Scala, linewidth=18cm, label={code:specs2code}, caption={Standard usage of Specs2}]{./specs2/SampleTest.scala}
+
+Scala developers tend to use use many language features to create a Domain Specific Language (DSL) for visually pleasing code.
+% TODO: maybe explain, but reword for sure
+Because many Scala compiler feature are in play in this example, the details are quite intricate, but the result is that for each test case shown in the example \ref{code:specs2code} (first test, second test) a stand alone .class compilation output is created (SampleTest\$\$annon\$1.class, \$SampleTest\$\$anon\$2.class).
+Having many unit tests in a sophisticated codebase can therefore prolong the compilation process significantly, to a point where an iterative development process becomes impractical.
+Compilation times longer than a minute can be easily surpassed when meticulously writing Unit tests in a Test Drive Development (TDD) environment.
+
+TDD also promotes writing tests as a playground to explore approaches and test code feasibility before writing the actual code, therefore long compilation times of unit tests can make such an approach impractical.
+There are many reasons why such an optimization might improve usage of a compiler and increase the development experience of a developer.
+
 
 \section{Benchmarking}
 Some text about benchmarking.
