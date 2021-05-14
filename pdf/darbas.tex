@@ -307,12 +307,18 @@ It represents the language structure in straight forward way just using case cla
 
 \subsubsection{Backend}
 
-The compiler targets the JVM just like the official Scala compiler and therefore tranforms the internal IR to Java bytecode.
+%todo: reword stuff somehow
+The compiler targets the JVM just like the official Scala compiler and therefore tranforms the internal IR to the JVMs instruction set called Java bytecode.
 Compared to other computer architectures the Java bytecode is a fairly high level representation mirroring the functionality of Java closely.
 As such it has a an explicit notion of classes and groups functionality of classes in a singular file ‒ the so called class file \cite{ClassFileFormat}.
 
-Machine architectures such as x86-64, ARM and Sparc do not have a notion of classes with fields and methods, references to other classes.
-Languages directly targeting these kind of architectures need to map their language concepts to a much more simplistic instructions, which have only a concept of registers and a linear memory model.
+Other machine architectures such as x86-64, ARM and Sparc do not have a notion of classes with fields and methods, references to other classes.
+Compilers directly compiling to these kind of architectures need to map their high-level language constructs to a much more simplistic instructions, which have only a concept of registers and a linear memory model.
+This requires a lot of additional work, but in our case the JVM takes care of this job.
+
+\section{Benchmarking}
+Some text about benchmarking.
+
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
