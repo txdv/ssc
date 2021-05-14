@@ -264,8 +264,8 @@ Compared to other computer architectures the Java bytecode is a fairly high leve
 As such it has a an explicit notion of classes and groups functionality of classes in a singular file ‒ the so called class file \cite{ClassFileFormat}.
 
 Other machine architectures such as x86-64, ARM and Sparc do not have a notion of classes with fields and methods, references to other classes.
-Compilers directly compiling to these kind of architectures need to map their high-level language constructs to a much more simplistic instructions, which have only a concept of registers and a linear memory model.
-This requires a lot of additional work, but in our case the JVM takes care of this job.
+Compilers directly compiling to these kind of architectures need to map their high-level language constructs to a much more simplistic instruction set, which has only a concept of registers and a linear memory model.
+This requires a lot of additional work by the compiler, but in our case the JVM takes care of this job.
 
 \section{Translation Unit}
 The classic approach of compilers is to read an entire source file and generate a corresponding output file with the translated code.
