@@ -17,7 +17,7 @@ object Expression {
   case class Import(name: String) extends Statement
   case class DefObject(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
 
-  trait ScalaType extends Expression
+  sealed trait ScalaType extends Expression
   case class SimpleType(name: String) extends ScalaType
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
 

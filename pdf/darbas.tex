@@ -286,7 +286,9 @@ Complex parsers can be easily created by combining simple parsers (lst. \ref{cod
 Utilizing monad composition and Scalas for comprehension the solution is terse and compact.
 A classic functional programming approach to deal with complexity also widely known as a bottom-up approach.
 
-Scalas functional programming community is thriving and many libraries libraries like Cats, Scalaz exist which can be used easily to handle monads on your own.
+Scalas functional programming community is thriving and many libraries exist which can be used to aid in the handling of monads.
+% todo: scalaz book citation
+Scalaz \cite{scalaz} was used in the implementation of the parser, it had the candidest interface for mondas to implement.
 
 %Scala
 %  - has a very nice functional programming community, wich provides a lot of functional programming libraries like cats, scalaz with support for mondas
@@ -296,10 +298,19 @@ Scalas functional programming community is thriving and many libraries libraries
 
 \subsubsection{Intermediate representation}
 
-The intermedia representation is basically a bunch of case classes.
+The intermedia representation (IR) is kept uncomplicated and easy to follow.
+It represents the language structure in straight forward way just using case classes and sealed traits emulating ADTs.
+
+\lstinputlisting[language=Scala, linewidth=16cm, label={multidef}, caption={Intermediate Representation}]{./code/IR.scala}
 
 \subsubsection{Backend}
 
+The compiler targets the JVM just like the official Scala compiler and therefore tranforms the internal IR to Java bytecode.
+Compared to other computer architectures the Java bytecode is a fairly high level representation mirroring the functionality of Java closely.
+As such it has a an explicit notion of classes and groups functionality of classes in a singular file ‒ the so called class file \cite{ClassFileFormat}.
+
+Machine architectures such as x86-64, ARM and Sparc do not have a notion of classes with fields and methods, references to other classes.
+Languages directly targeting these kind of architectures need to map their language concepts to a much more simplistic instructions, which have only a concept of registers and a linear memory model.
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
@@ -331,6 +342,8 @@ This is the result.
 \textbf{ADT} - Algebraic Data Type
 
 \textbf{API} - Application Programming Interface
+
+\textbf{IR} - Intermediate Representation
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai

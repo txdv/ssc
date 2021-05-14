@@ -2201,6 +2201,8 @@
     <bcf:citekey order="16">IncrementalCompiler</bcf:citekey>
     <bcf:citekey order="17">ScalaSpec</bcf:citekey>
     <bcf:citekey order="18">MonadicParsing</bcf:citekey>
+    <bcf:citekey order="19">scalaz</bcf:citekey>
+    <bcf:citekey order="20">ClassFileFormat</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="anyt">
