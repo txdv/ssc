@@ -274,31 +274,19 @@ Simple parsers can be easily defined on their own (lst. \ref{code:SimpleParser})
 
 % https://tex.stackexchange.com/questions/35155/lstlisting-in-two-columns
 
-\noindent\begin{minipage}{.45\textwidth}
-
-\lstinputlisting[language=Scala, linewidth=7cm, label={code:SimpleParser}, caption={Parsing a token}]{./code/Number.scala}
-%\lstlisting[language=Scala, linewidth=10cm, label={code:SimpleParser}, caption={Parsing a token}]{./code/Number.scala}
-%\begin{lstlisting}[caption=code 1,frame=tlrb]{Name}
-%void code()
-%{
-%
-%}
-%\end{lstlisting}
+\noindent
+\begin{minipage}{.45\textwidth}
+  \lstinputlisting[language=Scala, linewidth=7cm, label={code:SimpleParser}, caption={Parsing a token}]{./code/Number.scala}
 \end{minipage}\hfill
 \begin{minipage}{.45\textwidth}
-
-\lstinputlisting[language=Scala, linewidth=10cm, label={code:ComplexParser}, caption={Parsing an import}]{./code/Import.scala}
-%\begin{lstlisting}[caption=code 2,frame=tlrb]{Name}
-%void code()
-%{
-%
-%}
-%\end{lstlisting}
+  \lstinputlisting[language=Scala, linewidth=10cm, label={code:ComplexParser}, caption={Parsing an import}]{./code/Import.scala}
 \end{minipage}
 
 Complex parsers can be easily created by combining simple parsers (lst. \ref{code:ComplexParser}).
 Utilizing monad composition and Scalas for comprehension the solution is terse and compact.
 A classic functional programming approach to deal with complexity also widely known as a bottom-up approach.
+
+Scalas functional programming community is thriving and many libraries libraries like Cats, Scalaz exist which can be used easily to handle monads on your own.
 
 %Scala
 %  - has a very nice functional programming community, wich provides a lot of functional programming libraries like cats, scalaz with support for mondas
