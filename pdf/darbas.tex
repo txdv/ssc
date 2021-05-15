@@ -61,6 +61,7 @@ This thesis presents an approach on how to speed up compilation in a day to day 
 Classic compilers treat a source file as an atomic translation unit in their compilation pipeline, the proposed approach tries to leverage the structure of modern programming languages to granularize the translation unit in order to improve recompilation times for classic development workloads.
 
 The chosen target language is a subset of the Scala programming language.
+% todo: remove acomodate two times
 Instead of modifying the standard Scala compiler to accommodate the proposed approach, a compiler is written from scratch in order to have simple program enabling straightforward modifications for an easier accommodation of the proposed approach.
 
 Performance measurements of the prototype compiler are taken with the approach enabled and disabled, various dynamic inputs are generated with different compilation unit sizes to gain insights in the effectiveness of the approach.
@@ -85,13 +86,15 @@ Results are then compared to the classic compiler and conclusions are drawn.
 %\subsectionnonum{Outline}
 
 \subsectionnonum{Research object and actuality}
-The majority of the research done on compilers is focused on making compilers output optimized programs in terms of code execution speed and memory usage \cite{lopes2018future} while neglecting or willfully sacrificing \cite{fast2019compilers} actual runtime performance of the compiler itself.
+The majority of the research done on compilers is focused on making compiler output optimized programs in terms of code execution speed and memory usage \cite{lopes2018future} while neglecting or willfully sacrificing \cite{fast2019compilers} actual runtime performance of the compiler itself.
 As computers get faster more resources are available, but programmers tend to utilize these newfound resources to make the implementation of programs simpler rather than making the programs faster\cite{Wirth1995}.
 
+% todo: compiler sphere is too abstract
 Another vector of academic improvement within the compiler sphere is to add new features or utilize paradigms like dependent types or formal specifications\cite{RustVerification} in order to allow the compiler to do more sophisticated type checking and verification than classic type checking allows while significantly increasing runtime compilation .
 
 % ecosystem is bad
-When assessing the adoption of a new programming language the runtime speed of the available compilers for a particular programming languages are often gauged as an important metric\cite{ScalaSlow} among other such as language complexity, available libraries and spread of ecosystem.
+% todo: among other, do I need to add others?
+When assessing the adoption of a new programming language the runtime speed of the available compilers are often gauged as an important metric\cite{ScalaSlow} among others such as language complexity, available libraries and spread of ecosystem.
 Dealing with enormous compilation times of huge projects can have negative effects on the productivity of programmers and even drive away people from an entire ecosystem \cite{ScalaReallySlow, ScalaSlow}.
 
 Modern organizations moving towards continuous delivery practices called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their CI pipeline.
@@ -139,8 +142,9 @@ An automated but definitive and consistent source code generation tool will be u
 
 \section{Compiler}
 At the start of the bachelor thesis a thorough investigation was made to analyze how the official Scala compiler works \cite{ScalaGithub} and if it is feasible to apply the targeted optimizations to it.
-The investigation took very long and yielded little results, the codebase was too humongous and complicated too understand, the compiler too featured packed to adjust with the target objectives.
-Without the help of a mentor with high proficiency in the official Scala compiler codebase and taking the scope of the bachelor thesis into account, it was deemed too complicated to undergo such a task.
+The investigation took very long and yielded little results, the codebase was too humongous and complicated to understand, the compiler too feature packed to adjust with the target objectives.
+% todo: word it differently
+Not being proefficient enough in the codebase of the official Scala compiler and taking the scope of the bachelor thesis into account, it was deemed to complicated to undergo such a task.
 
 Instead of adjusting an already existing compiler, a compiler was written from scratch with an iterative approach.
 In the following numerous advantages and disadvantages of this method are expressed.
