@@ -16,7 +16,11 @@ object Constant {
   case class ConstInt(int: Int) extends Constant
 }
 
-case class ClassFile(head: ByteBuffer, body: ByteBuffer) {
+case class ClassFile(
+  name: String,
+  head: ByteBuffer,
+  body: ByteBuffer,
+) {
   def getBytes: Array[Byte] = {
     val headLength = head.limit()
     val bodyLength = body.limit()
@@ -109,7 +113,7 @@ class Materializer {
 
     constantPoolCount.putShort(constant_index.toShort)
 
-    ClassFile(head.getBytes, body.getBytes)
+    ClassFile(jclass.thisClass.name, head.getBytes, body.getBytes)
   }
 
   private def write(jclass: Class): ByteBufferStream = {

@@ -326,21 +326,49 @@ object ScalaCompiler {
     println
   }
 
-  def main(args: Array[String]): Unit = {
+  def main2(args: Array[String]): Unit = {
     val statements = readFile(args.head)
     val defObject = statements.find(_.isInstanceOf[DefObject]).get.asInstanceOf[DefObject]
     val jclass = Benchmark.gauge2("ast") {
       convert(defObject)
     }
-    PrettyPrint.pformat(defObject)
-    PrettyPrint.pformat(jclass)
+    //PrettyPrint.pformat(defObject)
+    //PrettyPrint.pformat(jclass)
     val m = new classfile.higher.Materializer
     val cf = Benchmark.gauge2("class") {
       m.bytes(jclass)
     }
 
-    val fname = args.head.replaceFirst("\\.scala$", ".class")
-    writeFile(fname, cf)
+    Benchmark.gauge2("write") {
+      val fname = cf.name
+      writeFile(fname, cf)
+    }
+
+    Benchmark.print
+  }
+
+  def main(args: Array[String]): Unit = {
+    val statements = readFile(args.head)
+    val defObjects = statements.filter(_.isInstanceOf[DefObject]).map(_.asInstanceOf[DefObject])
+
+    val classes = Benchmark.gauge2("ast") {
+      defObjects.map(convert)
+    }
+
+    val classFiles = Benchmark.gauge2("class") {
+      classes.map { klass =>
+        val m = new classfile.higher.Materializer
+        m.bytes(klass)
+      }
+    }
+
+    Benchmark.gauge2("write") {
+      classFiles.foreach { classFile =>
+        val fname = classFile.name
+        writeFile(fname, classFile)
+
+      }
+    }
 
     Benchmark.print
   }
