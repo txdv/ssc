@@ -348,6 +348,8 @@ object ScalaCompiler {
   }
 
   def main(args: Array[String]): Unit = {
+    val targetFile = args.head
+
     val statements = readFile(args.head)
     val defObjects = statements.filter(_.isInstanceOf[DefObject]).map(_.asInstanceOf[DefObject])
 
@@ -362,10 +364,12 @@ object ScalaCompiler {
       }
     }
 
+    val root = new File(targetFile).getParent
+
     Benchmark.gauge2("write") {
       classFiles.foreach { classFile =>
         val fname = classFile.name
-        writeFile(fname, classFile)
+        writeFile(s"$root/$fname.class", classFile)
 
       }
     }
