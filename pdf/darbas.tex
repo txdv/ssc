@@ -150,10 +150,11 @@ Not being proefficient enough in the codebase of the official Scala compiler and
 Instead of adjusting an already existing compiler, a compiler was written from scratch with an iterative approach.
 In the following numerous advantages and disadvantages of this method are expressed.
 
-\textbf{Flexibility} - big mature compilers are right and harder to change, they have accumulated a lot of code which needs to be adjusted for every modification.
+\textbf{Flexibility} - mature compilers are harder to change, they have accumulated a lot of code which needs to be adjusted for every modification.
 The official Scala compiler has a complex pipeline with multiple passes and figuring out where what the best point of incision is a difficult task.
 A small compiler written from scratch allows the author to focus on the most important aspects.
 
+% todo: second sentence repeats insurance
 \textbf{Correctness} - ensuring that a new feature is correctly implemented in a sizable code base is an immense undertaking.
 In order to ensure that a new feature addition doesn't impact the overall behavior of the compiler every feature needs to be tested for correctness.
 The multi-pass nature of the official Scala compiler makes reasoning about correctness difficult, because it is a non trivial undertaking to reason about how caching in one pass might affect functionality the subsequent passes.
