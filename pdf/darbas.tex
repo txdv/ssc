@@ -279,11 +279,12 @@ The classic approach of compilers is to read an entire source file and generate 
 For example in C++ and C source files with the extensions .cpp or .c are compiled to an intermediate object file with the extension .o, containing the generated assembly code of a specific target architecture, x86, ARM, etc.
 Once all source files are compiled into object files, all object files are combined together with optional resources into a singular output file called the executable.
 
+\subsection{File scope translation unit}
 The Java language forces the programmer to define every Java class in its own file and every .java file is then compiled to a .class file, which can be later packaged to .jar files together with additional resources for easier deployment.
 A .class file contains all the Java bytecode generated from the Java source file, a condensed representation of the a Java class in a high level format which is abstract and does not target any specific target architecture, but an abstract architecture called the Java Virtual Machine (JVM).
-Code targeting the JVM can be then executed provided a Java runtime is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
+Code targeting the JVM can be then executed provided a Java Runtime Environment (JRE) is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
 
-% todo: maybe later?
+% todo: write this block in a separate section
 Java bytecode is much more abstract and conceptually closer to the original representation of a class than the generated object files containing assembly are.
 Java class methods are basically sections in a .class file \cite{JvmMethods} which wrap Java bytecode - the implementation of the methods functionality.
 This high level representation makes granularization of translation units much more convenient, because it is possible to map a method directly to an entire section within the class file.
@@ -293,10 +294,12 @@ A Scala source file can contain multiple class definitions in a singular and due
 
 % listings https://tex.stackexchange.com/questions/321843/using-labels-for-lstinputlisting
 
-\lstinputlisting[language=Scala, linewidth=18cm, label={multidef}, caption={An interface and 3 class definitions in a singular source file}]{./code/Expression.scala}
+\lstinputlisting[language=Scala, linewidth=18cm, label={multidef}, caption={Example of multiple classes in a single Scala source file}]{./code/Expression.scala}
 
 The compiler creates in total 4 corresponding .class files as depicted in Listing \ref{img:Expression}.
-The classes all depend on the same trait definition called Expression, which is an empty interface in Java called a Marker Interface \cite{10.5555/1407381}, however there is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
+The classes all depend on the same trait definition called Expression, an empty interface.
+A similar concept in Java exists and is called a Marker Interface \cite{10.5555/1407381}.
+There is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
 
 When running the compiler with the source file displayed in \ref{multidef} as the input, the compiler will recompile all 4 classes, even though new modifications might be present only within one class because the minimal translation unit is the entire source file.
 In the given examples the classes are trivial and the performance when recompiling is negligible.
@@ -319,12 +322,18 @@ Because many Scala compiler feature are in play in this example, the details are
 Having many unit tests in a sophisticated codebase can therefore prolong the compilation process significantly, to a point where an iterative development process becomes impractical.
 Compilation times longer than a minute can be easily surpassed when meticulously writing Unit tests in a Test Drive Development (TDD) environment.
 
-TDD also promotes writing tests as a playground to explore approaches and test code feasibility before writing the actual code, therefore long compilation times of unit tests can make such an approach impractical.
-There are many reasons why such an optimization might improve usage of a compiler and increase the development experience of a developer.
+TDD also promotes writing tests as a playground to explore approaches and test code feasibility before writing the implementation.
+Long compilation times of unit tests can make such an approach impractical.
 
+If an action takes more than 10 seconds \cite{Usability} the user is likely to loose attention and starts to perform different tasks.
+The norm for compilers it to not show any kind of progress when compiling a single translation units.
+This exacerbates the perceived \cite{Usability} time it takes to complete the process for the user.
+
+%These kind of interruption during software development
 
 \section{Benchmarking}
-Some text about benchmarking.
+In order to verify.
+%Some text about benchmarking.
 
 
 \sectionnonum{Results and conclusion}
@@ -359,6 +368,8 @@ This is the result.
 \textbf{API} - Application Programming Interface
 
 \textbf{IR} - Intermediate Representation
+
+\textbf{JRE} - Java Runtime Environment
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
