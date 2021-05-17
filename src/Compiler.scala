@@ -347,14 +347,47 @@ object ScalaCompiler {
     Benchmark.print
   }
 
+  object Cache {
+    import java.nio.ByteBuffer
+    import java.nio.file.{Files, Path, StandardOpenOption}
+
+    val path = Path.of("class_cache")
+
+    def save(values: Seq[Int]): Unit = {
+      val bb = java.nio.ByteBuffer.allocate(values.length * 4)
+      values.foreach(bb.putInt)
+      Files.write(path, bb.array, Seq(StandardOpenOption.CREATE):_*)
+    }
+
+    def load(): Seq[Int] = {
+      try {
+        val bytes = Files.readAllBytes(path)
+        val bb = ByteBuffer.wrap(bytes)
+        (1 to (bytes.size / 4)).map { _ => bb.getInt }
+      } catch {
+        case _: java.nio.file.NoSuchFileException =>
+          Seq.empty
+      }
+    }
+  }
+
+
   def main(args: Array[String]): Unit = {
     val targetFile = args.head
 
     val statements = readFile(args.head)
     val defObjects = statements.filter(_.isInstanceOf[DefObject]).map(_.asInstanceOf[DefObject])
 
+    val cachedHashes = Cache.load()
+    val hashes = defObjects.map { defObject => defObject.hashCode }.sorted
+    Cache.save(hashes)
+
+    val needRecompile = hashes.diff(cachedHashes)
+
     val classes = Benchmark.gauge2("ast") {
-      defObjects.map(convert)
+      defObjects
+        .filter { defObject => needRecompile.contains(defObject.hashCode) }
+        .map(convert)
     }
 
     val classFiles = Benchmark.gauge2("class") {
