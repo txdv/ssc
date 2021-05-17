@@ -352,7 +352,7 @@ In short the sequence during benchmark looked like this:
 \subsection{Measurements}
 
 During the compilation runs a general time measurement was taken measuring the entire time it took the compiler from start to finish labeled "full" in the following.
-Additional measurements were taken of the prototype compiler of the following steps:
+Additional measurements were taken of the prototype compiler of the following compilation steps:
 
 \begin{enumerate}
 \item{read - reading the source file}
@@ -368,11 +368,28 @@ The official compiler has a much more complex compilation pipeline consisting of
 Its architecture also is noticably more side effectful so utilizing the same caching technique might not be easy to apply at the same layers.
 The additional metrics would add little value and would make the benchmarking results harder to read without actually implementing the caching mechanism on in the official compiler.
 
-\subsection{Sideeffects}
-The JVM incures additional costs, 
+\subsection{Hard to measure metrics}
+Combining all single compilation pipeline steps of the prototype compiler does not add up to the single measurement metric "full" of the entire application.
+This is easily explained due to JVM JIT startup costs and and GC.
+The JVM needs to load the jars, the class files of a jar, run in interpreted mode and then JIT the class files into executable assembly code.
+Also the GC can happen unpredictably at any moment between measurements which can add.
+
+When analyzing the collected metrics one should keep in mind the additional overhead that the JVM can have.
+
+\subsection{Input variance}
+In order to measure variance in class difference, variable input had to be created.
+The dimensions of the created classes where two
+
+\begin{enumerate}
+\item{Classes - the number of classes a source file contains}
+\item{Methods - the number methods each classes has}
+\end{enumerate}
+
+The input file looks like this:
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
+Combining all compilation steps to.
 The compilation pipeline has many steps and creating 
 
 

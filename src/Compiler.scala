@@ -1,6 +1,5 @@
 package lt.vu.mif.bentkus.bachelor.compiler
 
-
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.Version
 import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{
   ClassAccessFlag,
