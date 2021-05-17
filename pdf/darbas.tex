@@ -332,9 +332,44 @@ This exacerbates the perceived time it takes to complete a process for the user\
 %These kind of interruption during software development
 
 \section{Benchmarking}
-After applying caching.
-%Some text about benchmarking.
+In order to measure the efficiency of the proproposed granularization technique, multiple measurements have been taken.
+Measurements were taken of the prototype compiler with and without caching of the translation units enabled and then also a measurement was taken of the official Scala compiler on the same input.
 
+In order to measure the time difference between a cached compilation and a full compilation the cache file containing the hash codes of the already compiled translation units is simply deleted triggering a complete run of the compiler on the next invocation.
+
+The additional translation unit caching logic generates such a low overhead, that it was decided to just leave it during both runs to simplify measurements.
+The warming up of the JVMs JIT mechanism and the JVMs Garbage Collection (GC) mechanism times incure a higher cost and therefore the additional overhead is neglectable.
+
+In short the sequence during benchmark looked like this:
+
+\begin{enumerate}
+\item{Delete the cache}
+\item{Run the prototype compiler, which generates the cache}
+\item{Run the prototype compiler, which utilizes the cache now}
+\item{Run the official Scala compiler}
+\end{enumerate}
+
+\subsection{Measurements}
+
+During the compilation runs a general time measurement was taken measuring the entire time it took the compiler from start to finish labeled "full" in the following.
+Additional measurements were taken of the prototype compiler of the following steps:
+
+\begin{enumerate}
+\item{read - reading the source file}
+\item{lex - lexing the input into lexemes}
+\item{parse - parsing the stream of tokens into an ast}
+\item{ast - the transformation step which converts the ast into a high level class file representation}
+\item{class - serializing the higher level class file representation into the binary class file format}
+\item{write - writing the serialized class file from memory files}
+\end{enumerate}
+
+These measurements were taken only for the prototype compiler.
+The official compiler has a much more complex compilation pipeline consisting of more than 12 steps instead of singular ast step in the prototype compiler.
+Its architecture also is noticably more side effectful so utilizing the same caching technique might not be easy to apply at the same layers.
+It would create a lot of metrics but without actually implementing the caching mechanism on those layers, additional metrics would add little value and would make the benchmarking results harder to read.
+
+\subsection{Sideeffects}
+The JVM incures additional costs, 
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
