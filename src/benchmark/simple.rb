@@ -3,12 +3,16 @@ def simple(f, i)
   f.puts("object A#{i} { }")
 end
 
-def hard(f, i)
-  f.puts("object A#{i} {
-  def main(args: Array[String]): Unit = {
+def main(i)
+"""
+  def main#{i}(args: Array[String]): Unit = {
     println(\"Hello world\")
   }
-}")
+"""
+end
+
+def hard(f, i)
+  f.puts("object A#{i} {}")
 end
 
 arg = ARGV.first || "100"
