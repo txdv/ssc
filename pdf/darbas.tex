@@ -366,7 +366,8 @@ Additional measurements were taken of the prototype compiler of the following st
 These measurements were taken only for the prototype compiler.
 The official compiler has a much more complex compilation pipeline consisting of more than 12 steps instead of singular ast step in the prototype compiler.
 Its architecture also is noticably more side effectful so utilizing the same caching technique might not be easy to apply at the same layers.
-It would create a lot of metrics but without actually implementing the caching mechanism on those layers, additional metrics would add little value and would make the benchmarking results harder to read.
+It would create a lot of metrics but without actually implementing the caching mechanism on those layers.
+The additional metrics would add little value and would make the benchmarking results harder to read.
 
 \subsection{Sideeffects}
 The JVM incures additional costs, 
