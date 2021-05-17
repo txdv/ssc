@@ -378,14 +378,21 @@ When analyzing the collected metrics one should keep in mind the additional over
 
 \subsection{Input variance}
 In order to measure variance in class difference, variable input had to be created.
-The dimensions of the created classes where two
+The dimensions of the created classes where twofold:
 
 \begin{enumerate}
 \item{Classes - the number of classes a source file contains}
 \item{Methods - the number methods each classes has}
 \end{enumerate}
 
-The input file looks like this:
+The generated input files look like this:
+
+\lstinputlisting[language=Scala, linewidth=18cm, label={code:generated}, caption={Generated source inputs}]{./code/Generated.scala}
+
+The number of compilation units within a source file is controlled by the Classes dimension. The complexitly of each compilation unit is controlled by the number methods.
+
+The methods themselfs are trivial, singular expressions containing a basic function call.
+Even with trivial methods which do not take much computation to compile down a significant optimization is already achieved presented in the later subsection.
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
