@@ -3,7 +3,7 @@
 require 'json'
 
 #puts JSON.parse(File.read("resi;t)
-puts "Classes & Methods & Prototyp & Cached & Official \\\\"
+puts "Classes & Methods & Prototyp & Cached & Diff & Official \\\\"
 lines = File.read("results.json").lines
 lines.each do |line|
   result = JSON.parse(line)
@@ -12,5 +12,8 @@ lines.each do |line|
   new = result["new"]["clock"].to_s.rjust(5, ' ')
   cache = result["new_cached"]["clock"].to_s.rjust(5, ' ')
   old = result["old"]["clock"].to_s.rjust(5, ' ')
-  puts "#{classes} & #{methods} & #{new} & #{cache} & #{old} \\\\"
+
+  diff = (result["new"]["clock"] - result["new_cached"]["clock"]).to_s.rjust(5, ' ')
+
+  puts "#{classes} & #{methods} & #{new} & #{cache} & #{diff} & #{old} \\\\"
 end
