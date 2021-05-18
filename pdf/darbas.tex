@@ -401,11 +401,12 @@ Even with trivial methods which do not take much computation to compile down a s
 \end{tabular}
 \end{center}
 
-
+\begin{figure}
 \begin{tikzpicture}
 	\begin{axis}[
 		title={Speedup with caching},
 		ylabel={Diff [milliseconds]},
+		width=1\textwidth, height=0.5\textwidth,
 		ymin=0, ymax=300,
 		xlabel={Number of classes},
 		xmode=log,
@@ -420,11 +421,16 @@ Even with trivial methods which do not take much computation to compile down a s
 
 	\end{axis}
 \end{tikzpicture}
+\end{figure}
 
+asd
+
+\begin{figure}
 \begin{tikzpicture}
 	\begin{axis}[
 		title={Percentual speedup},
 		ylabel={Percent [\%]},
+		width=1\textwidth, height=0.5\textwidth,
 		ymin=0, ymax=50,
 		xlabel={Number of classes},
 		xmode=log,
@@ -439,6 +445,7 @@ Even with trivial methods which do not take much computation to compile down a s
 
 	\end{axis}
 \end{tikzpicture}
+\end{figure}
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
