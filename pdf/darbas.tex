@@ -418,14 +418,8 @@ Even with trivial methods which do not take much computation to compile down a s
   %ymajorgrids=true,
   %grid style=dashed,
 
-\addplot[color=blue, mark=square]
-  table {
-    1    1000
-    10   10000
-    100  15000
-    1000 20000
-    2000 25000
-  };
+\input{./src/benchmark/plot.tex}
+
 
 \legend{new 10}
 
