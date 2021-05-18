@@ -4,7 +4,7 @@ def gen(classes, methods)
   `ruby simple.rb #{classes} #{methods}`
 end
 
-classes = [1, 10, 100, 1000, 2000]
+classes = [1, 5, 10, 20, 50, 100]
 methods = [0, 1, 5, 10, 20, 50, 100]
 
 
