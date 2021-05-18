@@ -403,30 +403,41 @@ Even with trivial methods which do not take much computation to compile down a s
 
 
 \begin{tikzpicture}
-\begin{axis}[
-  title={Speedup with caching},
-  ylabel={Diff [milliseconds]},
-  ymin=0, ymax=300,
-  xlabel={Number of classes},
-  xmode=log,
-  legend pos=north west,
-  ymajorgrids=true,
-  log ticks with fixed point,
-]
-  %ylabel={Time [milliseconds]},
-  %xmin=0, xmax=2000,
-  %ymin=0, ymax=30000,
-  %xtick={1, 10, 100, 1000, 2000},
-  %ytick={0,5000,10000,15000,20000,25000,30000},
-  %legend pos=north west,
-  %ymajorgrids=true,
-  %grid style=dashed,
+	\begin{axis}[
+		title={Speedup with caching},
+		ylabel={Diff [milliseconds]},
+		ymin=0, ymax=300,
+		xlabel={Number of classes},
+		xmode=log,
+		legend pos=north west,
+		ymajorgrids=true,
+		log ticks with fixed point,
+	]
 
-\input{./src/benchmark/plot.tex}
+	\input{./src/benchmark/plot.tex}
 
-\legend{0, 1, 5, 10, 20, 50, 100}
+	\legend{0, 1, 5, 10, 20, 50, 100}
 
-\end{axis}
+	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+	\begin{axis}[
+		title={Percentual speedup},
+		ylabel={Percent [\%]},
+		ymin=0, ymax=50,
+		xlabel={Number of classes},
+		xmode=log,
+		legend pos=north west,
+		ymajorgrids=true,
+		log ticks with fixed point,
+	]
+
+	\input{./src/benchmark/plot_pct.tex}
+
+	\legend{0, 1, 5, 10, 20, 50, 100}
+
+	\end{axis}
 \end{tikzpicture}
 
 \sectionnonum{Results and conclusion}
