@@ -404,11 +404,14 @@ Even with trivial methods which do not take much computation to compile down a s
 
 \begin{tikzpicture}
 \begin{axis}[
+  title={Speedup with caching},
+  ylabel={Diff [milliseconds]},
+  xlabel={Number of classes},
   xmode=log,
+  legend pos=north west,
+  ymajorgrids=true,
   log ticks with fixed point,
 ]
-  %title={Compilation speed},
-  %xlabel={Number of classes},
   %ylabel={Time [milliseconds]},
   %xmin=0, xmax=2000,
   %ymin=0, ymax=30000,
