@@ -449,8 +449,32 @@ asd
 
 \sectionnonum{Results and conclusion}
 \subsectionnonum{Results}
-Combining all compilation steps to.
-The compilation pipeline has many steps and creating 
+%For this bachelor thesis a prototype compiler was created 
+In this thesis the translation unit granularization concept has been presented.
+An introduction was given to the current state of how compilers handle translation units in various programming languages.
+It was pointed out that the size of the granularity of the compilation units is directrly related to compilation times.
+To reduce compilation times in code that gets modified only minimally granularization of big compilation units was proposed.
+
+Scala was picked as a target language since it does not not enforce singular classes per source file like Java.
+The JVM's class file format also enforced a singular file per class.
+Singular Scala source files can therefore produce mulitple compilation output files, a natural fit for selective recompilation for changed output files.
+
+For demonstration purposes of the viability for the presented approach, a compiler has been written from scratch.
+It was deemed that the official Scala compiler is too complex and implemented in way which make it too difficult to adjust to use the proposed approach.
+The prototype compiler was much simpler and writing one from scratch had the possitive effect of complete understanding of how it works.
+
+Once the compiler was realized
+
+%A compiler was written from scratch for this purpose.
+%The translation unit granularization has been described in detail.
+%A prototype compiler has been written from 
+
+\subsectionnonum{Conclusion}
+
+\subsectionnonum{Future works}
+
+Implementing unit granularization for Scala was straight forward and showed very promising results.
+
 
 
 % (cituotų, perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
