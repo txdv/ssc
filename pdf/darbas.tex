@@ -473,9 +473,20 @@ Once the compiler was realized
 
 \subsectionnonum{Future works}
 
-Implementing unit granularization for Scala was straight forward and showed very promising results.
+Implementing unit granularization on a class level for source files was rather straight forward and showed very promising results.
+The possibility of trying to further granularize the compilation units on a method level was met with a far greater challenge.
 
+Method, field references and constants within a methods abstract syntax tree get encoded in the header of the class file.
+The core structure of the abstract syntax tree gets encoded in the body.
+However, the encoded structure depends on the header because it refers with an offset number to constants described into the header.
 
+Recompiling a singular method requires analyzing the target class file and patching the file accordingly.
+The class file format is not really patch friendly.
+
+If the newly compiled method body is bigger than the original in the class file, one might need to shift the rest of the file.
+Introduction of constants in the header might also require the shift of the entire body party of the file, which is an expensive operation.
+
+Finer compilation unit granularization would much more dedication to details and work and warrants a thesis on its own.
 
 % (cituotų, perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
 % bibliografiniai aprašai. Šaltinių sąrašas spausdinamas iš naujo puslapio.
