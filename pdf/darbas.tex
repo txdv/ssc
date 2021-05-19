@@ -448,7 +448,6 @@ asd
 \end{figure}
 
 \sectionnonum{Results and conclusion}
-\subsectionnonum{Results}
 %For this bachelor thesis a prototype compiler was created 
 In this thesis the translation unit granularization concept has been presented.
 An introduction was given to the current state of how compilers handle translation units in various programming languages.
@@ -463,13 +462,20 @@ For demonstration purposes of the viability for the presented approach, a compil
 It was deemed that the official Scala compiler is too complex, implemented in way which makes it too difficult to adjust to use the proposed approach.
 The prototype compiler was much simpler and writing one from scratch had the possitive effect of a complete understanding of it.
 
+The approach was implemented in the prototype compiler the efficienty of the approach was measured.
+
+
 %A compiler was written from scratch for this purpose.
 %The translation unit granularization has been described in detail.
 %A prototype compiler has been written from 
 
-\subsectionnonum{Conclusion}
+\sectionnonum{Conclusion}
 
-\subsectionnonum{Future works}
+Compilation unit granularization on a class level adds a small benefit even to the most simple compilation units and was measured to be at least 5\%.
+The number of classes within a source file and the complexity of the classes had a noticeable effect on the performance increase.
+%The more classes a source files contains the more better the performance 
+
+\sectionnonum{Future works}
 
 Implementing unit granularization on a class level for source files was rather straight forward and showed very promising results.
 The possibility of trying to further granularize the compilation units on a method level was met with a far greater challenges.
