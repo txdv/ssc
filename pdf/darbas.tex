@@ -473,6 +473,11 @@ The approach was implemented in the prototype compiler the efficienty of the app
 
 Compilation unit granularization on a class level adds a small benefit even to the most simple compilation units and was measured to be at least 5\%.
 The number of classes within a source file and the complexity of the classes had a noticeable effect on the performance increase.
+
+A performance increase of up to 30\% was observed on the most complex source files.
+This kind of complexity might only occur when a project utilizes a lot of code generation, for example, creating many objects from interface definition languages protocol buffers.
+
+Compilation speed for code with complexity better matching day to day scenarios saw an improvement between 12\% and 16\%
 %The more classes a source files contains the more better the performance 
 
 \sectionnonum{Future works}
