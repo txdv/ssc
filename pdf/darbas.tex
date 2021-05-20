@@ -290,7 +290,7 @@ A .class file contains all the Java bytecode generated from the Java source file
 Code targeting the JVM can be then executed provided a Java Runtime Environment (JRE) is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
 
 % todo: write this block in a separate section
-Java bytecode is much more abstract and conceptually closer to the original representation of a class than the generated object files containing assembly are.
+Java bytecode is much more abstract and conceptually closer to the original representation of a class than the C++ compiler generated object files, which contain directly exutable machine code.
 Java class methods are basically sections in a .class file \cite{JvmMethods} which wrap Java bytecode - the implementation of the methods functionality.
 This high level representation makes granularization of translation units much more convenient, because it is possible to map a method directly to an entire section within the class file.
 
