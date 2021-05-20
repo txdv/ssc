@@ -254,8 +254,16 @@ object ScalaCompiler {
         Code.op(Op.Return)
 
         res.addStackSize(1)
-      case _ =>
-        ???
+      case Ident("???") =>
+        val predef = JavaType.Class("scala/Predef$")
+        val nothing = JavaType.Class("scala/runtime/Nothing$")
+        val method = MethodRef(predef, "$qmark$qmark$qmark", Seq(nothing))
+
+        Code.ops(Seq(
+          Op.getstatic(FieldRef(predef, "MODULE$", Seq(predef))),
+          Op.invoke(method, Op.invoke.virtual),
+          Op.Return,
+        )).copy(localsCount = 1, stackSize = 1)
     }
   }
 

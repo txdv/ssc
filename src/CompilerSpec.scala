@@ -1,12 +1,11 @@
 package lt.vu.mif.bentkus.bachelor.compiler
 
+import java.lang.reflect.InvocationTargetException
+
 import org.scalatest._
 import flatspec._
 import matchers._
-
-import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.{
-  DefObject
-}
+import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.DefObject
 
 import collection.JavaConverters._
 
@@ -40,7 +39,12 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     val oldOut = System.out
     System.setOut(new java.io.PrintStream(baos));
 
-    method.invoke(method, Array[String]())
+    try {
+      method.invoke(method, Array[String]())
+    } catch {
+      case ex: InvocationTargetException =>
+        throw ex.getTargetException
+    }
 
     System.setOut(oldOut)
 
@@ -157,6 +161,20 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     """ } should be ("true\n")
   }
 
+  "Compiler" should "generate NotImplementedError for ???" in {
+    assertThrows[NotImplementedError] {
+      compileAndRun {
+        """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          ???
+        }
+      }
+    """
+      }
+    }
+  }
+/*
   "Compiler" should "stack depth check" in {
     compileAndRun { """
       object MainApp {
@@ -166,5 +184,5 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     """ } should be ("false\n")
   }
-
+*/
 }
