@@ -177,12 +177,15 @@ The compiler creates in total 4 corresponding .class files as depicted in figure
 The classes all depend on the same trait definition called Expression, an empty interface.
 A similar concept in Java exists and is called a Marker Interface \cite{10.5555/1407381}.
 There is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
+When running the compiler with the source file displayed in listing \ref{multidef} as the input, 4 .class files will be created.
 
-When running the compiler with the source file displayed in \ref{multidef} as the input, the compiler will recompile all 4 classes, even though new modifications might be present only within one class because the minimal translation unit is the entire source file.
+% todo: hash reference?
+A compiler might check if the input file was already compiled by memoizing the a corresponding hash value.
+However, cosmetic changes or reordering the classes within the source file will still trigger a complete recompilation, even though the output will be identifical.
 
 In the given examples the classes are trivial and the performance when recompiling is negligible.
-However, working in big codebases consisting of thousands and thousands of source files which result in multiple class files, the total amount of file operations needed to create all resulting object adds up.
-% todo: 
+However, working in giant codebases consisting of thousands and thousands of source files which result in multiple class files, the total amount of file operations needed to create all resulting object add up.
+% todo: something?
 
 \begin{figure}[H]
     \centering
