@@ -193,6 +193,8 @@ Functional aspects are prominently represented with a lightweight syntax for ano
 
 % https://livebook.manning.com/book/scala-in-depth/chapter-10/3
 % http://englishonlineclub.com/pdf/Scala%20in%20Depth%20[EnglishOnlineClub.com].pdf
+%todo: maybe make this longer?
+%\subsection{Runtime}
 Scala is a programming language targeting the Java Virtual Machine (JVM).
 Running on the JVM allows Scala easily to utilize existing Java code, which is a tremendous advantage because utilizing existing Java code opens access to a plethora of well maintained libraries targeting a wide range of needs.
 The opposite however is not always true since Scala has a lot of features which can not be directly translated to JVM bytecode which is the underlying instruction set powering the JVM.
@@ -205,6 +207,8 @@ Scala is also a language with a staggering amount of features that increases the
 Each language feature on its on might look simple and be easy to understand but putting another cog in an already complex machine can prove to be difficult.
 
 Not only does Scala have a multitude of features but some of the features are quite complex like macros, implicit type conversion and summoning, pattern matching, higher kinded types and type lambdas allowing a user of the language to implement language constructs \cite{Scala2Union, ShapelessGithub} which are challenging to understand even for experienced Scala developers and more so difficult to implement.
+
+%todo: talk a bit of how academic this compiler is
 
 Instead of writing the entire compiler from scratch at once containing all features a more conservative approach is taken.
 The approach starts out with the most simplistic compiler imaginable, compiling a bare minimum example of the target programming language, a simple "Hello World" program (listing \ref{code:helloworld}).
@@ -228,7 +232,8 @@ Keywords of the language have special tokens to represent them and numbers and i
 This is followed by a parser which transforms the sequence of tokens into an abstract syntax tree (AST).
 The chosen approach is heavily inspired by a functional programming approach called "Monadic Parsing" \cite{MonadicParsing}.
 
-Monadic parsing is an approach when monadic properties of data structures are being utilized very extensively to create a parsing mechanism that has a rather simple and concise data structure it operates on, the parser.
+% todo: mention how easy it is to combine
+Monadic parsing is a parsing aproach where monadic properties of data structures are being heavily utilized to create a parsing mechanism that has a rather simple and concise data structure it operates on, the parser.
 A parser is a transformation of a token stream to a list of results, with each result containing the parser product and a tail token stream.
 
 Simple parsers can be easily defined on their own (lst. \ref{code:SimpleParser})
@@ -253,16 +258,14 @@ Scalaz \cite{scalaz} was used in the implementation of the parser, it had the mo
 
 %Scala
 %  - has a very nice functional programming community, wich provides a lot of functional programming libraries like cats, scalaz with support for mondas
-%	- show a simple parser eaxmple
-%	- show a combined parser example
 % scala is mentioned here https://en.wikipedia.org/wiki/API
 
 \subsubsection{Intermediate representation}
 
-The intermediate representation (IR) is kept uncomplicated and easy to follow.
+The intermediate representation (IR) is uncomplicated and easy to follow.
 It represents the language structure in straight forward way just using case classes and sealed traits emulating ADTs.
 
-\lstinputlisting[language=Scala, linewidth=16cm, label={multidef}, caption={Intermediate Representation}]{./code/IR.scala}
+%\lstinputlisting[language=Scala, linewidth=16cm, label={multidef}, caption={Intermediate Representation}]{./code/IR.scala}
 
 \subsubsection{Backend}
 
