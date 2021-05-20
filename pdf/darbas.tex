@@ -141,6 +141,7 @@ A classic looking case study of average code complexity will be chosen, emphasiz
 An automated but definitive and consistent source code generation tool will be used to create consistently reproducible results for the given inputs listed in the following list.
 
 \section{Compiler}
+% todo: the targeted optimizations - what optimizations?
 At the start of the bachelor thesis a thorough investigation was made to analyze how the official Scala compiler works \cite{ScalaGithub} and if it is feasible to apply the targeted optimizations to it.
 The investigation took very long and yielded little results, the codebase was too humongous and complicated to understand, the compiler too feature packed to adjust with the target objectives.
 % todo: word it differently
@@ -157,7 +158,7 @@ A small compiler written from scratch allows the author to focus on the most imp
 % todo: second sentence repeats insurance
 \textbf{Correctness} - ensuring that a new feature is correctly implemented in a sizable code base is an immense undertaking.
 In order to ensure that a new feature addition doesn't impact the overall behavior of the compiler every feature needs to be tested for correctness.
-The multi-pass nature of the official Scala compiler makes reasoning about correctness difficult, because it is a non trivial undertaking to reason about how caching in one pass might affect functionality the subsequent passes.
+The multi-pass nature of the official Scala compiler makes reasoning about correctness difficult, because it is a non trivial undertaking to reason about how caching in one pass might affect functionality in subsequent passes.
 
 \textbf{Simplicity and transparency} - a small compiler is simple and easy to reason about.
 Writing one from scratch means that the entirety of the compiler is understood which enables better reasoning.
