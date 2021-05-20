@@ -451,12 +451,13 @@ asd
 \end{tikzpicture}
 \end{figure}
 
-\sectionnonum{Results and conclusion}
+% Rezultatų skyriuje išdėstomi pagrindiniai darbo rezultatai: kažkas išanalizuota, kažkas sukurta, kažkas įdiegta. Rezultatai pateikiami sunumeruotų (gali būti hierarchiniai) sąrašų pavidalu. Darbo rezultatai turi atitikti darbo tikslą.
+\sectionnonum{Results}
 
 %For this bachelor thesis a prototype compiler was created 
 In this thesis the translation unit granularization concept has been presented.
 An introduction was given to the current state of how compilers handle translation units in various programming languages.
-It was pointed out that the size of the granularity of the compilation units is directrly related to compilation times.
+It was pointed out that the size of the granularity of the compilation units is directly related to compilation times.
 To reduce compilation times in code that gets modified only minimally granularization of big compilation units was proposed.
 
 Scala was picked as a target language since it does not not enforce singular classes per source file like Java.
@@ -473,7 +474,9 @@ The approach was implemented in the prototype compiler to measure the added effi
 %The translation unit granularization has been described in detail.
 %A prototype compiler has been written from 
 
+% Išvadų skyriuje daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos rekomendacijos, akcentuojamos naujovės. Išvados pateikiamos sunumeruoto (gali būti hierarchinis) sąrašo pavidalu. Darbo išvados turi atitikti darbo tikslą.
 \sectionnonum{Conclusion}
+
 
 Compilation unit granularization on a class level adds a small benefit even to the most simple compilation units and was measured to be at least 5\%.
 The number of classes within a source file and the complexity of the classes had a noticeable effect on the performance increase.
@@ -483,6 +486,7 @@ This kind of complexity might only occur when a project utilizes a lot of code g
 
 Compilation speed for code with complexity more often found in day to day development scenarios saw an improvement between 12\% and 16\%.
 
+\iffalse
 \sectionnonum{Future works}
 
 Implementing unit granularization on a class level for source files was rather straight forward and showed very promising results.
@@ -499,6 +503,7 @@ If the newly compiled method body is bigger than the original in the class file,
 Introduction of constants in the header might also require the shift of the entire body part of the file.
 
 Finer compilation unit granularization would require much more dedication to details, handling many corner cases, a lot of additional work and warrants a thesis on its own.
+\fi
 
 % (cituotų, perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
 % bibliografiniai aprašai. Šaltinių sąrašas spausdinamas iš naujo puslapio.
