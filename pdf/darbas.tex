@@ -337,9 +337,10 @@ In the following example a typical usage of a popular Scala unit testing library
 Scala developers tend to use use many language features to create a Domain Specific Language (DSL) for visually pleasing code.
 % TODO: maybe explain, but reword for sure
 Because many Scala compiler feature are in play in this example, the details are quite intricate, but the result is that for each test case shown in the example \ref{code:specs2code} (first test, second test) a stand alone .class compilation output is created (SampleTest\$\$annon\$1.class, \$SampleTest\$\$anon\$2.class).
-Having many unit tests in a sophisticated codebase can therefore prolong the compilation process significantly, to a point where an iterative development process becomes impractical.
+Having many unit tests in a sophisticated codebase can therefore increase the compilation times significantly, to a point where an iterative development process becomes impractical.
 Compilation times longer than a minute can be easily surpassed when meticulously writing unit tests in a Test-driven development (TDD) approach.
 
+%todo: reference to TDD book
 TDD also promotes writing tests as a playground to explore approaches and test code feasibility before writing the implementation.
 Long compilation times of unit tests make such an approach also impractical.
 
