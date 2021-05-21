@@ -362,13 +362,12 @@ In order to save bytes and to avoid repeating constant definitions, the body ref
 
 This makes the body dependend and makes patching of the file hard.
 Adding an additional constant in the header means the the entire body needs to be shifted, which is an expensive operation.
+The main value in the IR is to avoid this split and encode all the constants directly in the IR structure, making each sub expression of the IR self contained and easily transferable.
 
-The main value in the IR is to avoid this split and encode all the constants directly in the IR structure.
-
-% todo: write about how class files are independent from each other and refer to each other with absolute strings
 Class files are designed to be standalone and independent.
 All the information needed is contained in the class.
 References to other methods and fields from other classes are a fully qualified identifiers.
+This property is key for translation unit granularization.
 
 \section{Benchmarks}
 In order to measure the efficiency of the proposed granularization technique, multiple measurements have been taken.
