@@ -478,7 +478,7 @@ Agurkai.
 		title={Speedup with caching},
 		ylabel={Diff [milliseconds]},
 		width=1\textwidth, height=0.4\textwidth,
-		ymin=0, ymax=300,
+		ymin=0, ymax=500,
 		xlabel={Number of classes},
 		xmode=log,
 		legend pos=north west,
@@ -571,13 +571,6 @@ Introduction of constants in the header might also require the shift of the enti
 Finer compilation unit granularization would require much more dedication to details, handling many corner cases, a lot of additional work and warrants a thesis on its own.
 \fi
 
-\sectionnonum{Appendix}
-\begin{center}
-\begin{tabular}{ c | c | c | c | c | c }
-\input{./src/benchmark/table.tex}
-\end{tabular}
-\end{center}
-
 % (cituotų, perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
 % bibliografiniai aprašai. Šaltinių sąrašas spausdinamas iš naujo puslapio.
 % Aprašai pateikiami netransliteruoti. Šaltinių sąraše negali būti tokių
@@ -613,6 +606,18 @@ Finer compilation unit granularization would require much more dedication to det
 % parengta, medžiaga. Savarankiški priedai gali būti pateikiami ir
 % kompaktiniame diske. Priedai taip pat numeruojami ir vadinami. Darbo tekstas
 % su priedais susiejamas nuorodomis.
+
+\begin{center}
+\begin{tabular}{ c | c | c | c | c | c }
+\input{./src/benchmark/table.tex}
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ c | c | c | c | c | c }
+\input{./src/benchmark/table2.tex}
+\end{tabular}
+\end{center}
 
 \printbibliography[heading=bibintoc]
 
