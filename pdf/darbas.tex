@@ -343,14 +343,32 @@ It represents the language structure in straight forward way just using case cla
 
 \subsubsection{Backend}
 
-%todo: reword stuff somehow
-The compiler targets the JVM just like the official Scala compiler and therefore transforms the internal IR to the JVMs instruction set called Java bytecode.
-Compared to other computer architectures the Java bytecode is a fairly high level representation mirroring the functionality of Java closely.
-As such it has a an explicit notion of classes and groups functionality of classes in a singular file ‒ the so called class file \cite{ClassFileFormat}.
+The compiler targets the JVM just like the official Scala compiler and therefore the output of the backed are instructions for the JVM called Java bytecode.
 
-Other machine architectures such as x86-64, ARM and Sparc do not have a notion of classes with fields and methods, references to other classes.
+Compared to other computer architectures the Java bytecode is a fairly high level representation mirroring the functionality of Java closely.
+As such it has a an explicit notion of classes and groups functionality of classes in a singular file ‒ the class file \cite{ClassFileFormat}.
+
+Other machine architectures such as x86-64, ARM and Sparc do not have a notion of classes with fields and methods or references to other classes.
 Compilers directly compiling to these kind of architectures need to map their high-level language constructs to a much more simplistic instruction set, which has only a concept of registers and a linear memory model.
-This requires a lot of additional work by the compiler, but in our case the JVM takes care of this job.
+This requires a lot of additional that a compiler should do, but in our case the JVM takes care of a lot of this functionality when JITing.
+
+The backend translates the frontend generated AST to an intermediate representation (IR) which is closely modeled after the class file format.
+Afterwards it serializes the IR to the class file format, which can be executed by the JVM.
+
+The class file format is split into a body and header part.
+The header parts contains integer, string constants, method and field references.
+The body part contains the structure of the class.
+In order to save bytes and to avoid repeating constant definitions, the body references values in the header.
+
+This makes the body dependend and makes patching of the file hard.
+Adding an additional constant in the header means the the entire body needs to be shifted, which is an expensive operation.
+
+The main value in the IR is to avoid this split and encode all the constants directly in the IR structure.
+
+% todo: write about how class files are independent from each other and refer to each other with absolute strings
+Class files are designed to be standalone and independent.
+All the information needed is contained in the class.
+References to other methods and fields from other classes are a fully qualified identifiers.
 
 \section{Benchmarks}
 In order to measure the efficiency of the proposed granularization technique, multiple measurements have been taken.
