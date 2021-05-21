@@ -379,6 +379,29 @@ Class files are designed to be standalone and independent.
 All the information needed is contained in the class.
 References to other methods and fields from other classes are a fully qualified identifiers.
 This property is key for translation unit granularization.
+% todo do I need to mention IR?
+
+\subsection{Translation unit memoization}
+%The main improvement proposed in this paper is to just not do work when you don't need to absolutely do it.
+%The second best way to increase performance is to make the code
+%The best way to increase performance is to usually avoid work.
+
+Computers have a limited amount of resources available, mainly the CPU and RAM get utilized when running programs like compilers.
+The execution of speed gets determined by how many instructions the application needs to execute in order fullfil its goal.
+%todo: mauybe quote SIMD?
+The execution speed of instructions is also variable, as some instructions can be executed faster or accept more data to be processed at once.
+
+Programming language abstractions add more instructions to the final executable that need to be executed.
+One way to optimize for performance is to remove these abstractions and use lower level abstractions, which are closer to the machine.
+Achieve the same goal with less.%, however this requires careful crafting of code.
+
+Another way is to completely avoid the execution of isntructions, reuse work that was already done.
+Do not work if it has been already done.
+This solution is used in the compiler on all top level AST object within a source file.
+
+Before translating the AST, a cache is queried with the list of all hash codes of already compiled AST objects.
+If the object already exists, no work needs to be done, otherwise the compiler pipeline is invoked as usual.
+Once the compiler has finished, the cache is replaced with all the new hashes.
 
 \section{Benchmarks}
 In order to measure the efficiency of the proposed granularization technique, multiple measurements have been taken.
@@ -386,6 +409,7 @@ Measurements were taken of the prototype compiler with and without caching of th
 
 In order to measure the time difference between a cached compilation and a full compilation the cache file containing the hash codes of the already compiled translation units is simply deleted triggering a complete run of the compiler on the next invocation.
 
+% todo: gal visdelto istrinam
 The additional translation unit caching logic generates such a low overhead, that it was decided to just leave it during both runs to simplify measurements.
 The warming up of the JVMs JIT mechanism and the JVMs Garbage Collection (GC) mechanism times incur a higher cost and therefore the additional overhead is negligible.
 
