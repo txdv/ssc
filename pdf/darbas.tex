@@ -213,7 +213,17 @@ If an action takes more than 10 seconds the user is likely to loose attention an
 The norm for compilers it to not show any kind of progress when compiling a single translation unit.
 This exacerbates the perceived time it takes to complete a process for the user\cite{Usability}.
 
-%These kind of interruption during software development
+\subsection{Granularization}
+
+As such the main idea of the thesis arises.
+Instead of conceptually treating an entire file as single translation unit which needs to be recompiled in its entirity producing multiple output files, all the objects declared in a source file get treated as as distinct translation units.
+
+It is a natural fit, every class declared in a the source already produces its own output, which is independent from other produced outputs.
+Thanks to the language structure of modern programming languages, most of the top level constructs within the source files are classes.
+Once a file has been loaded and parsed, all top level objects can be processed separately.
+Seperation enables the ability to process the translation units in parallel, the ability to skip already processed translation units. In other words, it enables us to granularize the giant translation unit into smaller translation units.
+% todo: ka cia parasyti dar?
+
 \section{Compiler}
 % todo: the targeted optimizations - what optimizations?
 At the start of the bachelor thesis a thorough investigation was made to analyze how the official Scala compiler works \cite{ScalaGithub} and if it is feasible to apply the targeted optimizations to it.
