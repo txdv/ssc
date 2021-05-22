@@ -402,7 +402,7 @@ One way to optimize for performance is to remove these abstractions and use lowe
 Achieve the same goal with less.%, however this requires careful crafting of code.
 
 Another way is to completely avoid the execution of isntructions, reuse work that was already done.
-Do not work if it has been already done.
+Do not work if it the work has already done.
 This solution is used in the compiler on all top level AST object within a source file.
 
 Before translating the AST, a cache is queried with the list of all hash codes of already compiled AST objects.
