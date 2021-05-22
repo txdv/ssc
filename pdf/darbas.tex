@@ -89,7 +89,8 @@ Performance measurements of the prototype compiler are taken with the approach e
 %\subsectionnonum{Contributions}
 %\subsectionnonum{Outline}
 
-\subsectionnonum{Research object and actuality}
+% todo: make the compiler faster?
+
 The majority of the research done on compilers is focused on making compiler output optimized programs in terms of code execution speed and memory usage \cite{lopes2018future} while neglecting or willfully sacrificing \cite{fast2019compilers} actual runtime performance of the compiler itself.
 As computers get faster more resources are available, but programmers tend to utilize these newfound resources to make the implementation of programs simpler rather than making the programs faster\cite{Wirth1995}.
 
@@ -101,29 +102,29 @@ Another vector of academic improvement within the compiler sphere is to add new 
 When assessing the adoption of a new programming language the runtime speed of the available compilers are often gauged as an important metric\cite{ScalaSlow} among others such as language complexity, available libraries and spread of ecosystem.
 Dealing with enormous compilation times of huge projects can have negative effects on the productivity of programmers and even drive away people from an entire ecosystem \cite{ScalaReallySlow, ScalaSlow}.
 
-Modern organizations moving towards continuous delivery practices called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their Continous Integration pipeline.
+Modern organizations moving towards continuous delivery practices called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their continous integration pipeline.
 % todo: change mantra maybe
 Slow compilation speeds go against the main goal of the short cycle times promoted in DevOps and has spurred creation and adoption of minimal programming language focused on compilation speed and productivity to counter the effects of giant code bases on the CI process\cite{TheGoProgrammingLanguage, GoGoogle}.
 
-\subsectionnonum{Goal}
+\subsectionnonum{Expected results}
 This thesis will analyze the effects of compilation unit granularization in a compiler on the compilation speed.
 
 It will be achieved by the following tasks:
 
 \begin{enumerate}
-\item{Creation of a compiler.}
-\item{Implementation of compilation unit granularization.}
-\item{Correctness validation for the compiler.}
-\item{Measurements of the impact on performance.}
-\item{A performance comparison to existing compilers.}
+\item{Create a prototype compiler.}
+\item{Implement compilation unit granularization in the prototype compiler.}
+\item{Validate correctness for the prototype compiler.}
+\item{Measure the performance impact of the implemented approach.}
+\item{Compare it to an existing compiler.}
 \end{enumerate}
 
 The expected results will be a compiler with compilation unit granularization and various performance measurements together with a comparison to an existing compiler.
 
-\subsectionnonum{Challenges and expected results}
+\subsectionnonum{Challenges}
 The goal of this bachelor thesis is to create a prototype compiler for a small subset of the Scala programming language.
 %todo: consider using features of Scala instead of ScalaSpec
-Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, the targeted compiler implementation in this thesis will support only basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
+Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, the prototype compiler implementation in this thesis will support only basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
 
 % todo: introduced errors?
 When writing software developers tend to create only small changes in existing source files before running the compilation again for a quick feedback loop of introduced errors.
