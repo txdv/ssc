@@ -469,8 +469,8 @@ The generated input files look like this:
 
 \lstinputlisting[language=Scala, linewidth=18cm, label={code:generated}, caption={Generated source inputs}]{./code/Generated.scala}
 
-The number of translation units within a source file is controlled by the Classes dimension.
-The complexity of each compilation unit is controlled by the number methods.
+The number of translation units within a source file is controlled by the number of classes in a source file.
+The complexity of each translation unit is controlled by the number of methods each class contains.
 
 The methods are kept very simple, singular expressions containing a basic function call.
 Even with trivial methods which do not take much computation to compile down a significant uplift ins performance is achieved, presented in the later subsection.
