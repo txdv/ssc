@@ -65,7 +65,7 @@ The chosen target language is a subset of the Scala programming language.
 % todo: remove acomodate two times
 Instead of modifying the standard Scala compiler to accommodate the proposed approach, a compiler is written from scratch in order to have simple program enabling straightforward modifications for an easier accommodation of the proposed approach.
 
-Performance measurements of the prototype compiler are taken with the approach enabled and disabled, various dynamic inputs are generated with different compilation unit sizes to gain insights in the effectiveness of the approach. The results show an improvement of 5\% to 30\% depending on the complexity of the input source.
+Performance measurements of the prototype compiler are taken with the approach enabled and disabled, various dynamic inputs are generated with different translation unit sizes to gain insights in the effectiveness of the approach. The results show an improvement of 5\% to 30\% depending on the complexity of the input source.
 
 \keywords{Compilers, Translation Unit, Compiler optimization}
 
@@ -108,7 +108,7 @@ Modern organizations moving towards continuous delivery practices called DevOps 
 Slow compilation speeds go against the main goal of the short cycle times promoted in DevOps and has spurred creation and adoption of minimal programming language focused on compilation speed and productivity to counter the effects of giant code bases on the CI process\cite{TheGoProgrammingLanguage, GoGoogle}.
 
 \subsectionnonum{Expected results}
-This thesis will analyze the effects of compilation unit granularization in a compiler on the compilation speed.
+This thesis will analyze the effects of translation unit granularization in a compiler on the recompilation speed.
 
 It will be achieved by the following tasks:
 
