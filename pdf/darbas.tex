@@ -103,7 +103,7 @@ Another vector of academic improvement within the compiler sphere is to add new 
 When assessing the adoption of a new programming language the runtime speed of the available compilers are often gauged as an important metric\cite{ScalaSlow} among others such as language complexity, available libraries and spread of ecosystem.
 Dealing with enormous compilation times of huge projects can have negative effects on the productivity of programmers and even drive away people from an entire ecosystem \cite{ScalaReallySlow, ScalaSlow}.
 
-Modern organizations moving towards continuous delivery practices called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their continous integration pipeline.
+Modern organizations moving towards continuous delivery practices called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their continuous integration pipeline.
 % todo: change mantra maybe
 Slow compilation speeds go against the main goal of the short cycle times promoted in DevOps and has spurred creation and adoption of minimal programming language focused on compilation speed and productivity to counter the effects of giant code bases on the CI process\cite{TheGoProgrammingLanguage, GoGoogle}.
 
@@ -159,7 +159,7 @@ The Java language forces the programmer to define every Java class in its own fi
 A .class file contains all the Java bytecode generated from the Java source file, a condensed representation of the a Java class in a high level format which is abstract and does not target any specific target architecture, but an abstract architecture called the Java Virtual Machine (JVM).
 Code targeting the JVM can be then executed provided a Java Runtime Environment (JRE) is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
 % todo: write this block in a separate section (?)
-Java bytecode is much more abstract and conceptually closer to the original representation of a class than the C++ compiler generated object files, which contain directly exutable machine code.
+Java bytecode is much more abstract and conceptually closer to the original representation of a class than the C++ compiler generated object files, which contain directly executable machine code.
 Since the translation unit in Java is an entire file and every Java class needs to be defined in its own file, naturally the translation unit size in Java is also class scoped.
 
 \subsection{Class scope}
@@ -173,7 +173,7 @@ Scala also targets the JVM, however it does not share the limitation of one clas
 \fi
 
 A Scala source file can contain multiple class definitions in a singular file.
-Because it is possible to define a class in a very concise mannr, Scala source files tend to contain more than one class as shown in listing \ref{multidef}.
+Because it is possible to define a class in a very concise manner, Scala source files tend to contain more than one class as shown in listing \ref{multidef}.
 
 % listings https://tex.stackexchange.com/questions/321843/using-labels-for-lstinputlisting
 
@@ -187,7 +187,7 @@ When running the compiler with the source file displayed in listing \ref{multide
 
 % todo: hash reference?
 A compiler might check if the input file was already compiled by memoizing the a corresponding hash value.
-However, cosmetic changes or reordering the classes within the source file will still trigger a complete recompilation, even though the output will be identifical.
+However, cosmetic changes or reordering the classes within the source file will still trigger a complete recompilation, even though the output will be identical.
 
 In the given examples the classes are trivial and the performance when recompiling is negligible.
 However, working in giant codebases consisting of thousands and thousands of source files which result in multiple class files, the total amount of file operations needed to create all resulting files add up.
@@ -222,12 +222,12 @@ This exacerbates the perceived time it takes to complete a process for the user\
 \subsection{Granularization}
 
 As such the main idea of the thesis arises.
-Instead of conceptually treating an entire file as single translation unit which needs to be recompiled in its entirity producing multiple output files, all the objects declared in a source file get treated as as distinct translation units.
+Instead of conceptually treating an entire file as single translation unit which needs to be recompiled in its entirety producing multiple output files, all the objects declared in a source file get treated as as distinct translation units.
 
 It is a natural fit, every class declared in a the source already produces its own output, which is independent from other produced outputs.
 Thanks to the language structure of modern programming languages, most of the top level constructs within the source files are classes.
 Once a file has been loaded and parsed, all top level objects can be processed separately.
-Seperation enables the ability to process the translation units in parallel, the ability to skip already processed translation units. In other words, it enables us to granularize the giant translation unit into smaller translation units.
+Separation enables the ability to process the translation units in parallel, the ability to skip already processed translation units. In other words, it enables us to granularize the giant translation unit into smaller translation units.
 % todo: ka cia parasyti dar?
 
 \section{Compiler}
@@ -252,7 +252,7 @@ In order to ensure that a new feature addition doesn't impact the overall behavi
 The multi-pass nature of the official Scala compiler makes reasoning about correctness difficult, because it is a non trivial undertaking to reason about how caching in one pass might affect functionality in subsequent passes.
 
 \textbf{Simplicity and transparency} - a small compiler is simple and easy to reason about.
-Writing one from scratch means that a complete understading of the compiler exists.
+Writing one from scratch means that a complete understanding of the compiler exists.
 New features are easier to add because of a complete understanding of the entire code base.
 Debugging is much more pleasant since the number of affected features is smaller.
 
@@ -323,10 +323,10 @@ This is followed by a parser which transforms the sequence of tokens into an abs
 The chosen approach is heavily inspired by a functional programming approach called "Monadic Parsing" \cite{MonadicParsing}.
 
 % todo: mention how easy it is to combine
-Monadic parsing is a parsing aproach where monadic properties of data structures are being heavily utilized to create a parsing mechanism that has a rather simple and concise data structure it operates on, the parser.
+Monadic parsing is a parsing approach where monadic properties of data structures are being heavily utilized to create a parsing mechanism that has a rather simple and concise data structure it operates on, the parser.
 A parser is a transformation of a token stream to a list of results, with each result containing the parser product and a tail token stream.
 
-Simple parsers can be easily defined on their own (lst. \ref{code:SimpleParser})
+Simple parsers can be easily defined on their own (listing. \ref{code:SimpleParser})
 
 % https://tex.stackexchange.com/questions/35155/lstlisting-in-two-columns
 
@@ -338,11 +338,11 @@ Simple parsers can be easily defined on their own (lst. \ref{code:SimpleParser})
   \lstinputlisting[language=Scala, linewidth=10cm, label={code:ComplexParser}, caption={Parsing an import}]{./code/Import.scala}
 \end{minipage}
 
-Complex parsers can be easily created by combining simple parsers (lst. \ref{code:ComplexParser}).
-Utilizing monad composition and Scalas for comprehension the solution is terse and compact.
+Complex parsers can be easily created by combining simple parsers (listing. \ref{code:ComplexParser}).
+Utilizing monad composition and Scala's for comprehension the solution is terse and compact.
 A classic functional programming approach to deal with complexity also widely known as a bottom-up approach.
 
-Scalas functional programming community is thriving and many libraries exist which can be used to aid in the handling of monads.
+Scala's functional programming community is thriving and many libraries exist which can be used to aid in the handling of monads.
 % todo: scalaz book citation
 Scalaz \cite{scalaz} was used in the implementation of the parser, it had the most candid interface for mondas to implement.
 
@@ -377,7 +377,7 @@ The header parts contains integer, string constants, method and field references
 The body part contains the structure of the class.
 In order to save bytes and to avoid repeating constant definitions, the body references values in the header.
 
-This makes the body dependend and makes patching of the file hard.
+This makes the body depended and makes patching of the file hard.
 Adding an additional constant in the header means the the entire body needs to be shifted, which is an expensive operation.
 The main value in the IR is to avoid this split and encode all the constants directly in the IR structure, making each sub expression of the IR self contained and easily transferable.
 
@@ -393,7 +393,7 @@ This property is key for translation unit granularization.
 %The best way to increase performance is to usually avoid work.
 
 Computers have a limited amount of resources available, mainly the CPU and RAM get utilized when running programs like compilers.
-The execution of speed gets determined by how many instructions the application needs to execute in order fullfil its goal.
+The execution of speed gets determined by how many instructions the application needs to execute in order fulfill its goal.
 %todo: mauybe quote SIMD?
 The execution speed of instructions is also variable, as some instructions can be executed faster or accept more data to be processed at once.
 
@@ -401,7 +401,7 @@ Programming language abstractions add more instructions to the final executable 
 One way to optimize for performance is to remove these abstractions and use lower level abstractions, which are closer to the machine.
 Achieve the same goal with less.%, however this requires careful crafting of code.
 
-Another way is to completely avoid the execution of isntructions, reuse work that was already done.
+Another way is to completely avoid the execution of instructions, reuse work that was already done.
 Do not work if it the work has already done.
 This solution is used in the compiler on all top level AST object within a source file.
 
@@ -451,7 +451,7 @@ The additional metrics would add little value and would make the benchmarking re
 \subsection{Hard to measure metrics}
 % todo: of the entire application
 Combining all single compilation pipeline step measurements of the prototype compiler does not add up to the single measurement metric "full" of the entire application.
-This is caused by the JVM JIT startup costs and and variable GC interuption time.
+This is caused by the JVM JIT startup costs and and variable GC interruption time.
 The JVM needs to load the jars, the class files of a jar, run in interpreted mode and then JIT the class files into executable assembly code.
 Also the GC can happen unpredictably at any moment between measurements which can add.
 
@@ -534,7 +534,7 @@ An analysis was provided how the scope of a translation unit can be reduced by t
 
 Scala was picked as a target language since it does not enforce a singular class per source file like Java.
 The JVMs class file format also enforces a singular compilation output per class.
-Singular Scala source files can therefore produce mulitple compilation output filesand therefore it is a natural fit for selective recompilation for changed output files.
+Singular Scala source files can therefore produce multiple compilation output files and therefore it is a natural fit for selective recompilation for changed output files.
 
 It was pointed out that the size of the granularity of the translation units is directly related to compilation times.
 To reduce compilation times in source code that does not change, granularization of big compilation units was proposed.
@@ -542,7 +542,7 @@ To reduce compilation times in source code that does not change, granularization
 The official Scala compiler was deemed too complex and implemented in way which makes it too difficult for the author to adjust it to use the proposed approach.
 For demonstration purposes of the viability of the presented approach, a prototype compiler has been written from scratch, implementing only a subset of the programming language, but designing it from the beginning with translation unit granularization in mind.
 
-The prototype compiler was benchmarked with various inputs and the feasilibity of the variance in inputs was discussed.
+The prototype compiler was benchmarked with various inputs and the feasibility of the variance in inputs was discussed.
 
 % Išvadų skyriuje daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos rekomendacijos, akcentuojamos naujovės. Išvados pateikiamos sunumeruoto (gali būti hierarchinis) sąrašo pavidalu. Darbo išvados turi atitikti darbo tikslą.
 \sectionnonum{Conclusion}
@@ -551,7 +551,7 @@ Translation unit granularization enables performance improvements by simply deco
 %todo: reword
 The smaller the translation unit is the less likely it is that a modification to the source code will result in a need to recompile.
 
-Applying this approach to already existing compilers might proove to be difficult, but designing a compiler from the beginning with this approach in mind will lead to the possibily of easily increasing performance in the future.
+Applying this approach to already existing compilers might prove to be difficult, but designing a compiler from the beginning with this approach in mind will lead to the possibly of easily increasing performance in the future.
 
 When applying this methodology to a programming language as complicated as Scala, small benefits even to the inputs were measured to be at least 5\%.
 The number of classes within a source file and the complexity of the classes have a noticeable effect on the performance increase.
