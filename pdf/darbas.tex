@@ -550,13 +550,21 @@ The approach was implemented in the prototype compiler to measure the added effi
 % Išvadų skyriuje daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos rekomendacijos, akcentuojamos naujovės. Išvados pateikiamos sunumeruoto (gali būti hierarchinis) sąrašo pavidalu. Darbo išvados turi atitikti darbo tikslą.
 \sectionnonum{Conclusion}
 
-Compilation unit granularization on a class level adds a small benefit even to the most simple compilation units and was measured to be at least 5\%.
-The number of classes within a source file and the complexity of the classes had a noticeable effect on the performance increase.
+Translation unit granularization enables performance improvements by simply decomposing work units and then applying uncomplicated approaches to avoid redundant work.
+%todo: reword
+The smaller the translation unit is the less likely it is that a modification to the source code will result in a need to recompile.
 
-A performance increase of up to 30\% was observed on the most complex source files.
+Applying this approach to already existing compilers might proove to be difficult, but designing a compiler from the beginning with this approach in mind will lead to the possibily of increasing performance in the future.
+
+When applying this methodology to a programming language as complicated as Scala, small benefits even to the most simple source file were measured to be at least 5\%.
+The number of classes within a source file and the complexity of the classes have a noticeable effect on the performance increase.
+
+A performance increase of up to 30\% was observed when the compiler needs to recompile the most complex source files.
 This kind of complexity might only occur when a project utilizes a lot of code generation, for example, creating many objects from interface definition languages protocol buffers.
 
 Compilation speed for code with complexity more often found in day to day development scenarios saw an improvement between 12\% and 16\%.
+
+Applying translation unit granularization enables significant improvements to the recompilation speed and as such should always be considered when trying to improve the user experience of a compiler.
 
 \iffalse
 \sectionnonum{Future works}
