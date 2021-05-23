@@ -430,6 +430,7 @@ In short the sequence during benchmark looked like this:
 
 \subsection{Measurements}
 
+%todo: what is a general time measurement?
 During the compilation runs a general time measurement was taken measuring the entire time it took the compiler from start to finish, labeled "full" in the following.
 Additional measurements were taken of the prototype compiler of the following compilation steps:
 
@@ -458,7 +459,7 @@ When analyzing the collected metrics one should keep in mind the additional over
 
 \subsection{Input variance}
 In order to measure variance in code complexity, variable input had to be created.
-The dimensions of the created classes where twofold:
+The dimensions of the created classes were twofold:
 
 \begin{enumerate}
 \item{Classes - the number of classes a source file contains}
@@ -473,12 +474,9 @@ The number of translation units within a source file is controlled by the number
 The complexity of each translation unit is controlled by the number of methods each class contains.
 
 The methods are kept very simple, singular expressions containing a basic function call.
-Even with trivial methods which do not take much computation to compile down a significant uplift ins performance is achieved, presented in the later subsection.
+Even with trivial methods which do not take much computation to compile down a significant uplift in performance is achieved, presented in the later subsection.
 
 \subsubsection{Measurement results}
-
-Agurkai.
-
 
 \begin{figure}
 \begin{tikzpicture}
@@ -494,11 +492,13 @@ Agurkai.
 		log ticks with fixed point,
 	]
 
+	\addlegendentry{\hspace{-.6cm}\textbf{methods}}
+	\addlegendentry{0}
+	%\legend{\hspace{-.6cm}\textbf{methods},0, 1, 5, 10, 20, 50, 100}
 	\input{./src/benchmark/plot.tex}
 
-	\legend{0, 1, 5, 10, 20, 50, 100}
-
 	\end{axis}
+  \label{graph:speed}
 \end{tikzpicture}
 \end{figure}
 
@@ -521,13 +521,13 @@ Agurkai.
 	\legend{0, 1, 5, 10, 20, 50, 100}
 
 	\end{axis}
+  \label{graph:speedup}
 \end{tikzpicture}
 \end{figure}
 
 % Rezultatų skyriuje išdėstomi pagrindiniai darbo rezultatai: kažkas išanalizuota, kažkas sukurta, kažkas įdiegta. Rezultatai pateikiami sunumeruotų (gali būti hierarchiniai) sąrašų pavidalu. Darbo rezultatai turi atitikti darbo tikslą.
 \sectionnonum{Results}
 
-%For this bachelor thesis a prototype compiler was created
 In this thesis the translation unit granularization concept has been presented.
 An introduction was given to the current state of how compilers handle translation units in various programming languages.
 An analysis was provided how the scope of a translation unit can be reduced by taking modern language features into consideration.
@@ -536,20 +536,13 @@ Scala was picked as a target language since it does not enforce a singular class
 The JVMs class file format also enforces a singular compilation output per class.
 Singular Scala source files can therefore produce mulitple compilation output filesand therefore it is a natural fit for selective recompilation for changed output files.
 
-For demonstration purposes of the viability of the presented approach, a prototype compiler has been written from scratch.
-It was deemed that the official Scala compiler is too complex, implemented in way which makes it too difficult to adjust it to use the proposed approach.
-% todo: write from scratch, a prototype
-%A prototype compiler was much simpler and writing one from scratch had the possitive effect of a complete understanding of it.
-
 It was pointed out that the size of the granularity of the translation units is directly related to compilation times.
 To reduce compilation times in source code that does not change, granularization of big compilation units was proposed.
 
+The official Scala compiler was deemed too complex and implemented in way which makes it too difficult for the author to adjust it to use the proposed approach.
+For demonstration purposes of the viability of the presented approach, a prototype compiler has been written from scratch, implementing only a subset of the programming language, but designing it from the beginning with translation unit granularization in mind.
 
-The approach was implemented in the prototype compiler to measure the added efficiency.
-
-%A compiler was written from scratch for this purpose.
-%The translation unit granularization has been described in detail.
-%A prototype compiler has been written from
+The prototype compiler was benchmarked with various inputs and the feasilibity of the variance in inputs was discussed.
 
 % Išvadų skyriuje daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos rekomendacijos, akcentuojamos naujovės. Išvados pateikiamos sunumeruoto (gali būti hierarchinis) sąrašo pavidalu. Darbo išvados turi atitikti darbo tikslą.
 \sectionnonum{Conclusion}
@@ -558,9 +551,9 @@ Translation unit granularization enables performance improvements by simply deco
 %todo: reword
 The smaller the translation unit is the less likely it is that a modification to the source code will result in a need to recompile.
 
-Applying this approach to already existing compilers might proove to be difficult, but designing a compiler from the beginning with this approach in mind will lead to the possibily of increasing performance in the future.
+Applying this approach to already existing compilers might proove to be difficult, but designing a compiler from the beginning with this approach in mind will lead to the possibily of easily increasing performance in the future.
 
-When applying this methodology to a programming language as complicated as Scala, small benefits even to the most simple source file were measured to be at least 5\%.
+When applying this methodology to a programming language as complicated as Scala, small benefits even to the inputs were measured to be at least 5\%.
 The number of classes within a source file and the complexity of the classes have a noticeable effect on the performance increase.
 
 A performance increase of up to 30\% was observed when the compiler needs to recompile the most complex source files.
