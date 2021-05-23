@@ -434,6 +434,7 @@ In short the sequence during benchmark looked like this:
 During the compilation runs a general time measurement was taken measuring the entire time it took the compiler from start to finish, labeled "full" in the following.
 Additional measurements were taken of the prototype compiler of the following compilation steps:
 
+%todo: add reference to the table
 \begin{enumerate}
 \item{read - reading the source file}
 \item{lex - lexing the input into lexemes}
@@ -466,19 +467,28 @@ The dimensions of the created classes were twofold:
 \item{Methods - the number methods each classes has}
 \end{enumerate}
 
-The generated input files look like this:
+The generated input files have the following format:
 
 \lstinputlisting[language=Scala, linewidth=18cm, label={code:generated}, caption={Generated source inputs}]{./code/Generated.scala}
 
-The number of translation units within a source file is controlled by the number of classes in a source file.
+The number of translation units within a source file is controlled by the number of classes.
 The complexity of each translation unit is controlled by the number of methods each class contains.
+%todo: reikia parasyti apie v
 
 The methods are kept very simple, singular expressions containing a basic function call.
 Even with trivial methods which do not take much computation to compile down a significant uplift in performance is achieved, presented in the later subsection.
 
-\subsubsection{Measurement results}
+To simulate various workloads different inputs where chosen ranging from 1 class to 100 in an input source file and from 0 to 100 methods.
+
+\subsection{Results}
+
+Improvements from 20ms to 480ms can be observed during recompilation \ref{graph:speed} which is an improvement between 5\% and 30\% \ref{graph:something} when amortizing against the total run time.
+
+Applying the approach results in a performance increase of 5\% in the most trivial cases with no downside.
+When a source file is very complex containing 100 translation units and 100 methods an improvement of up to 30\% can be observed.
 
 \begin{figure}
+\label{graph:speed}
 \begin{tikzpicture}
 	\begin{axis}[
 		title={Speedup with caching},
@@ -492,13 +502,12 @@ Even with trivial methods which do not take much computation to compile down a s
 		log ticks with fixed point,
 	]
 
-	\addlegendentry{\hspace{-.6cm}\textbf{methods}}
-	\addlegendentry{0}
-	%\legend{\hspace{-.6cm}\textbf{methods},0, 1, 5, 10, 20, 50, 100}
+	%\addlegendentry{\hspace{-.6cm}\textbf{methods}}
+	%addlegendentry{0}
+	\legend{0, 1, 5, 10, 20, 50, 100}
 	\input{./src/benchmark/plot.tex}
 
 	\end{axis}
-  \label{graph:speed}
 \end{tikzpicture}
 \end{figure}
 
