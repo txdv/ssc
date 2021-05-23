@@ -530,16 +530,20 @@ Agurkai.
 %For this bachelor thesis a prototype compiler was created
 In this thesis the translation unit granularization concept has been presented.
 An introduction was given to the current state of how compilers handle translation units in various programming languages.
-It was pointed out that the size of the granularity of the compilation units is directly related to compilation times.
+An analysis was provided how the scope of a translation unit can be reduced by taking modern language features into consideration.
+
+Scala was picked as a target language since it does not enforce a singular class per source file like Java.
+The JVMs class file format also enforces a singular compilation output per class.
+Singular Scala source files can therefore produce mulitple compilation output filesand therefore it is a natural fit for selective recompilation for changed output files.
+
+For demonstration purposes of the viability of the presented approach, a prototype compiler has been written from scratch.
+It was deemed that the official Scala compiler is too complex, implemented in way which makes it too difficult to adjust it to use the proposed approach.
+% todo: write from scratch, a prototype
+%A prototype compiler was much simpler and writing one from scratch had the possitive effect of a complete understanding of it.
+
+It was pointed out that the size of the granularity of the translation units is directly related to compilation times.
 To reduce compilation times in source code that does not change, granularization of big compilation units was proposed.
 
-Scala was picked as a target language since it does not not enforce singular classes per source file like Java.
-The JVM's class file format also enforced a singular file per class.
-Singular Scala source files can therefore produce mulitple compilation output files, a natural fit for selective recompilation for changed output files.
-
-For demonstration purposes of the viability for the presented approach, a compiler has been written from scratch.
-It was deemed that the official Scala compiler is too complex, implemented in way which makes it too difficult to adjust to use the proposed approach.
-The prototype compiler was much simpler and writing one from scratch had the possitive effect of a complete understanding of it.
 
 The approach was implemented in the prototype compiler to measure the added efficiency.
 
