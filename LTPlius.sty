@@ -136,7 +136,16 @@ additions]
 
 % Teisingai formatuojame paveikslėlių antraštes.
 \RequirePackage{caption}
-\captionsetup*[figure]{labelsep=period, name=pav}
+\captionsetup*[figure]{labelsep=period,name=Figure}
+% https://tex.stackexchange.com/questions/17489/change-caption-name-of-figures
+%\addto\captionslithuanian{\renewcommand{\figurename}{Fig.}}
+
+%\renewcommand{\figurename}{Fig.}
+
+%\captionsetup*[figure]{name=Figure}
+
+% https://tex.stackexchange.com/questions/80443/change-the-word-table-in-table-captions
+\captionsetup[table]{name=Table}
 
 % Teisingai formatuojame lentelių antraštes.
 \captionsetup*[table]{labelsep=period}

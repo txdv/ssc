@@ -5,6 +5,9 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{bm}
+%\renewcommand{\figurename}{Fig.}
+%\addto\captionslithuanian{\renewcommand{\figurename}{Fig.}}
+%\addto\captionsenglish{\renewcommand{\figurename}{Fig.}}
 \usepackage{caption}
 \usepackage{color}
 \usepackage{float}
@@ -482,24 +485,24 @@ To simulate various workloads different inputs where chosen ranging from 1 class
 
 \subsection{Discussion}
 
-Improvements from 20ms to 480ms can be observed during recompilation \ref{graph:speed}.
-This corresponds to an increase of 5\% and 30\% when considering the total run time of the compiler.
+Improvements from 20ms to 480ms can be observed during recompilation (figure \ref{graph:speed}).
+This corresponds to an increase of 5\% and 30\% when considering the total run time of the compiler (figure \ref{graph:speed_pct}).
 
 20ms is a value so small that it is hard to notice for the user of a compiler.
-However, shaving off 322ms in a complex translation unit with 50 classes and 50 methods when the entire compilation takes 1084ms \ref{table} is significant and actually noticeable to the user of the software.
+However, shaving off 322ms in a complex translation unit with 50 classes and 50 methods when the entire compilation takes 1084ms \ref{tb:benchmarks} is significant and actually noticeable to the user of the software.
 
 Applying the approach results in a performance increase of 5\% in the most trivial cases with no downside.
 When a source file is very complex containing 100 translation units with each translation unit also being very complex containing 100 methods an improvement of up to 30\% can be observed.
 
 In general an improvement in performance from 5\% to 15\% should be expected in normal scenarios.
-In a scenario where code generation is involved and a lot, an improvement of up to is expected.
+In a scenario where a lot of code generation is involved an improvement of up to 30\% can be expected.
 
 
 \begin{figure}
+\caption{Speedup with caching}
 \label{graph:speed}
 \begin{tikzpicture}
 	\begin{axis}[
-		title={Speedup with caching},
 		ylabel={Diff [milliseconds]},
 		width=1\textwidth, height=0.4\textwidth,
 		ymin=0, ymax=500,
@@ -520,9 +523,10 @@ In a scenario where code generation is involved and a lot, an improvement of up 
 \end{figure}
 
 \begin{figure}
+\caption{Speedup in percent}
+\label{graph:speed_pct}
 \begin{tikzpicture}
 	\begin{axis}[
-		title={Speedup in percent},
 		ylabel={Percent [\%]},
 		width=1\textwidth, height=0.4\textwidth,
 		ymin=0, ymax=50,
@@ -635,16 +639,16 @@ Finer compilation unit granularization would require much more dedication to det
 % kompaktiniame diske. Priedai taip pat numeruojami ir vadinami. Darbo tekstas
 % su priedais susiejamas nuorodomis.
 
+% https://tex.stackexchange.com/questions/28422/table-reference
 \begin{center}
-\begin{tabular}{ c | c || c || c | c | c }
-\input{./src/benchmark/table.tex}
-\end{tabular}
-\end{center}
+	\begin{table}
+	  \caption{Benchmarking results}
+	  \label{tb:benchmarks}
 
-\begin{center}
-\begin{tabular}{ c | c || c || c | c | c }
-\input{./src/benchmark/table2.tex}
-\end{tabular}
+    \begin{tabular}{ c | c || c || c | c | c }
+      \input{./src/benchmark/table.tex}
+    \end{tabular}
+  \end{table}
 \end{center}
 
 \printbibliography[heading=bibintoc]
