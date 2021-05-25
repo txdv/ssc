@@ -503,6 +503,9 @@ However, shaving off 322ms in a complex translation unit with 50 classes and 50 
 Applying the approach results in a performance increase of 5\% in the most trivial cases with no downside.
 When a source file is very complex containing 100 translation units with each translation unit also being very complex containing 100 methods an improvement of up to 30\% can be observed.
 
+In the graph which displays the different phases for the prototype compiler (figure \ref{graph:phases}) it is easy to see that entire phases get dropped with caching.
+The the complexity of a translation unit has been fixed to 50 methods to simulate a difficult workload.
+
 In general an improvement in performance from 5\% to 15\% should be expected in normal scenarios.
 In a scenario where a lot of code generation is involved an improvement of up to 30\% can be expected.
 
