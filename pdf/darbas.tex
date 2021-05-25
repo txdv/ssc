@@ -480,12 +480,20 @@ Even with trivial methods which do not take much computation to compile down a s
 
 To simulate various workloads different inputs where chosen ranging from 1 class to 100 in an input source file and from 0 to 100 methods.
 
-\subsection{Results}
+\subsection{Discussion}
 
-Improvements from 20ms to 480ms can be observed during recompilation \ref{graph:speed} which is an improvement between 5\% and 30\% \ref{graph:something} when amortizing against the total run time.
+Improvements from 20ms to 480ms can be observed during recompilation \ref{graph:speed}.
+This corresponds to an increase of 5\% and 30\% when considering the total run time of the compiler.
+
+20ms is a value so small that it is hard to notice for the user of a compiler.
+However, shaving off 322ms in a complex translation unit with 50 classes and 50 methods when the entire compilation takes 1084ms \ref{table} is significant and actually noticeable to the user of the software.
 
 Applying the approach results in a performance increase of 5\% in the most trivial cases with no downside.
-When a source file is very complex containing 100 translation units and 100 methods an improvement of up to 30\% can be observed.
+When a source file is very complex containing 100 translation units with each translation unit also being very complex containing 100 methods an improvement of up to 30\% can be observed.
+
+In general an improvement in performance from 5\% to 15\% should be expected in normal scenarios.
+In a scenario where code generation is involved and a lot, an improvement of up to is expected.
+
 
 \begin{figure}
 \label{graph:speed}
