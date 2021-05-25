@@ -426,10 +426,15 @@ In short the sequence during benchmark looked like this:
 
 \begin{enumerate}
 \item{Delete the cache}
+\item{Run the official Scala compiler}
 \item{Run the prototype compiler, which generates the cache}
 \item{Run the prototype compiler, which utilizes the cache of the previous run}
-\item{Run the official Scala compiler}
 \end{enumerate}
+
+The measurements taken can be found in the table \ref{tb:benchmarks} in the appendix.
+The column Official corresponds to the time in milliseconds.
+The column New is the measurement taken of the prototype compiler without caching, the column Cache is the measurement taken of the prototype compiler with caching enabled.
+Diff is the difference between New and Cache.
 
 \subsection{Measurements}
 
@@ -437,7 +442,6 @@ In short the sequence during benchmark looked like this:
 During the compilation runs a general time measurement was taken measuring the entire time it took the compiler from start to finish, labeled "full" in the following.
 Additional measurements were taken of the prototype compiler of the following compilation steps:
 
-%todo: add reference to the table
 \begin{enumerate}
 \item{read - reading the source file}
 \item{lex - lexing the input into lexemes}
@@ -446,6 +450,11 @@ Additional measurements were taken of the prototype compiler of the following co
 \item{class - serializing the higher level class file representation into the binary class file format}
 \item{write - writing the serialized class file from memory files}
 \end{enumerate}
+
+
+The table \ref{bf:benchmarks} in the appendix contains measurements of all the phases described.
+Since the caching only affects the ast, class and write part, the results for the cached run was written down in a more terse way in the table.
+When looking at an entry 100/0, the first number is the time it took for the compiler without caching enabled for that phase and the second number is the result with caching enabled.
 
 These measurements were taken only for the prototype compiler.
 The official compiler has a much more complex compilation pipeline consisting of more than 12 steps instead of singular ast step in the prototype compiler.
