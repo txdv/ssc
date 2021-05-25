@@ -506,6 +506,7 @@ When a source file is very complex containing 100 translation units with each tr
 In general an improvement in performance from 5\% to 15\% should be expected in normal scenarios.
 In a scenario where a lot of code generation is involved an improvement of up to 30\% can be expected.
 
+% https://tex.stackexchange.com/questions/2311/add-a-legend-title-to-the-legend-box-with-pgfplots
 
 \begin{figure}
 \caption{Speedup with caching}
@@ -518,6 +519,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 		xlabel={Number of classes},
 		xmode=log,
 		legend pos=north west,
+		legend columns=2,
 		ymajorgrids=true,
 		log ticks with fixed point,
 		xtick=data,
@@ -525,7 +527,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 
 	%\addlegendentry{\hspace{-.6cm}\textbf{methods}}
 	%addlegendentry{0}
-	\legend{0, 1, 5, 10, 20, 50, 100}
+	\legend{\hspace{-.6cm}\textbf{Methods}, 0, 1, 5, 10, 20, 50, 100}
 	\input{./src/benchmark/plot.tex}
 
 	\end{axis}
@@ -543,6 +545,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 		xlabel={Number of classes},
 		xmode=log,
 		legend pos=north west,
+		legend columns=2,
 		ymajorgrids=true,
 		log ticks with fixed point,
 		xtick=data,
@@ -550,7 +553,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 
 	\input{./src/benchmark/plot_pct.tex}
 
-	\legend{0, 1, 5, 10, 20, 50, 100}
+	\legend{\hspace{-.6cm}\textbf{Methods}, 0, 1, 5, 10, 20, 50, 100}
 
 	\end{axis}
   \label{graph:speedup}
@@ -561,6 +564,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 
 \begin{figure}
 \caption{Runtime for 50 methods per class without and with caching}
+\label{graph:phases}
 \begin{tikzpicture}
     % first draw the filled areas in a plot
     \begin{axis}[
