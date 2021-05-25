@@ -1,7 +1,7 @@
 require 'json'
 
 #puts JSON.parse(File.read("resi;t)
-tail = "& read & ast & parse & ast & class & write"
+tail = "& read & lex & parse & ast & class & write"
 puts "Classes & Methods & Official & New & Cache & Diff #{tail}\\\\"
 lines = File.read("results.json").lines
 lines.each do |line|
