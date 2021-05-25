@@ -520,6 +520,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 		legend pos=north west,
 		ymajorgrids=true,
 		log ticks with fixed point,
+		xtick=data,
 	]
 
 	%\addlegendentry{\hspace{-.6cm}\textbf{methods}}
@@ -544,6 +545,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 		legend pos=north west,
 		ymajorgrids=true,
 		log ticks with fixed point,
+		xtick=data,
 	]
 
 	\input{./src/benchmark/plot_pct.tex}
@@ -576,6 +578,8 @@ In a scenario where a lot of code generation is involved an improvement of up to
         axis lines=none,
         xlabel={Number of classes},
         log ticks with fixed point,
+        xtick=data,
+        xmode=log,
     ]
 	    \legend{read, lex, parse, ast, class, write}
 	    \input{./src/benchmark/stacked_plot_closed.tex}
@@ -589,6 +593,8 @@ In a scenario where a lot of code generation is involved an improvement of up to
         ymin=0, ymax=1000,
         xlabel={Number of classes},
         log ticks with fixed point,
+        xtick=data,
+        xmode=log,
     ]
 
 	  \input{./src/benchmark/stacked_plot.tex}
@@ -612,6 +618,8 @@ In a scenario where a lot of code generation is involved an improvement of up to
         axis lines=none,
         xlabel={Number of classes},
         log ticks with fixed point,
+        xtick=data,
+        xmode=log,
     ]
 	    \legend{read, lex, parse, ast, class, write}
 	    \input{./src/benchmark/stacked_plot_cache_closed.tex}
@@ -624,6 +632,8 @@ In a scenario where a lot of code generation is involved an improvement of up to
         ymin=0, ymax=1000,
         xlabel={Number of classes},
         log ticks with fixed point,
+        xtick=data,
+        xmode=log,
     ]
 
 	  \input{./src/benchmark/stacked_plot_cache.tex}
