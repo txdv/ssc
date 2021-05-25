@@ -87,6 +87,7 @@ Performance measurements of the prototype compiler are taken with the approach e
 % Darbo įvadas neturi būti dėstymo santrauka.
 % Įvado apimtis 2–4 puslapiai.
 \sectionnonum{Introduction}
+% todo: pamineti kad scala kompileri
 
 %\subsectionnonum{Overview}
 %\subsectionnonum{Contributions}
@@ -99,6 +100,7 @@ The majority of the research done on compilers is focused on making compiler out
 As computers get faster more resources are available, but programmers tend to utilize these newfound resources to make the implementation of programs simpler rather than making the programs faster\cite{Wirth1995}.
 
 % todo: compiler sphere is too abstract
+% todo:  tarpas tarp \cite{} \ref{}?
 Another vector of academic improvement within the compiler sphere is to add new features or utilize paradigms like dependent types or formal specifications\cite{RustVerification} in order to allow the compiler to do more sophisticated type checking and verification than classic type checking allows while significantly increasing runtime compilation .
 
 % ecosystem is bad
@@ -196,6 +198,7 @@ In the given examples the classes are trivial and the performance when recompili
 However, working in giant codebases consisting of thousands and thousands of source files which result in multiple class files, the total amount of file operations needed to create all resulting files add up.
 % todo: something?
 
+%todo: caption Figure 1.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{img/Expression}
@@ -232,6 +235,8 @@ Thanks to the language structure of modern programming languages, most of the to
 Once a file has been loaded and parsed, all top level objects can be processed separately.
 Separation enables the ability to process the translation units in parallel, the ability to skip already processed translation units. In other words, it enables us to granularize the giant translation unit into smaller translation units.
 % todo: ka cia parasyti dar?
+
+% todo: not novel idea, present a similar implementation in an already existing compiler
 
 \section{Compiler}
 % todo: the targeted optimizations - what optimizations?
@@ -651,6 +656,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 
 % Rezultatų skyriuje išdėstomi pagrindiniai darbo rezultatai: kažkas išanalizuota, kažkas sukurta, kažkas įdiegta. Rezultatai pateikiami sunumeruotų (gali būti hierarchiniai) sąrašų pavidalu. Darbo rezultatai turi atitikti darbo tikslą.
 \sectionnonum{Results}
+% sunmeruoti
 
 In this thesis the translation unit granularization concept has been presented.
 An introduction was given to the current state of how compilers handle translation units in various programming languages.
@@ -672,6 +678,7 @@ Various graphs were presented to better understand the performance improvements 
 
 % Išvadų skyriuje daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos rekomendacijos, akcentuojamos naujovės. Išvados pateikiamos sunumeruoto (gali būti hierarchinis) sąrašo pavidalu. Darbo išvados turi atitikti darbo tikslą.
 \sectionnonum{Conclusion}
+% sunmeruoti ir padaryti dvi pagrindines isvadas
 
 Translation unit granularization enables performance improvements by simply decomposing work units and then applying uncomplicated approaches to avoid redundant work.
 %todo: reword
@@ -759,3 +766,5 @@ Finer compilation unit granularization would require much more dedication to det
 \printbibliography[heading=bibintoc]
 
 \end{document}
+
+% LITERATURE: priedai
