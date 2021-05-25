@@ -489,7 +489,7 @@ Improvements from 20ms to 480ms can be observed during recompilation (figure \re
 This corresponds to an increase of 5\% and 30\% when considering the total run time of the compiler (figure \ref{graph:speed_pct}).
 
 20ms is a value so small that it is hard to notice for the user of a compiler.
-However, shaving off 322ms in a complex translation unit with 50 classes and 50 methods when the entire compilation takes 1084ms \ref{tb:benchmarks} is significant and actually noticeable to the user of the software.
+However, shaving off 322ms in a complex translation unit with 50 classes and 50 methods when the entire compilation takes 1084ms (table \ref{tb:benchmarks}) is significant and actually noticeable to the user of the software.
 
 Applying the approach results in a performance increase of 5\% in the most trivial cases with no downside.
 When a source file is very complex containing 100 translation units with each translation unit also being very complex containing 100 methods an improvement of up to 30\% can be observed.
