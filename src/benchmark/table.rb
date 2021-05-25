@@ -1,7 +1,8 @@
 require 'json'
 
 #puts JSON.parse(File.read("resi;t)
-puts "Classes & Methods & Official & Prototype & Cached & Diff \\\\"
+tail = "& read & ast & parse & ast & class & write"
+puts "Classes & Methods & Official & Prototype & Cached & Diff #{tail}\\\\"
 lines = File.read("results.json").lines
 lines.each do |line|
   obj = JSON.parse(line, object_class: OpenStruct)
@@ -13,5 +14,15 @@ lines.each do |line|
 
   diff = (obj.new.clock - obj.new_cached.clock).to_s.rjust(5, ' ')
 
-  puts "#{classes} & #{methods} & #{old} & #{new} & #{cache} & #{diff} \\\\"
+
+  read = obj.new.read
+  lex = obj.new.lex.to_s.rjust(3, ' ')
+  parse = obj.new.parse.to_s.rjust(3, ' ')
+  ast = obj.new.ast.to_s.rjust(3, ' ')
+  clazz = obj.new.class.to_s.rjust(3, ' ')
+  write = obj.new.write.to_s.rjust(2)
+
+  last = "& #{read} & #{lex} & #{parse} & #{ast} & #{clazz} & #{write}"
+
+  puts "#{classes} & #{methods} & #{old} & #{new} & #{cache} & #{diff} #{last} \\\\"
 end
