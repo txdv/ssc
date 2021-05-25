@@ -587,6 +587,38 @@ In a scenario where a lot of code generation is involved an improvement of up to
 \end{tikzpicture}
 \end{figure}
 
+\begin{figure}
+\begin{tikzpicture}
+    % first draw the filled areas in a plot
+    \begin{axis}[
+		    legend pos=north west,
+        stack plots=y,
+        no markers,
+        every axis plot post/.append style={
+            % here we don't want to draw the lines ...
+            draw=none,
+            % but only the (filled) areas
+            fill=.!25,
+        },
+        % we don't want to draw the axis lines etc. twice
+        axis lines=none,
+    ]
+	    \legend{read, lex, parse, ast, class, write}
+	    \input{./src/benchmark/stacked_plot_cache_closed.tex}
+
+    \end{axis}
+    % second draw the lines in a plot
+    \begin{axis}[
+        stack plots=y,
+        no markers,
+    ]
+
+	  \input{./src/benchmark/stacked_plot_cache.tex}
+
+    \end{axis}
+\end{tikzpicture}
+\end{figure}
+
 % Rezultatų skyriuje išdėstomi pagrindiniai darbo rezultatai: kažkas išanalizuota, kažkas sukurta, kažkas įdiegta. Rezultatai pateikiami sunumeruotų (gali būti hierarchiniai) sąrašų pavidalu. Darbo rezultatai turi atitikti darbo tikslą.
 \sectionnonum{Results}
 
