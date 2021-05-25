@@ -555,6 +555,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 \end{tikzpicture}
 \end{figure}
 
+% https://tex.stackexchange.com/questions/37581/latex-figures-side-by-side
 \begin{figure}
 \begin{tikzpicture}
     % first draw the filled areas in a plot
@@ -562,6 +563,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 		    legend pos=north west,
         stack plots=y,
         no markers,
+        ymin=0, ymax=1000,
         every axis plot post/.append style={
             % here we don't want to draw the lines ...
             draw=none,
@@ -579,21 +581,20 @@ In a scenario where a lot of code generation is involved an improvement of up to
     \begin{axis}[
         stack plots=y,
         no markers,
+        ymin=0, ymax=1000,
     ]
 
 	  \input{./src/benchmark/stacked_plot.tex}
 
     \end{axis}
 \end{tikzpicture}
-\end{figure}
-
-\begin{figure}
 \begin{tikzpicture}
     % first draw the filled areas in a plot
     \begin{axis}[
 		    legend pos=north west,
         stack plots=y,
         no markers,
+        ymin=0, ymax=1000,
         every axis plot post/.append style={
             % here we don't want to draw the lines ...
             draw=none,
@@ -611,6 +612,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
     \begin{axis}[
         stack plots=y,
         no markers,
+        ymin=0, ymax=1000,
     ]
 
 	  \input{./src/benchmark/stacked_plot_cache.tex}
