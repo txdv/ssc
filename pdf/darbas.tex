@@ -563,14 +563,16 @@ To reduce compilation times in source code that does not change, granularization
 The official Scala compiler was deemed too complex and implemented in way which makes it too difficult for the author to adjust it to use the proposed approach.
 For demonstration purposes of the viability of the presented approach, a prototype compiler has been written from scratch, implementing only a subset of the programming language, but designing it from the beginning with translation unit granularization in mind.
 
-The prototype compiler was benchmarked with various inputs and the feasibility of the variance in inputs was discussed.
+The prototype compiler was benchmarked with inputs of variable size and complexity.
+To generate variable inputs a mechanism was presented and detailed, which creates inputs with a varying number of translation units and complexity for benchmark.
+Various graphs were presented to better understand the performance improvements and the feasibility of the approach was discussed.
 
 % Išvadų skyriuje daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos rekomendacijos, akcentuojamos naujovės. Išvados pateikiamos sunumeruoto (gali būti hierarchinis) sąrašo pavidalu. Darbo išvados turi atitikti darbo tikslą.
 \sectionnonum{Conclusion}
 
 Translation unit granularization enables performance improvements by simply decomposing work units and then applying uncomplicated approaches to avoid redundant work.
 %todo: reword
-The smaller the translation unit is the less likely it is that a modification to the source code will result in a need to recompile.
+The smaller the translation unit is the less likely it is that a modification to the source code will result in a need redo work during recompilation.
 
 Applying this approach to already existing compilers might prove to be difficult, but designing a compiler from the beginning with this approach in mind will lead to the possibly of easily increasing performance in the future.
 
