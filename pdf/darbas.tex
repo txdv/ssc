@@ -675,6 +675,34 @@ The prototype compiler was benchmarked with inputs of variable size and complexi
 To generate variable inputs a mechanism was presented and detailed, which creates inputs with a varying number of translation units and complexity for benchmark.
 Various graphs were presented to better understand the performance improvements and the feasibility of the approach was discussed.
 
+\sectionnonum{Results}
+
+\begin{enumerate}
+% todo:
+\item{
+  The official Scala compiler was deemed too complex and implemented in way which makes it too difficult for the author to adjust it to use the proposed approach.
+  For demonstration purposes of the viability of the presented approach, a prototype compiler has been written from scratch, implementing only a subset of the programming language, but designing it from the beginning with translation unit granularization in mind.
+}
+% todo: cover afterwards
+\item{
+  Compilation unit granularization was succesfully implemented in the prototype compiler.
+	Scala turned out a to be a perfect target for the implementation.
+	It targets the JVM which in turn has expects separate class files for every created class while source files had.
+}
+\item{!Validate correctness for the prototype compiler.}
+\item{
+  The prototype compiler was benchmarked with inputs of variable size and complexity.
+  To generate variable inputs a mechanism was presented and detailed, which creates inputs with a varying number of translation units and complexity for benchmark.
+  Various graphs were presented to better understand the performance improvements and the feasibility of the approach was discussed.
+}
+\item{
+  A comparison to the official Scala compiler was made.
+	The prototype compiler operates faster,
+}
+
+
+\end{enumerate}
+
 % Išvadų skyriuje daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos rekomendacijos, akcentuojamos naujovės. Išvados pateikiamos sunumeruoto (gali būti hierarchinis) sąrašo pavidalu. Darbo išvados turi atitikti darbo tikslą.
 \sectionnonum{Conclusion}
 % sunmeruoti ir padaryti dvi pagrindines isvadas
