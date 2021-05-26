@@ -97,20 +97,19 @@ Performance measurements of the prototype compiler are taken with the approach e
 % todo: make recompilations mfaster
 
 The majority of the research done on compilers is focused on making compiler output optimized programs in terms of code execution speed and memory usage \cite{lopes2018future} while neglecting or willfully sacrificing \cite{fast2019compilers} actual runtime performance of the compiler itself.
-As computers get faster more resources are available, but programmers tend to utilize these newfound resources to make the implementation of programs simpler rather than making the programs faster\cite{Wirth1995}.
+As computers get faster more resources are available, but programmers tend to utilize these newfound resources to make the implementation of programs simpler rather than making the programs faster \cite{Wirth1995}.
 
 % todo: compiler sphere is too abstract
-% todo:  tarpas tarp \cite{} \ref{}?
-Another vector of academic improvement within the compiler sphere is to add new features or utilize paradigms like dependent types or formal specifications\cite{RustVerification} in order to allow the compiler to do more sophisticated type checking and verification than classic type checking allows while significantly increasing runtime compilation .
+Another vector of academic improvement within the compiler sphere is to add new features or utilize paradigms like dependent types or formal specifications \cite{RustVerification} in order to allow the compiler to do more sophisticated type checking and verification than classic type checking allows while significantly increasing runtime compilation .
 
 % ecosystem is bad
 % todo: among other, do I need to add others?
-When assessing the adoption of a new programming language the runtime speed of the available compilers are often gauged as an important metric\cite{ScalaSlow} among others such as language complexity, available libraries and spread of ecosystem.
+When assessing the adoption of a new programming language the runtime speed of the available compilers are often gauged as an important metric \cite{ScalaSlow} among others such as language complexity, available libraries and spread of ecosystem.
 Dealing with enormous compilation times of huge projects can have negative effects on the productivity of programmers and even drive away people from an entire ecosystem \cite{ScalaReallySlow, ScalaSlow}.
 
 Modern organizations moving towards continuous delivery practices called DevOps \cite{DevOps} experience an ever increasing need to run the compilations over and over within their continuous integration pipeline.
 % todo: change mantra maybe
-Slow compilation speeds go against the main goal of the short cycle times promoted in DevOps and has spurred creation and adoption of minimal programming language focused on compilation speed and productivity to counter the effects of giant code bases on the CI process\cite{TheGoProgrammingLanguage, GoGoogle}.
+Slow compilation speeds go against the main goal of the short cycle times promoted in DevOps and has spurred creation and adoption of minimal programming language focused on compilation speed and productivity to counter the effects of giant code bases on the CI process \cite{TheGoProgrammingLanguage, GoGoogle}.
 
 \subsectionnonum{Expected results}
 This thesis will analyze the effects of translation unit granularization in a compiler on the recompilation speed.
@@ -130,7 +129,7 @@ The expected results will be a compiler with compilation unit granularization an
 \subsectionnonum{Challenges}
 The goal of this bachelor thesis is to create a prototype compiler for a small subset of the Scala programming language.
 %todo: consider using features of Scala instead of ScalaSpec
-Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features\cite{ScalaSpec}, the prototype compiler implementation in this thesis will support only basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
+Since writing a compiler is a difficult task in itself and Scala is known to have a multitude of advanced and complicated features \cite{ScalaSpec}, the prototype compiler implementation in this thesis will support only basic features in order to allow for an easier realization of the proposed augmentation to the compiler.
 
 % todo: introduced errors?
 When writing software developers tend to create only small changes in existing source files before running the compilation again for a quick feedback loop of introduced errors.
@@ -223,7 +222,7 @@ Long compilation times of unit tests make such an approach also impractical.
 
 If an action takes more than 10 seconds the user is likely to loose attention and starts to perform different tasks \cite{Usability}.
 The norm for compilers it to not show any kind of progress when compiling a single translation unit.
-This exacerbates the perceived time it takes to complete a process for the user\cite{Usability}.
+This exacerbates the perceived time it takes to complete a process for the user \cite{Usability}.
 
 \subsection{Granularization}
 
