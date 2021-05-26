@@ -261,13 +261,13 @@
     \setcounter{section}{0}%
     \renewcommand{\thesection}{nr. \arabic{section}}%
     % Insert record to TOC 
-    \addcontentsline{toc}{section}{\MakeUppercase{Priedai}}%}
+    \addcontentsline{toc}{section}{\MakeUppercase{Appendix}}%}
 }
 
 \def\@Appendix[#1]#2{%
     \refstepcounter{section}%
     \addcontentsline{toc}{subsection}%
-        {\arabic{section} priedas.~#2}%
+        {\arabic{section} appendix.~#2}%
     {\large\bfseries\appendixname\ \thesection\par
      #2\par}% \nohyphens\centering#2\par}%
     \sectionmark{#1}\vspace{\baselineskip}%
@@ -284,6 +284,8 @@
 % Literatūros sąrašą reikia pervadinti
 \addto\captionslithuanian{%
     \renewcommand{\refname}{Literature}%
+    \renewcommand{\contentsname}{Contents}%
+    \renewcommand{\appendixname}{Appendix}%
 }
 
 % Apibrėžiame ketvirto lygio skyrius
