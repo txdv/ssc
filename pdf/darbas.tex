@@ -537,7 +537,7 @@ In a scenario where a lot of code generation is involved an improvement of up to
 % https://tex.stackexchange.com/questions/2311/add-a-legend-title-to-the-legend-box-with-pgfplots
 
 \begin{figure}
-\caption{Speedup with caching}
+\caption{Speedup with caching in milliseconds}
 \label{graph:speed}
 \begin{tikzpicture}
 	\begin{axis}[
@@ -555,15 +555,15 @@ In a scenario where a lot of code generation is involved an improvement of up to
 
 	%\addlegendentry{\hspace{-.6cm}\textbf{methods}}
 	%addlegendentry{0}
-	\legend{\hspace{-.6cm}\textbf{Methods}, 0, 1, 5, 10, 20, 50, 100}
 	\input{./src/benchmark/plot.tex}
+	\legend{\hspace{-.6cm}\textbf{Methods}, 0, 1, 5, 10, 20, 50, 100}
 
 	\end{axis}
 \end{tikzpicture}
 \end{figure}
 
 \begin{figure}
-\caption{Speedup in percent}
+\caption{Speedup with caching in percent}
 \label{graph:speed_pct}
 \begin{tikzpicture}
 	\begin{axis}[
