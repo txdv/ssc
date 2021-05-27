@@ -507,7 +507,7 @@ However, shaving off 322ms in a complex translation unit with 50 classes and 50 
 Applying the approach results in a performance increase of 5\% in the most trivial cases with no downside.
 When a source file is very complex containing 100 translation units with each translation unit also being very complex containing 100 methods an improvement of up to 30\% can be observed.
 
-In the graph which displays the different phases for the prototype compiler (figure \ref{graph:phases}) it is easy to see that the last 3 phases (ast, class and write) are non existend with caching enabled.
+In the graph which displays the different phases for the prototype compiler (figure \ref{graph:phases}) it is easy to see that the last 3 phases (ast, class and write) are non existent with caching enabled.
 The the complexity of a translation unit has been fixed to 50 methods to simulate a difficult workload.
 
 In general an improvement in performance from 5\% to 15\% should be expected in normal scenarios.
@@ -691,7 +691,7 @@ The following the results were obtained:
 }
 % todo: cover afterwards
 \item{
-  Compilation unit granularization was succesfully implemented in the prototype compiler.
+  Compilation unit granularization was successfully implemented in the prototype compiler.
 	Scala turned out a to be a perfect target for the implementation.
 	It targets the JVM which in turn expects separate class files for every defined class in the source.
 }
@@ -739,7 +739,7 @@ Applying translation unit granularization enables significant improvements to th
 	Translation unit granularization enables performance improvements during recompilation by simply decomposing work units and then applying uncomplicated approaches to avoid redundant work.
 }
 \item{
-  Object oriented programming languages which have multiple independent outputs are a natural fit for translation unit granluarization.
+  Object oriented programming languages which have multiple independent outputs are a natural fit for translation unit granularization.
 }
 \end{enumerate}
 
