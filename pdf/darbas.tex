@@ -113,6 +113,7 @@ Slow compilation speeds go against the main goal of the short cycle times promot
 
 \subsectionnonum{Expected results}
 This thesis will analyze the effects of translation unit granularization in a compiler on the recompilation speed.
+The compilers language will be a subset of the Scala programming language.
 
 It will be achieved by the following tasks:
 
@@ -146,7 +147,7 @@ The lack of complex compiler features in the prototype might skew the results ag
 Time measurements in the millisecond range will be taken of subsequent compilation runs changing only parts of the source code using the prototype compiler written in this thesis with the translation unit granularization feature enabled and disabled.
 
 Various source code input sizes and complexity of source code will be evaluated.
-A classic looking case study of average code complexity will be chosen, emphasized, discussed and evaluated, for example, a translation unit with 5 classes and 10 methods in every class with a small change in a singular method between compilations and another measurement with a small change in a singular class.
+A study of a classic looking case of average code complexity will be chosen, emphasized, discussed and evaluated.
 
 An automated but definitive and consistent source code generation tool will be used to create consistently reproducible results for the given inputs listed in the following list.
 
