@@ -161,7 +161,7 @@ Once all source files are compiled into object files, all object files are combi
 
 \subsection{File scope}
 The Java language forces the programmer to define every Java class in its own file and every .java file is then compiled to a .class file, which can be later packaged to .jar files together with additional resources for easier deployment.
-A .class file contains all the Java bytecode generated from the Java source file, a condensed representation of the a Java class in a high level format which is abstract and does not target any specific target architecture, but an abstract architecture called the Java Virtual Machine (JVM).
+A .class file contains all the Java bytecode generated from the Java source file, a condensed representation of the a Java class in a high level format which is abstract and does not target any specific architecture, but an abstract architecture called the Java Virtual Machine (JVM).
 Code targeting the JVM can be then executed provided a Java Runtime Environment (JRE) is present on the target machine which Just in Time (JIT) compiles the bytecode to the target machines assembly code and executes it.
 % todo: write this block in a separate section (?)
 Java bytecode is much more abstract and conceptually closer to the original representation of a class than the C++ compiler generated object files, which contain directly executable machine code.
@@ -186,7 +186,7 @@ Because it is possible to define a class in a very concise manner, Scala source 
 
 The compiler creates in total 4 corresponding .class files as depicted in figure \ref{img:Expression}.
 The classes all depend on the same trait definition called Expression, an empty interface.
-A similar concept in Java exists and is called a Marker Interface \cite{10.5555/1407381}.
+A similar concept exists in Java and is called a Marker Interface \cite{10.5555/1407381}.
 There is no need for a strict compilation order, the compiler can utilize the meta information to compile all result .class files in parallel or whatever order it sees fit.
 When running the compiler with the source file displayed in listing \ref{multidef} as the input, 4 .class files will be created.
 
