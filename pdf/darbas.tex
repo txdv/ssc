@@ -711,10 +711,11 @@ The following the results were obtained:
 \end{enumerate}
 
 % Išvadų skyriuje daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos rekomendacijos, akcentuojamos naujovės. Išvados pateikiamos sunumeruoto (gali būti hierarchinis) sąrašo pavidalu. Darbo išvados turi atitikti darbo tikslą.
+\iffalse
 \sectionnonum{Conclusion}
 % sunmeruoti ir padaryti dvi pagrindines isvadas
 
-Translation unit granularization enables performance improvements by simply decomposing work units and then applying uncomplicated approaches to avoid redundant work.
+Translation unit granularization enables performance improvements during recompilation by simply decomposing work units and then applying uncomplicated approaches to avoid redundant work.
 %todo: reword
 The smaller the translation unit is the less likely it is that a modification to the source code will result in a need redo work during recompilation.
 
@@ -729,6 +730,18 @@ This kind of complexity might only occur when a project utilizes a lot of code g
 Compilation speed for code with complexity more often found in day to day development scenarios saw an improvement between 12\% and 16\%.
 
 Applying translation unit granularization enables significant improvements to the recompilation speed and as such should always be considered when trying to improve the user experience of a compiler.
+\fi
+
+\sectionnonum{Conclusion}
+
+\begin{enumerate}
+\item{
+	Translation unit granularization enables performance improvements during recompilation by simply decomposing work units and then applying uncomplicated approaches to avoid redundant work.
+}
+\item{
+  Object oriented programming languages which have multiple independent outputs are a natural fit for translation unit granluarization.
+}
+\end{enumerate}
 
 \iffalse
 \sectionnonum{Future works}
