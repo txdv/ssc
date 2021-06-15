@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException
 import org.scalatest._
 import flatspec._
 import matchers._
-import ssc.parser.scala.Expression.ObjectDecl
+import ssc.parser.scala.AST.ObjectDecl
 
 import collection.JavaConverters._
 

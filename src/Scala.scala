@@ -8,16 +8,16 @@ import ssc.parser.Parser._
 import scalaz.{Monad, MonadPlus}
 import scalaz.syntax.monadPlus._
 
-sealed trait Expression
+sealed trait AST
 
-object Expression {
-  sealed trait Statement extends Expression
+object AST {
+  sealed trait Statement extends AST
 
   case class Package(name: String) extends Statement
   case class Import(name: String) extends Statement
   case class ObjectDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
 
-  sealed trait ScalaType extends Expression
+  sealed trait ScalaType extends AST
   case class SimpleType(name: String) extends ScalaType
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
 
@@ -70,7 +70,7 @@ object Expression {
 }
 
 object Scala {
-  import Expression._
+  import AST._
 
   def symbol(ch: Char): Parser[LexerToken] = token(sat(Symbol(ch.toString)))
 
@@ -268,10 +268,10 @@ object Scala {
     }
   }
 
-  val statement: Parser[Expression] =
-    `import`.asInstanceOf[Parser[Expression]] +++
-    defObject.asInstanceOf[Parser[Expression]]
+  val statement: Parser[AST] =
+    `import`.asInstanceOf[Parser[AST]] +++
+    defObject.asInstanceOf[Parser[AST]]
 
-  val main: Parser[List[Expression]] = many(token(statement))
+  val main: Parser[List[AST]] = many(token(statement))
 
 }

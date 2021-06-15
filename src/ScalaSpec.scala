@@ -8,7 +8,7 @@ import ssc.parser.Parser
 import org.scalatest._
 import flatspec._
 import matchers._
-import Expression._
+import AST._
 
 object Helper {
   implicit class StringOps(val string: String) {
@@ -274,8 +274,8 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "expr.op" should "parse booleans" in {
-    "true".ast(Scala.expr.all) should be (Some(Expression.Bool(true)))
-    "false".ast(Scala.expr.all) should be (Some(Expression.Bool(false)))
+    "true".ast(Scala.expr.all) should be (Some(AST.Bool(true)))
+    "false".ast(Scala.expr.all) should be (Some(AST.Bool(false)))
   }
 
   "expr.function" should "parse println(1 + 2)" in {
@@ -284,7 +284,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "expr.ifExpr" should "parse if (true) 1 else 2" in {
-    val expected = Expression.If(Expression.Bool(true), Num("1"), Num("2"))
+    val expected = AST.If(AST.Bool(true), Num("1"), Num("2"))
     //"if (true) 1 else 2".ast(Scala.expr.ifExpr) should be (Some(expected))
     "if (true) 1 else 2".ast(Scala.expr.ifExpr) should be (Some(expected))
   }

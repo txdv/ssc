@@ -18,8 +18,8 @@ import ssc.classfile.higher.{
 }
 import ssc.lexer.Lexer
 import ssc.parser.Parser
-import ssc.parser.scala.{Scala, Expression}
-import ssc.parser.scala.Expression.{
+import ssc.parser.scala.{Scala, AST}
+import ssc.parser.scala.AST.{
   ObjectDecl,
   MethodDecl,
   Expr
@@ -58,13 +58,13 @@ object ScalaCompiler {
       access = Set(ClassAccessFlag.Public, ClassAccessFlag.Super))
   }
 
-  def convert(stype: Expression.ScalaType): JavaType = {
+  def convert(stype: AST.ScalaType): JavaType = {
     stype match {
-      case Expression.SimpleType("Unit") =>
+      case AST.SimpleType("Unit") =>
         JavaType.Void
-      case Expression.SimpleType("String") =>
+      case AST.SimpleType("String") =>
         JavaType.String
-      case Expression.GenericType("Array", Seq(generic)) =>
+      case AST.GenericType("Array", Seq(generic)) =>
         JavaType.Array(convert(generic))
       case _ =>
         println(stype)
@@ -77,7 +77,7 @@ object ScalaCompiler {
   }
 
   def evalCache(expr: Expr, cache: Seq[Int]): Expr = {
-    import Expression._
+    import AST._
     expr match {
       case ExprOp("+", Num(a), Num(b)) =>
         Num((a.toInt + b.toInt).toString)
@@ -129,7 +129,7 @@ object ScalaCompiler {
   import ssc.classfile.types.runtime.ClassObj
 
   case class Context(map: Map[String, ClassObj]) {
-    def findMethods(f: Expression.Func): Seq[MethodRef] = {
+    def findMethods(f: AST.Func): Seq[MethodRef] = {
       for {
         namespace <- f.namespace.headOption.toSeq
         types <- map.get(namespace).toSeq
@@ -137,7 +137,7 @@ object ScalaCompiler {
       } yield methods
     }
 
-    def find(f: Expression.Func): Option[MethodRef] = {
+    def find(f: AST.Func): Option[MethodRef] = {
       None
     }
   }
@@ -148,7 +148,7 @@ object ScalaCompiler {
 
 
   def genops(expr: Expr, stack: Seq[StackFrame] = Seq.empty): Code = {
-    import Expression._
+    import AST._
     expr match {
       case f: Func =>
         val method = ns.findMethods(f).head
@@ -200,7 +200,7 @@ object ScalaCompiler {
   }
 
   def guessType(expr: Expr): JavaType = {
-    import Expression._
+    import AST._
     expr match {
       case _: Stri =>
         JavaType.String
@@ -226,7 +226,7 @@ object ScalaCompiler {
   }
 
   def convertBody(expr: Expr): Code = {
-    import Expression._
+    import AST._
 
     expr match {
       case Func("println", Seq(arg)) =>
@@ -275,7 +275,7 @@ object ScalaCompiler {
       code = None)
   }
 
-  def readFile(filename: String): Seq[Expression] = {
+  def readFile(filename: String): Seq[AST] = {
     val content = Benchmark.gauge2("read") {
       Files.readAllBytes(new File(filename).toPath)
     }
@@ -283,7 +283,7 @@ object ScalaCompiler {
     parseBytes(content)
   }
 
-  def parseBytes(content: Array[Byte]): Seq[Expression] = {
+  def parseBytes(content: Array[Byte]): Seq[AST] = {
     val lex = Benchmark.gauge2("lex") {
       Lexer.lexAll(Span(content)).toList
     }
