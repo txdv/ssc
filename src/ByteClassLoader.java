@@ -1,4 +1,4 @@
-package lt.vu.mif.bentkus.bachelor.compiler;
+package ssc;
 
 import java.net.URL;
 import java.net.URLClassLoader;

@@ -1,7 +1,7 @@
-package lt.vu.mif.bentkus.bachelor.compiler.classfile
+package ssc.classfile
 
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MethodAccessFlag
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.JavaType
+import ssc.classfile.higher.MethodAccessFlag
+import ssc.classfile.higher.JavaType
 import Constant._
 
 import java.io.File

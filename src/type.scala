@@ -1,7 +1,6 @@
-package lt.vu.mif.bentkus.bachelor.compiler.classfile.types.runtime
+package ssc.classfile.types.runtime
 
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.JavaType
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MethodRef
+import ssc.classfile.higher.{JavaType, MethodRef}
 
 case class ClassObj(jclass: JavaType.Class, methods: Seq[MethodRef])
 
@@ -42,7 +41,7 @@ object Types {
   }
 
   def main(args: Array[String]): Unit = {
-    import lt.vu.mif.bentkus.bachelor.compiler.misc.PrettyPrint
+    import ssc.misc.PrettyPrint
     val classes = if (args.size == 0) Seq("java.lang.Math") else args.toSeq
 
     classes.foreach { name =>

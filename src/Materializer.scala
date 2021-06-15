@@ -1,6 +1,6 @@
-package lt.vu.mif.bentkus.bachelor.compiler.classfile.higher
+package ssc.classfile.higher
 
-import lt.vu.mif.bentkus.bachelor.compiler.misc.{ByteBufferStream}
+import ssc.misc.{ByteBufferStream}
 
 import java.nio.ByteBuffer
 

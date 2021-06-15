@@ -1,4 +1,4 @@
-package lt.vu.mif.bentkus.bachelor.compiler.classfile
+package ssc.classfile
 
 import org.scalatest._
 import flatspec._

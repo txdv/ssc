@@ -1,6 +1,6 @@
-package lt.vu.mif.bentkus.bachelor.compiler.classfile
+package ssc.classfile
 
-import lt.vu.mif.bentkus.bachelor.compiler.span._
+import ssc.span._
 import java.nio.ByteBuffer
 
 case class Version(minor: Int, major: Int)

@@ -39,7 +39,7 @@ scala_binary(
     srcs = ["LexerApp.scala"],
     scalacopts = fatal_warnings(),
     deps = [":lexer"],
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerApp")
+    main_class = "ssc.lexer.LexerApp")
 
 scala_test(
     name = "lexer_spec",
@@ -83,7 +83,7 @@ scala_binary(
     srcs = ["ScalaApp.scala"],
     scalacopts = fatal_warnings(),
     deps = [":scala", ":lexer"],
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.parser.scala.ScalaApp")
+    main_class = "ssc.parser.scala.ScalaApp")
 
 scala_library(
     name = "classfile",
@@ -97,7 +97,7 @@ scala_binary(
     srcs = ["CodeAttributeApp.scala"],
     scalacopts = fatal_warnings(),
     deps = [":classfile"],
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.CodeAttributeApp")
+    main_class = "ssc.classfile.CodeAttributeApp")
 
 scala_test(
     name = "classfile_spec",
@@ -109,7 +109,7 @@ scala_binary(
     name = "classfile_app",
     srcs = ["ClassFileApp.scala"],
     scalacopts = fatal_warnings(),
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.ClassFileApp",
+    main_class = "ssc.classfile.ClassFileApp",
     deps = [":classfile", ":class"])
 
 scala_binary(
@@ -117,7 +117,7 @@ scala_binary(
     srcs = ["Class.scala"],
     deps = [":classfile", ":pretty_print"],
     scalacopts = fatal_warnings(),
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.MainApp")
+    main_class = "ssc.classfile.higher.MainApp")
 
 scala_test(
     name = "class_spec",
@@ -130,7 +130,7 @@ scala_binary(
     srcs = ["Compiler.scala"],
     deps = [":scala", ":class", ":classfile", ":pretty_print", ":materializer", ":type"],
     scalacopts = fatal_warnings(),
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.ScalaCompiler")
+    main_class = "ssc.ScalaCompiler")
 
 scala_test(
     name = "compiler_spec",
@@ -143,7 +143,7 @@ scala_binary(
     srcs = ["PrettyPrint.scala"],
     deps = [],
     scalacopts = fatal_warnings(),
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.misc.MainApp")
+    main_class = "ssc.misc.MainApp")
 
 scala_library(
     name = "bytestream",
@@ -163,4 +163,4 @@ scala_binary(
     srcs = ["type.scala"],
     deps = [":class", ":pretty_print"],
     scalacopts = fatal_warnings(),
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.classfile.types.runtime.Types")
+    main_class = "ssc.classfile.types.runtime.Types")

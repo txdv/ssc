@@ -1,8 +1,8 @@
-package lt.vu.mif.bentkus.bachelor.compiler.classfile.higher
+package ssc.classfile.higher
 
-import lt.vu.mif.bentkus.bachelor.compiler.span.Span
-import lt.vu.mif.bentkus.bachelor.compiler.misc.PrettyPrint
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.{
+import ssc.span.Span
+import ssc.misc.PrettyPrint
+import ssc.classfile.{
   AttributeInfo,
   Constant,
   Instr,

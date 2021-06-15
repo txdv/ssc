@@ -1,4 +1,4 @@
-package lt.vu.mif.bentkus.bachelor.compiler.classfile
+package ssc.classfile
 
 import java.nio.ByteBuffer
 

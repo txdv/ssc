@@ -1,11 +1,11 @@
-package lt.vu.mif.bentkus.bachelor.compiler
+package ssc
 
 import java.lang.reflect.InvocationTargetException
 
 import org.scalatest._
 import flatspec._
 import matchers._
-import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.DefObject
+import ssc.parser.scala.Expression.DefObject
 
 import collection.JavaConverters._
 

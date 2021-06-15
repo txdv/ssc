@@ -1,4 +1,4 @@
-package lt.vu.mif.bentkus.bachelor.compiler.span
+package ssc.span
 
 case class Span(start: Int, end: Int, buffer: Array[Byte]) {
 

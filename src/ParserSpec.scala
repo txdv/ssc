@@ -1,12 +1,12 @@
-package lt.vu.mif.bentkus.bachelor.compiler.parser
+package ssc.parser
 
-import lt.vu.mif.bentkus.bachelor.compiler.Util
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken
+import ssc.Util
+import ssc.lexer.LexerToken
 
 import org.scalatest._
 import flatspec._
 import matchers._
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken._
+import ssc.lexer.LexerToken._
 
 class ParserSpec extends AnyFlatSpec with should.Matchers {
 

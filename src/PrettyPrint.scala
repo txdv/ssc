@@ -1,4 +1,4 @@
-package lt.vu.mif.bentkus.bachelor.compiler.misc
+package ssc.misc
 
 case class Field(name: String, value: Value)
 

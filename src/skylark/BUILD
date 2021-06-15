@@ -12,5 +12,5 @@ scala_binary(
     name = "app",
     srcs = ["SkylarkApp.scala"],
     scalacopts = fatal_warnings(),
-    main_class = "lt.vu.mif.bentkus.bachelor.compiler.parser.skylark.SkylarkApp",
+    main_class = "ssc.parser.skylark.SkylarkApp",
     deps = [":skylark"])

@@ -1,8 +1,8 @@
-package lt.vu.mif.bentkus.bachelor.compiler.parser.scala
+package ssc.parser.scala
 
-import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.Lexer
-import lt.vu.mif.bentkus.bachelor.compiler.span.Span
+import ssc.parser.Parser
+import ssc.lexer.Lexer
+import ssc.span.Span
 
 object ScalaApp extends App {
   import java.io.File

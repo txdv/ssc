@@ -1,8 +1,8 @@
-package lt.vu.mif.bentkus.bachelor.compiler.parser.skylark
+package ssc.parser.skylark
 
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.Lexer
-import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
-import lt.vu.mif.bentkus.bachelor.compiler.span.Span
+import ssc.lexer.Lexer
+import ssc.parser.Parser
+import ssc.span.Span
 
 object SkylarkApp extends App {
   import java.io.File

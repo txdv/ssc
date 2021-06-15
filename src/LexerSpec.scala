@@ -1,4 +1,4 @@
-package lt.vu.mif.bentkus.bachelor.compiler.lexer
+package ssc.lexer
 
 import org.scalatest._
 import flatspec._

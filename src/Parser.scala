@@ -1,10 +1,10 @@
-package lt.vu.mif.bentkus.bachelor.compiler.parser
+package ssc.parser
 
 import scalaz.{Monad, MonadPlus}
 import scalaz.syntax.monadPlus._
 import scala.reflect.ClassTag
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.{Lexer, LexerToken}
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken._
+import ssc.lexer.{Lexer, LexerToken}
+import ssc.lexer.LexerToken._
 
 case class Parser[A](run: List[LexerToken] => List[(A, List[LexerToken])]){
   val t: List[LexerToken] => List[(A, List[LexerToken])] = { input =>

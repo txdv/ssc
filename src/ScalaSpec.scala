@@ -1,9 +1,9 @@
-package lt.vu.mif.bentkus.bachelor.compiler.parser.scala
+package ssc.parser.scala
 
-import lt.vu.mif.bentkus.bachelor.compiler.Util
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken._
-import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
+import ssc.Util
+import ssc.lexer.LexerToken
+import ssc.lexer.LexerToken._
+import ssc.parser.Parser
 
 import org.scalatest._
 import flatspec._

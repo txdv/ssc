@@ -1,9 +1,9 @@
-package lt.vu.mif.bentkus.bachelor.compiler.parser.skylark
+package ssc.parser.skylark
 
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.{Lexer, LexerToken}
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.LexerToken._
-import lt.vu.mif.bentkus.bachelor.compiler.parser._
-import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser._
+import ssc.lexer.{Lexer, LexerToken}
+import ssc.lexer.LexerToken._
+import ssc.parser._
+import ssc.parser.Parser._
 
 import scalaz.{Monad, MonadPlus}
 import scalaz.syntax.monadPlus._

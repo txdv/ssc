@@ -1,7 +1,7 @@
-package lt.vu.mif.bentkus.bachelor.compiler
+package ssc
 
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.Version
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{
+import ssc.classfile.Version
+import ssc.classfile.higher.{
   ClassAccessFlag,
   AccessFlag,
   Class,
@@ -16,17 +16,17 @@ import lt.vu.mif.bentkus.bachelor.compiler.classfile.higher.{
   Op,
   ClassFile,
 }
-import lt.vu.mif.bentkus.bachelor.compiler.lexer.Lexer
-import lt.vu.mif.bentkus.bachelor.compiler.parser.Parser
-import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.{Scala, Expression}
-import lt.vu.mif.bentkus.bachelor.compiler.parser.scala.Expression.{
+import ssc.lexer.Lexer
+import ssc.parser.Parser
+import ssc.parser.scala.{Scala, Expression}
+import ssc.parser.scala.Expression.{
   DefObject,
   DefMethod,
   Expr
 }
-import lt.vu.mif.bentkus.bachelor.compiler.span.Span
-import lt.vu.mif.bentkus.bachelor.compiler.misc.PrettyPrint
-import lt.vu.mif.bentkus.bachelor.compiler.classfile.types.runtime.Types
+import ssc.span.Span
+import ssc.misc.PrettyPrint
+import ssc.classfile.types.runtime.Types
 
 
 import java.io.File
@@ -126,7 +126,7 @@ object ScalaCompiler {
     }
   }
 
-  import lt.vu.mif.bentkus.bachelor.compiler.classfile.types.runtime.ClassObj
+  import ssc.classfile.types.runtime.ClassObj
 
   case class Context(map: Map[String, ClassObj]) {
     def findMethods(f: Expression.Func): Seq[MethodRef] = {

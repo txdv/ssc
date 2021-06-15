@@ -1,4 +1,4 @@
-package lt.vu.mif.bentkus.bachelor.compiler
+package ssc
 
 object Util {
   def check[A, B](state: List[(A, List[B])]): Option[A] = {

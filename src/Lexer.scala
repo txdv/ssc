@@ -1,6 +1,6 @@
-package lt.vu.mif.bentkus.bachelor.compiler.lexer
+package ssc.lexer
 
-import lt.vu.mif.bentkus.bachelor.compiler.span._
+import ssc.span._
 
 import scala.reflect.ClassTag
 

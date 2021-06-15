@@ -1,6 +1,6 @@
-package lt.vu.mif.bentkus.bachelor.compiler.lexer
+package ssc.lexer
 
-import lt.vu.mif.bentkus.bachelor.compiler.span.Span
+import ssc.span.Span
 
 import java.io.File
 import java.nio.file.Files
