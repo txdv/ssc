@@ -21,7 +21,7 @@ import ssc.parser.Parser
 import ssc.parser.scala.{Scala, Expression}
 import ssc.parser.scala.Expression.{
   ObjectDecl,
-  DefMethod,
+  MethodDecl,
   Expr
 }
 import ssc.span.Span
@@ -39,7 +39,7 @@ object ScalaCompiler {
       thisClass = JavaType.Class(obj.name),
       superClass = JavaType.Object,
       methods = {
-        val defMethods = obj.statements.filter(_.isInstanceOf[DefMethod]).map(_.asInstanceOf[DefMethod])
+        val defMethods = obj.statements.filter(_.isInstanceOf[MethodDecl]).map(_.asInstanceOf[MethodDecl])
 
         val defcon = Method.DefaultConstructor
 
@@ -267,7 +267,7 @@ object ScalaCompiler {
     }
   }
 
-  def convert(method: DefMethod): Method = {
+  def convert(method: MethodDecl): Method = {
     Method(
       method.name,
       signature = null,

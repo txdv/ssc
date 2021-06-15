@@ -21,13 +21,13 @@ object Expression {
   case class SimpleType(name: String) extends ScalaType
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
 
-  case class DefMethod(
+  case class MethodDecl(
     name: String,
     returnType: ScalaType,
-    arguments: Seq[DefMethodArgument] = Seq.empty,
+    arguments: Seq[MethodDeclArgument] = Seq.empty,
     body: Option[Expr] = None) extends Statement
 
-  case class DefMethodArgument(name: String, argumentType: ScalaType)
+  case class MethodDeclArgument(name: String, argumentType: ScalaType)
 
   sealed trait Expr extends Statement {
     val depth: Int
@@ -154,23 +154,23 @@ object Scala {
   val objectStatements =
     many(objectStatement)
 
-  def defMethodArgument: Parser[DefMethodArgument] = for {
+  def defMethodArgument: Parser[MethodDeclArgument] = for {
     name <- identifier
     _ <- `:`
     argumentType <- typeDef
-  } yield DefMethodArgument(name.value, argumentType)
+  } yield MethodDeclArgument(name.value, argumentType)
 
-  def methodArgumentsGroup: Parser[Seq[DefMethodArgument]] = for {
+  def methodArgumentsGroup: Parser[Seq[MethodDeclArgument]] = for {
     _ <- `(`
     args <- sepBy(defMethodArgument, `,`)
     _ <- `)`
   } yield args
 
-  def methodArguments: Parser[Seq[DefMethodArgument]] = for {
+  def methodArguments: Parser[Seq[MethodDeclArgument]] = for {
     args <- one(methodArgumentsGroup)
   } yield args.getOrElse(Seq.empty)
 
-  def defMethod: Parser[DefMethod] = for {
+  def defMethod: Parser[MethodDecl] = for {
     _ <- identifierWithName("def")
     name <- identifier
     arguments <- methodArguments
@@ -178,7 +178,7 @@ object Scala {
     returnType <- typeDef
     _ <- `=`
     expr <- expr.all
-  } yield DefMethod(name.value, returnType, arguments, body = Some(expr))
+  } yield MethodDecl(name.value, returnType, arguments, body = Some(expr))
 
   object expr {
     val number: Parser[Expr] = for {
