@@ -129,17 +129,17 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "defObject" should "parse empty object definition" in {
-    "object empty{}".ast(Scala.defObject) should be (Some(DefObject("empty")))
+    "object empty{}".ast(Scala.defObject) should be (Some(ObjectDecl("empty")))
   }
 
   "defObject" should "parse multiple statements" in {
     "import a.b.c\nobject empty{}\n".ast(Scala.main) should be (Some(
-      List(Import("a.b.c"), DefObject("empty"))
+      List(Import("a.b.c"), ObjectDecl("empty"))
     ))
   }
 
   "defObject" should "parse an empty method in an object" in {
-    val expected = DefObject("Main", Seq(
+    val expected = ObjectDecl("Main", Seq(
       DefMethod("methodName", `Unit`, body = Option(`???`))
     ))
     """
@@ -203,7 +203,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |}
       |"""
 
-    val expected = DefObject("Main", Seq(
+    val expected = ObjectDecl("Main", Seq(
       DefMethod("method1", `Unit`, body = Option(`???`)),
       DefMethod("method2", `Unit`, body = Option(`???`)),
       DefMethod("method3", `Unit`, body = Option(`???`)),
@@ -221,7 +221,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |}
       |"""
 
-    val expected = DefObject("Main", Seq(
+    val expected = ObjectDecl("Main", Seq(
       DefMethod("main", `Unit`, body = Option(
         Func("println", Seq(Stri("Hello World!")))
       ))
@@ -241,7 +241,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
     val args = DefMethodArgument("args", GenericType("Array", Seq(SimpleType("String"))))
 
-    val expected = DefObject("Main", Seq(
+    val expected = ObjectDecl("Main", Seq(
       DefMethod(
         name = "main",
         returnType = `Unit`,

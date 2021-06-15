@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException
 import org.scalatest._
 import flatspec._
 import matchers._
-import ssc.parser.scala.Expression.DefObject
+import ssc.parser.scala.Expression.ObjectDecl
 
 import collection.JavaConverters._
 
@@ -13,7 +13,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
   def compileAndRun(code: String): String = {
     val codeBytes = code.getBytes
     val statements = ScalaCompiler.parseBytes(codeBytes)
-    val defObject = statements.find(_.isInstanceOf[DefObject]).get.asInstanceOf[DefObject]
+    val defObject = statements.find(_.isInstanceOf[ObjectDecl]).get.asInstanceOf[ObjectDecl]
     val name = defObject.name
     val objDef = ScalaCompiler.convert(defObject)
     val m = new classfile.higher.Materializer

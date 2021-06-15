@@ -20,7 +20,7 @@ import ssc.lexer.Lexer
 import ssc.parser.Parser
 import ssc.parser.scala.{Scala, Expression}
 import ssc.parser.scala.Expression.{
-  DefObject,
+  ObjectDecl,
   DefMethod,
   Expr
 }
@@ -33,7 +33,7 @@ import java.io.File
 import java.nio.file.Files
 
 object ScalaCompiler {
-  def convert(obj: DefObject): Class = {
+  def convert(obj: ObjectDecl): Class = {
     Class(
       version = Version(0, 58),
       thisClass = JavaType.Class(obj.name),
@@ -335,7 +335,7 @@ object ScalaCompiler {
 
   def main2(args: Array[String]): Unit = {
     val statements = readFile(args.head)
-    val defObject = statements.find(_.isInstanceOf[DefObject]).get.asInstanceOf[DefObject]
+    val defObject = statements.find(_.isInstanceOf[ObjectDecl]).get.asInstanceOf[ObjectDecl]
     val jclass = Benchmark.gauge2("ast") {
       convert(defObject)
     }
@@ -383,7 +383,7 @@ object ScalaCompiler {
     val targetFile = args.head
 
     val statements = readFile(args.head)
-    val defObjects = statements.filter(_.isInstanceOf[DefObject]).map(_.asInstanceOf[DefObject])
+    val defObjects = statements.filter(_.isInstanceOf[ObjectDecl]).map(_.asInstanceOf[ObjectDecl])
 
     val cachedHashes = Cache.load()
     val hashes = defObjects.map { defObject => defObject.hashCode }.sorted

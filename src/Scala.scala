@@ -15,7 +15,7 @@ object Expression {
 
   case class Package(name: String) extends Statement
   case class Import(name: String) extends Statement
-  case class DefObject(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
+  case class ObjectDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
 
   sealed trait ScalaType extends Expression
   case class SimpleType(name: String) extends ScalaType
@@ -140,13 +140,13 @@ object Scala {
     fullname = name.map(_.value).mkString(".")
   } yield Import(fullname)
 
-  val defObject: Parser[DefObject] = for {
+  val defObject: Parser[ObjectDecl] = for {
     _ <- identifierWithName("object")
     name <- identifier
     _ <- `{`
     statements <- objectStatements
     _ <- `}`
-  } yield DefObject(name.value, statements)
+  } yield ObjectDecl(name.value, statements)
 
   val objectStatement =
     defMethod
