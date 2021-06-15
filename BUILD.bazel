@@ -7,12 +7,3 @@ config_setting(
     name = "scalac_opts_deprecations",
     define_values = {"scalac_deprecations": "1"},
 )
-
-filegroup(
-    name = "sources",
-    srcs = [
-        "LTPlius.sty",
-        "VUMIFPSbakalaurinis.cls",
-        "csquotes.cfg",
-    ],
-    visibility = ["//pdf:__pkg__"])
