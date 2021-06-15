@@ -290,6 +290,10 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "varDecl" should "parser simple declaration without expression" in {
-    "val a: Int".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", SimpleType("Int"))))
+    "val a: Int".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", SimpleType("Int"), None)))
+  }
+
+  "varDecl" should "parser simple declaration with simple expression" in {
+    "val a: Int = 1".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", SimpleType("Int"), Some(Num("1")))))
   }
 }
