@@ -288,4 +288,8 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     //"if (true) 1 else 2".ast(Scala.expr.ifExpr) should be (Some(expected))
     "if (true) 1 else 2".ast(Scala.expr.ifExpr) should be (Some(expected))
   }
+
+  "varDecl" should "parser simple declaration without expression" in {
+    "val a: Int".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", SimpleType("Int"))))
+  }
 }

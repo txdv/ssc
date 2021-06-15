@@ -21,6 +21,8 @@ object AST {
   case class SimpleType(name: String) extends ScalaType
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
 
+  case class VarDecl(name: String, scalaType: ScalaType)
+
   case class MethodDecl(
     name: String,
     returnType: ScalaType,
@@ -179,6 +181,13 @@ object Scala {
     _ <- `=`
     expr <- expr.all
   } yield MethodDecl(name.value, returnType, arguments, body = Some(expr))
+
+  val varDecl: Parser[VarDecl] = for {
+    _ <- identifierWithName("val")
+    name <- identifier
+    _ <- `:`
+    `type` <- typeDef
+  } yield VarDecl(name.value, `type`)
 
   object expr {
     val number: Parser[Expr] = for {
