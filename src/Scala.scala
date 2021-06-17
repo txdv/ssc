@@ -21,7 +21,7 @@ object AST {
   case class SimpleType(name: String) extends ScalaType
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
 
-  case class VarDecl(name: String, scalaType: ScalaType, expr: Option[Expr])
+  case class VarDecl(name: String, scalaType: Option[ScalaType], expr: Option[Expr])
 
   case class MethodDecl(
     name: String,
@@ -30,6 +30,10 @@ object AST {
     body: Option[Expr] = None) extends Statement
 
   case class MethodDeclArgument(name: String, argumentType: ScalaType)
+
+  case class Multi(expressions: Seq[Expr]) extends Expr {
+    val depth: Int = expressions.last.depth
+  }
 
   sealed trait Expr extends Statement {
     val depth: Int
@@ -179,17 +183,24 @@ object Scala {
     _ <- `:`
     returnType <- typeDef
     _ <- `=`
-    expr <- expr.all
+    expr <- expressions
   } yield MethodDecl(name.value, returnType, arguments, body = Some(expr))
+
+  val expressions: Parser[Expr] = for {
+    exprs <- expr.all
+  } yield exprs
 
   val varDecl: Parser[VarDecl] = for {
     _ <- identifierWithName("val")
     name <- identifier
+    `type` <- one(varDeclType)
+    assignment <- one(varDeclAssignment)
+  } yield VarDecl(name.value, `type`, expr = assignment)
+
+  val varDeclType: Parser[ScalaType] = for {
     _ <- `:`
     `type` <- typeDef
-    assignment <- one(varDeclAssignment)
-
-  } yield VarDecl(name.value, `type`, expr = assignment)
+  } yield `type`
 
   val varDeclAssignment: Parser[Expr] = for {
     _ <- `=`
@@ -238,9 +249,14 @@ object Scala {
 
     def grouped: Parser[Expr] = for {
       _ <- `{`
-      all <- all
+      all <- many(all)
       _ <- `}`
-    } yield all
+    } yield {
+      all match {
+        case Seq(expr) => expr
+        case all => Multi(all)
+      }
+    }
 
     val constants: Parser[Expr] =
       number +++

@@ -186,15 +186,15 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
   }
 */
 
-  "Compiler" should "simple variable declaration" in {
+  "Compiler" should "method with two lines" in {
     compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
-          val a: Int = 1
-          println(a)
+          println(1)
+          println(2)
         }
       }
-    """ } should be ("false\n")
+    """ } should be ("1\n2\n")
 
   }
 }

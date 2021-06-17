@@ -75,7 +75,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
   "defMethod" should "parse simple method definition" in {
     "def method_name: Unit = ???".ast(Scala.defMethod) should be (Some(
-      MethodDecl("method_name", `Unit`, body = Option(`???`))
+      MethodDecl("method_name", `Unit`, body = Seq(`???`))
     ))
   }
 
@@ -84,7 +84,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |def method_name: Unit = {
       |  ???
       |}""".ast(Scala.defMethod) should be (Some(
-        MethodDecl("method_name", `Unit`, body = Option(`???`))
+        MethodDecl("method_name", `Unit`, body = Seq(`???`))
       ))
   }
 
@@ -95,7 +95,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
         MethodDeclArgument("arg1", `Int`),
         MethodDeclArgument("arg2", `String`),
       ),
-      body = Option(`???`))
+      body = Seq(`???`))
     ))
   }
 
@@ -140,7 +140,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
   "defObject" should "parse an empty method in an object" in {
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("methodName", `Unit`, body = Option(`???`))
+      MethodDecl("methodName", `Unit`, body = Seq(`???`))
     ))
     """
       |object Main {
@@ -204,9 +204,9 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
 
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("method1", `Unit`, body = Option(`???`)),
-      MethodDecl("method2", `Unit`, body = Option(`???`)),
-      MethodDecl("method3", `Unit`, body = Option(`???`)),
+      MethodDecl("method1", `Unit`, body = Seq(`???`)),
+      MethodDecl("method2", `Unit`, body = Seq(`???`)),
+      MethodDecl("method3", `Unit`, body = Seq(`???`)),
     ))
 
     src.ast(Scala.defObject) should be (Some(expected))
@@ -222,7 +222,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
 
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("main", `Unit`, body = Option(
+      MethodDecl("main", `Unit`, body = Seq(
         Func("println", Seq(Stri("Hello World!")))
       ))
     ))
@@ -246,7 +246,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
         name = "main",
         returnType = `Unit`,
         arguments = Seq(args),
-        body = Option(
+        body = Seq(
           Func("println", Seq(Stri("Hello World!")))
         )
       )
@@ -290,10 +290,14 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
   }
 
   "varDecl" should "parser simple declaration without expression" in {
-    "val a: Int".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", SimpleType("Int"), None)))
+    "val a: Int".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", Some(SimpleType("Int")), None)))
   }
 
   "varDecl" should "parser simple declaration with simple expression" in {
-    "val a: Int = 1".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", SimpleType("Int"), Some(Num("1")))))
+    "val a: Int = 1".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", Some(SimpleType("Int")), Some(Num("1")))))
+  }
+
+  "varDecl" should "parse declaration without type" in {
+    "val a = 1".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", None, Some(Num("1")))))
   }
 }
