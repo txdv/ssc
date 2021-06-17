@@ -187,10 +187,14 @@ object Scala {
     name <- identifier
     _ <- `:`
     `type` <- typeDef
-    // TODO: need to make this optional
+    assignment <- one(varDeclAssignment)
+
+  } yield VarDecl(name.value, `type`, expr = assignment)
+
+  val varDeclAssignment: Parser[Expr] = for {
     _ <- `=`
     e <- expr.all
-  } yield VarDecl(name.value, `type`, expr = None)
+  } yield e
 
   object expr {
     val number: Parser[Expr] = for {
