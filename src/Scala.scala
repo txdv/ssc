@@ -150,7 +150,7 @@ object Scala {
     fullname = name.map(_.value).mkString(".")
   } yield Import(fullname)
 
-  val defObject: Parser[ObjectDecl] = for {
+  val objectDecl: Parser[ObjectDecl] = for {
     _ <- identifierWithName("object")
     name <- identifier
     _ <- `{`
@@ -304,7 +304,7 @@ object Scala {
   }
 
   val statement: Parser[AST] =
-    `import` +++ defObject +++ varDecl
+    `import` +++ objectDecl +++ varDecl
 
 
   val main: Parser[List[AST]] = many(token(statement))

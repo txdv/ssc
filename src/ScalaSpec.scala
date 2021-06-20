@@ -128,17 +128,17 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     " ".ast(Scala.fidentifier) should be (None)
   }
 
-  "defObject" should "parse empty object definition" in {
-    "object empty{}".ast(Scala.defObject) should be (Some(ObjectDecl("empty")))
+  "objectDecl" should "parse empty object definition" in {
+    "object empty{}".ast(Scala.objectDecl) should be (Some(ObjectDecl("empty")))
   }
 
-  "defObject" should "parse multiple statements" in {
+  "objectDecl" should "parse multiple statements" in {
     "import a.b.c\nobject empty{}\n".ast(Scala.main) should be (Some(
       List(Import("a.b.c"), ObjectDecl("empty"))
     ))
   }
 
-  "defObject" should "parse an empty method in an object" in {
+  "objectDecl" should "parse an empty method in an object" in {
     val expected = ObjectDecl("Main", Seq(
       MethodDecl("methodName", `Unit`, body = Some(`???`))
     ))
@@ -146,7 +146,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |object Main {
       |  def methodName: Unit = ???
       |}
-      |""".ast(Scala.defObject) should be (Some(expected))
+      |""".ast(Scala.objectDecl) should be (Some(expected))
   }
 
   "number" should "parse integer number" in {
@@ -209,7 +209,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       MethodDecl("method3", `Unit`, body = Some(`???`)),
     ))
 
-    src.ast(Scala.defObject) should be (Some(expected))
+    src.ast(Scala.objectDecl) should be (Some(expected))
   }
 
   "main" should "parse 'hello world' example without arguments in main method" in {
@@ -227,7 +227,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       ))
     ))
 
-    src.ast(Scala.defObject) should be (Some(expected))
+    src.ast(Scala.objectDecl) should be (Some(expected))
   }
 
   "main" should "parse 'hello world' example" in {
@@ -252,7 +252,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       )
     ))
 
-    src.ast(Scala.defObject) should be (Some(expected))
+    src.ast(Scala.objectDecl) should be (Some(expected))
   }
 
   "expr.op" should "parse 1 + 2" in {
