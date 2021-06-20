@@ -346,10 +346,10 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       ObjectDecl("MainApp", Seq(
         MethodDecl(
           name = "main",
-          returnType = scalaType[Unit],
+          returnType = `Unit`,
           arguments = Seq((argument[Array[String]]("args"))),
           body = Some(Multi(Seq(
-            VarDecl("a", SimpleType("Int"), Num("1")),
+            VarDecl("a", `Int`, Num("1")),
             Func("println", Seq(Ident("a")))
           ))))
       )
