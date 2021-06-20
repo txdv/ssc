@@ -73,35 +73,35 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
   }
 
-  "defMethod" should "parse simple method definition" in {
-    "def method_name: Unit = ???".ast(Scala.defMethod) should be (Some(
-      MethodDecl("method_name", `Unit`, body = Option(`???`))
+  "methodDecl" should "parse simple method definition" in {
+    "def method_name: Unit = ???".ast(Scala.methodDecl) should be (Some(
+      MethodDecl("method_name", `Unit`, body = Some(`???`))
     ))
   }
 
-  "defMethod" should "parse method with expr surrounded in { }" in {
+  "methodDecl" should "parse method with expr surrounded in { }" in {
     """
       |def method_name: Unit = {
       |  ???
-      |}""".ast(Scala.defMethod) should be (Some(
-        MethodDecl("method_name", `Unit`, body = Option(`???`))
+      |}""".ast(Scala.methodDecl) should be (Some(
+        MethodDecl("method_name", `Unit`, body = Some(`???`))
       ))
   }
 
-  "defMethod" should "parse method with arguments and types" in {
+  "methodDecl" should "parse method with arguments and types" in {
     val src = """def method1(arg1: Int, arg2: String): Unit = ???"""
-    src.ast(Scala.defMethod) should be (Some(
+    src.ast(Scala.methodDecl) should be (Some(
       MethodDecl("method1", `Unit`, Seq(
         MethodDeclArgument("arg1", `Int`),
         MethodDeclArgument("arg2", `String`),
       ),
-      body = Option(`???`))
+      body = Some(`???`))
     ))
   }
 
-  "defMethodArgument" should "parse name and type tuple" in {
+  "methodDeclArgument" should "parse name and type tuple" in {
     val expected = MethodDeclArgument("name", `Int`)
-    """name:Int""".ast(Scala.defMethodArgument) should be (Some(expected))
+    """name:Int""".ast(Scala.methodDeclArgument) should be (Some(expected))
   }
 
   "methodArguments" should "parse method with arguments and types" in {
@@ -128,25 +128,25 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     " ".ast(Scala.fidentifier) should be (None)
   }
 
-  "defObject" should "parse empty object definition" in {
-    "object empty{}".ast(Scala.defObject) should be (Some(ObjectDecl("empty")))
+  "objectDecl" should "parse empty object definition" in {
+    "object empty{}".ast(Scala.objectDecl) should be (Some(ObjectDecl("empty")))
   }
 
-  "defObject" should "parse multiple statements" in {
+  "objectDecl" should "parse multiple statements" in {
     "import a.b.c\nobject empty{}\n".ast(Scala.main) should be (Some(
       List(Import("a.b.c"), ObjectDecl("empty"))
     ))
   }
 
-  "defObject" should "parse an empty method in an object" in {
+  "objectDecl" should "parse an empty method in an object" in {
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("methodName", `Unit`, body = Option(`???`))
+      MethodDecl("methodName", `Unit`, body = Some(`???`))
     ))
     """
       |object Main {
       |  def methodName: Unit = ???
       |}
-      |""".ast(Scala.defObject) should be (Some(expected))
+      |""".ast(Scala.objectDecl) should be (Some(expected))
   }
 
   "number" should "parse integer number" in {
@@ -204,12 +204,12 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
 
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("method1", `Unit`, body = Option(`???`)),
-      MethodDecl("method2", `Unit`, body = Option(`???`)),
-      MethodDecl("method3", `Unit`, body = Option(`???`)),
+      MethodDecl("method1", `Unit`, body = Some(`???`)),
+      MethodDecl("method2", `Unit`, body = Some(`???`)),
+      MethodDecl("method3", `Unit`, body = Some(`???`)),
     ))
 
-    src.ast(Scala.defObject) should be (Some(expected))
+    src.ast(Scala.objectDecl) should be (Some(expected))
   }
 
   "main" should "parse 'hello world' example without arguments in main method" in {
@@ -222,12 +222,12 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
 
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("main", `Unit`, body = Option(
+      MethodDecl("main", `Unit`, body = Some(
         Func("println", Seq(Stri("Hello World!")))
       ))
     ))
 
-    src.ast(Scala.defObject) should be (Some(expected))
+    src.ast(Scala.objectDecl) should be (Some(expected))
   }
 
   "main" should "parse 'hello world' example" in {
@@ -246,13 +246,13 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
         name = "main",
         returnType = `Unit`,
         arguments = Seq(args),
-        body = Option(
+        body = Some(
           Func("println", Seq(Stri("Hello World!")))
         )
       )
     ))
 
-    src.ast(Scala.defObject) should be (Some(expected))
+    src.ast(Scala.objectDecl) should be (Some(expected))
   }
 
   "expr.op" should "parse 1 + 2" in {
@@ -287,5 +287,39 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     val expected = AST.If(AST.Bool(true), Num("1"), Num("2"))
     //"if (true) 1 else 2".ast(Scala.expr.ifExpr) should be (Some(expected))
     "if (true) 1 else 2".ast(Scala.expr.ifExpr) should be (Some(expected))
+  }
+
+  "varDecl" should "parser simple declaration without expression" in {
+    "val a: Int".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", Some(SimpleType("Int")), None)))
+  }
+
+  "varDecl" should "parser simple declaration with simple expression" in {
+    "val a: Int = 1".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", Some(SimpleType("Int")), Some(Num("1")))))
+  }
+
+  "varDecl" should "parse declaration without type" in {
+    "val a = 1".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", None, Some(Num("1")))))
+  }
+
+  "objectDecl" should "parse object with method containing a variable declaration" in {
+    """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          val a: Int = 1
+          println(a)
+        }
+      }
+    """.ast(Scala.main) should be (Some(Seq(
+      ObjectDecl("MainApp", Seq(
+        MethodDecl(
+          name = "main",
+          returnType = SimpleType("Unit"),
+          arguments = Seq((MethodDeclArgument("args", GenericType("Array", Seq(SimpleType("String")))))),
+          body = Some(Multi(Seq(
+            VarDecl("a", SimpleType("Int"), Num("1")),
+            Func("println", Seq(Ident("a")))
+          ))))
+      )
+    ))))
   }
 }

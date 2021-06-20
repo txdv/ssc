@@ -51,7 +51,9 @@ object ScalaCompiler {
             defMethod.name,
             signature = sig,
             access = Set(AccessFlag.Public, AccessFlag.Static),
-            code = defMethod.body.map(convertBody))
+            code = defMethod
+              .body.map(convertBody)
+              .map(_ + Code.op(Op.Return)))
         }
       },
       attributes = Seq.empty,
@@ -225,6 +227,20 @@ object ScalaCompiler {
     }
   }
 
+  def convertBody(statement: AST.Statement): Code = {
+    statement match {
+      case expr: Expr => convertBody(expr)
+      case AST.Multi(all) =>
+        val empty = Code(0, 0, Seq.empty, Seq.empty)
+        all.map(convertBody).foldLeft(empty)(_ + _)
+      case b: AST.VarDecl =>
+        println(b)
+        ???
+      case _ =>
+        ???
+    }
+  }
+
   def convertBody(expr: Expr): Code = {
     import AST._
 
@@ -250,8 +266,7 @@ object ScalaCompiler {
         genops(argExpr, Seq(
           StackFrame(offset = 3, Seq(StackElement.Type(systemOut.signature.head)))
         )) +
-        Code.op(Op.invoke(method, Op.invoke.virtual)) +
-        Code.op(Op.Return)
+        Code.op(Op.invoke(method, Op.invoke.virtual))
 
         res.addStackSize(1)
       case Ident("???") =>
@@ -262,7 +277,6 @@ object ScalaCompiler {
         Code.ops(Seq(
           Op.getstatic(FieldRef(predef, "MODULE$", Seq(predef))),
           Op.invoke(method, Op.invoke.virtual),
-          Op.Return,
         )).copy(localsCount = 1, stackSize = 1)
     }
   }
@@ -367,6 +381,7 @@ object ScalaCompiler {
     }
 
     def load(): Seq[Int] = {
+    /*
       try {
         val bytes = Files.readAllBytes(path)
         val bb = ByteBuffer.wrap(bytes)
@@ -375,6 +390,8 @@ object ScalaCompiler {
         case _: java.nio.file.NoSuchFileException =>
           Seq.empty
       }
+    */
+      Seq.empty
     }
   }
 
