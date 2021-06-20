@@ -10,6 +10,8 @@ import flatspec._
 import matchers._
 import AST._
 
+import scala.reflect.ClassTag
+
 object Helper {
   implicit class StringOps(val string: String) {
     def ast[A](parser: Parser[A], debug: Boolean = false): Option[A] = Util.check {
@@ -316,7 +318,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     }
   }
 
-  def argument[T](name: String)(implicit classTag: scala.reflect.ClassTag[T]): MethodDeclArgument = {
+  def argument[T : ClassTag](name: String): MethodDeclArgument = {
     MethodDeclArgument(name, scalaType[T])
   }
 
