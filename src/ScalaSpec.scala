@@ -301,6 +301,37 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     "val a = 1".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", None, Some(Num("1")))))
   }
 
+  def scalaType[T](implicit classTag: scala.reflect.ClassTag[T]): ScalaType = {
+    classTag.runtimeClass.getTypeName match {
+      case "java.lang.String[]" =>
+        GenericType("Array", Seq(SimpleType("String")))
+      case "int" =>
+        SimpleType("Int")
+      case "void" =>
+        SimpleType("Unit")
+      case a =>
+        println(a)
+        // todo: investigate weird type resolution bug
+        ???.asInstanceOf[Nothing]
+    }
+  }
+
+  def argument[T](name: String)(implicit classTag: scala.reflect.ClassTag[T]): MethodDeclArgument = {
+    MethodDeclArgument(name, scalaType[T])
+  }
+
+  def expr[T](value: T): Expr = {
+    value match {
+      case i: Int =>
+        Num(i.toString)
+      case _ => ???
+    }
+  }
+
+  def varDecl[T](name: String, value: T)(implicit classTag: scala.reflect.ClassTag[T]): VarDecl = {
+    VarDecl(name, scalaType[T], expr(value))
+  }
+
   "objectDecl" should "parse object with method containing a variable declaration" in {
     """
       object MainApp {
@@ -313,8 +344,8 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       ObjectDecl("MainApp", Seq(
         MethodDecl(
           name = "main",
-          returnType = SimpleType("Unit"),
-          arguments = Seq((MethodDeclArgument("args", GenericType("Array", Seq(SimpleType("String")))))),
+          returnType = scalaType[Unit],
+          arguments = Seq((argument[Array[String]]("args"))),
           body = Some(Multi(Seq(
             VarDecl("a", SimpleType("Int"), Num("1")),
             Func("println", Seq(Ident("a")))
