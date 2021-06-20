@@ -156,9 +156,9 @@ object Scala {
     many(objectStatement)
 
   lazy val objectStatement =
-    defMethod
+    methodDecl
 
-  val defMethodArgument: Parser[MethodDeclArgument] = for {
+  val methodDeclArgument: Parser[MethodDeclArgument] = for {
     name <- identifier
     _ <- `:`
     argumentType <- typeDef
@@ -166,7 +166,7 @@ object Scala {
 
   val methodArgumentsGroup: Parser[Seq[MethodDeclArgument]] = for {
     _ <- `(`
-    args <- sepBy(defMethodArgument, `,`)
+    args <- sepBy(methodDeclArgument, `,`)
     _ <- `)`
   } yield args
 
@@ -174,7 +174,7 @@ object Scala {
     args <- one(methodArgumentsGroup)
   } yield args.getOrElse(Seq.empty)
 
-  lazy val defMethod: Parser[MethodDecl] = for {
+  lazy val methodDecl: Parser[MethodDecl] = for {
     _ <- identifierWithName("def")
     name <- identifier
     arguments <- methodArguments
