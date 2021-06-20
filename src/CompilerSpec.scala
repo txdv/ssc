@@ -197,4 +197,16 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     """ } should be ("1\n2\n")
 
   }
+
+  "Compiler" should "method with variable" in {
+    compileAndRun { """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          val a: Int = 1
+          println(a)
+        }
+      }
+    """ } should be ("1\n2\n")
+
+  }
 }
