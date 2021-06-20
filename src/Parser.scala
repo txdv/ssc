@@ -6,14 +6,14 @@ import scala.reflect.ClassTag
 import ssc.lexer.{Lexer, LexerToken}
 import ssc.lexer.LexerToken._
 
-case class Parser[A](run: List[LexerToken] => List[(A, List[LexerToken])]){
+case class Parser[+A](run: List[LexerToken] => List[(A, List[LexerToken])]){
   val t: List[LexerToken] => List[(A, List[LexerToken])] = { input =>
     val output = run(input)
     //println(s"$input -> $output")
     output
   }
   
-  def +++(b: Parser[A]): Parser[A] = Parser[A](cs => t(cs) ++ b.t(cs) match {
+  def +++(b: Any): Parser[A] = Parser[A](cs => t(cs) ++ b.asInstanceOf[Parser[A]].t(cs) match {
     case Nil => Nil
     case x :: _ => List(x)
   })

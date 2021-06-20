@@ -227,14 +227,24 @@ object ScalaCompiler {
     }
   }
 
+  def convertBody(statement: AST.Statement): Code = {
+    statement match {
+      case expr: Expr => convertBody(expr)
+      case AST.Multi(all) =>
+        val empty = Code(0, 0, Seq.empty, Seq.empty)
+        all.map(convertBody).foldLeft(empty)(_ + _)
+      case b: AST.VarDecl =>
+        println(b)
+        ???
+      case _ =>
+        ???
+    }
+  }
+
   def convertBody(expr: Expr): Code = {
     import AST._
 
     expr match {
-      case Multi(all) =>
-        val empty = Code(0, 0, Seq.empty, Seq.empty)
-        all.map(convertBody).foldLeft(empty)(_ + _)
-
       case Func("println", Seq(arg)) =>
         val printStream = JavaType.Class("java/io/PrintStream")
 
