@@ -73,24 +73,24 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
   }
 
-  "defMethod" should "parse simple method definition" in {
-    "def method_name: Unit = ???".ast(Scala.defMethod) should be (Some(
+  "methodDecl" should "parse simple method definition" in {
+    "def method_name: Unit = ???".ast(Scala.methodDecl) should be (Some(
       MethodDecl("method_name", `Unit`, body = Some(`???`))
     ))
   }
 
-  "defMethod" should "parse method with expr surrounded in { }" in {
+  "methodDecl" should "parse method with expr surrounded in { }" in {
     """
       |def method_name: Unit = {
       |  ???
-      |}""".ast(Scala.defMethod) should be (Some(
+      |}""".ast(Scala.methodDecl) should be (Some(
         MethodDecl("method_name", `Unit`, body = Some(`???`))
       ))
   }
 
-  "defMethod" should "parse method with arguments and types" in {
+  "methodDecl" should "parse method with arguments and types" in {
     val src = """def method1(arg1: Int, arg2: String): Unit = ???"""
-    src.ast(Scala.defMethod) should be (Some(
+    src.ast(Scala.methodDecl) should be (Some(
       MethodDecl("method1", `Unit`, Seq(
         MethodDeclArgument("arg1", `Int`),
         MethodDeclArgument("arg2", `String`),
@@ -99,9 +99,9 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
     ))
   }
 
-  "defMethodArgument" should "parse name and type tuple" in {
+  "methodDeclArgument" should "parse name and type tuple" in {
     val expected = MethodDeclArgument("name", `Int`)
-    """name:Int""".ast(Scala.defMethodArgument) should be (Some(expected))
+    """name:Int""".ast(Scala.methodDeclArgument) should be (Some(expected))
   }
 
   "methodArguments" should "parse method with arguments and types" in {
@@ -299,5 +299,27 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
   "varDecl" should "parse declaration without type" in {
     "val a = 1".ast(Scala.varDecl) should be (Some(AST.VarDecl("a", None, Some(Num("1")))))
+  }
+
+  "objectDecl" should "parse object with method containing a variable declaration" in {
+    """
+      object MainApp {
+        def main(args: Array[String]): Unit = {
+          val a: Int = 1
+          println(a)
+        }
+      }
+    """.ast(Scala.main) should be (Some(Seq(
+      ObjectDecl("MainApp", Seq(
+        MethodDecl(
+          name = "main",
+          returnType = SimpleType("Unit"),
+          arguments = Seq((MethodDeclArgument("args", GenericType("Array", Seq(SimpleType("String")))))),
+          body = Some(Multi(Seq(
+            VarDecl("a", SimpleType("Int"), Num("1")),
+            Func("println", Seq(Ident("a")))
+          ))))
+      )
+    ))))
   }
 }

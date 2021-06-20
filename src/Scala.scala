@@ -23,6 +23,12 @@ object AST {
 
   case class VarDecl(name: String, scalaType: Option[ScalaType], expr: Option[Expr]) extends Statement
 
+  case object VarDecl {
+    def apply(name: String, scalaType: ScalaType, expr: Expr): VarDecl =
+      VarDecl(name, Some(scalaType), Some(expr))
+
+  }
+
   case class MethodDecl(
     name: String,
     returnType: ScalaType,

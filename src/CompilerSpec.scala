@@ -197,7 +197,7 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     """ } should be ("1\n2\n")
 
   }
-
+/*
   "Compiler" should "method with variable" in {
     compileAndRun { """
       object MainApp {
@@ -207,6 +207,6 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
         }
       }
     """ } should be ("1\n2\n")
-
   }
+*/
 }

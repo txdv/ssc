@@ -13,10 +13,15 @@ case class Parser[+A](run: List[LexerToken] => List[(A, List[LexerToken])]){
     output
   }
   
-  def +++(b: Any): Parser[A] = Parser[A](cs => t(cs) ++ b.asInstanceOf[Parser[A]].t(cs) match {
-    case Nil => Nil
-    case x :: _ => List(x)
-  })
+  def +++(other: Any): Parser[A] = {
+    other match {
+      case b: Parser[A] =>
+        Parser[A](cs => t(cs) ++ b.asInstanceOf[Parser[A]].t(cs) match {
+          case Nil => Nil
+          case x :: _ => List(x)
+        })
+    }
+  }
 }
 
 object Parser {
