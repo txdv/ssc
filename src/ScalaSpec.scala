@@ -75,7 +75,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
   "defMethod" should "parse simple method definition" in {
     "def method_name: Unit = ???".ast(Scala.defMethod) should be (Some(
-      MethodDecl("method_name", `Unit`, body = Seq(`???`))
+      MethodDecl("method_name", `Unit`, body = Some(`???`))
     ))
   }
 
@@ -84,7 +84,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |def method_name: Unit = {
       |  ???
       |}""".ast(Scala.defMethod) should be (Some(
-        MethodDecl("method_name", `Unit`, body = Seq(`???`))
+        MethodDecl("method_name", `Unit`, body = Some(`???`))
       ))
   }
 
@@ -95,7 +95,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
         MethodDeclArgument("arg1", `Int`),
         MethodDeclArgument("arg2", `String`),
       ),
-      body = Seq(`???`))
+      body = Some(`???`))
     ))
   }
 
@@ -140,7 +140,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
 
   "defObject" should "parse an empty method in an object" in {
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("methodName", `Unit`, body = Seq(`???`))
+      MethodDecl("methodName", `Unit`, body = Some(`???`))
     ))
     """
       |object Main {
@@ -204,9 +204,9 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
 
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("method1", `Unit`, body = Seq(`???`)),
-      MethodDecl("method2", `Unit`, body = Seq(`???`)),
-      MethodDecl("method3", `Unit`, body = Seq(`???`)),
+      MethodDecl("method1", `Unit`, body = Some(`???`)),
+      MethodDecl("method2", `Unit`, body = Some(`???`)),
+      MethodDecl("method3", `Unit`, body = Some(`???`)),
     ))
 
     src.ast(Scala.defObject) should be (Some(expected))
@@ -222,7 +222,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
       |"""
 
     val expected = ObjectDecl("Main", Seq(
-      MethodDecl("main", `Unit`, body = Seq(
+      MethodDecl("main", `Unit`, body = Some(
         Func("println", Seq(Stri("Hello World!")))
       ))
     ))
@@ -246,7 +246,7 @@ class ScalaSpec extends AnyFlatSpec with should.Matchers {
         name = "main",
         returnType = `Unit`,
         arguments = Seq(args),
-        body = Seq(
+        body = Some(
           Func("println", Seq(Stri("Hello World!")))
         )
       )
