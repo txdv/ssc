@@ -236,7 +236,7 @@ object Scala {
       args <- one(expressionGroup)
     } yield {
       args.map { args =>
-        Func(fullname.asInstanceOf[Ident].name, args)
+        Func(fullname.name, args)
       } getOrElse {
         fullname
       }
@@ -250,7 +250,7 @@ object Scala {
       left <- all
       _ <- token(sat(LexerToken.Else))
       right <- all
-    } yield If(cond, left, right).asInstanceOf[Expr]
+    } yield If(cond, left, right)
 
     val expressionGroup = for {
       _ <- `(`
@@ -298,9 +298,7 @@ object Scala {
   }
 
   val statement: Parser[AST] =
-    `import`.asInstanceOf[Parser[AST]] +++
-    defObject.asInstanceOf[Parser[AST]] +++
-    varDecl.asInstanceOf[Parser[AST]]
+    `import` +++ defObject +++ varDecl
 
 
   val main: Parser[List[AST]] = many(token(statement))
