@@ -164,3 +164,10 @@ scala_binary(
     deps = [":class", ":pretty_print"],
     scalacopts = fatal_warnings(),
     main_class = "ssc.classfile.types.runtime.Types")
+
+scala_binary(
+    name = "jar",
+    srcs = ["Jar.scala"],
+    deps = [":classfile"],
+    scalacopts = fatal_warnings(),
+    main_class = "ssc.jar.MainApp")
