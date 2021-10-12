@@ -165,9 +165,19 @@ scala_binary(
     scalacopts = fatal_warnings(),
     main_class = "ssc.classfile.types.runtime.Types")
 
+scala_library(
+    name = "scalap",
+    exports = ["@maven//:org_json4s_json4s_scalap_2_13_4_0_3"],
+)
+
+scala_library(
+    name = "hex",
+    srcs = ["Hex.scala"],
+)
+
 scala_binary(
     name = "jar",
     srcs = ["Jar.scala"],
-    deps = [":classfile"],
+    deps = [":classfile", ":scalap", ":hex"],
     scalacopts = fatal_warnings(),
     main_class = "ssc.jar.MainApp")

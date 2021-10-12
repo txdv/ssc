@@ -61,6 +61,7 @@ maven_install(
         "org.specs2:specs2-fp_2.13:jar:4.11.0",
         "org.mockito:mockito-core:jar:3.9.0",
         "org.hamcrest:hamcrest-all:jar:1.3",
+        "org.json4s:json4s-scalap_2.13:jar:4.0.3",
     ],
     repositories = [
         "https://jcenter.bintray.com/",

@@ -167,7 +167,12 @@ case class MethodInfo(
   }
 }
 
-case class AttributeInfo(name: Int, info: Array[Byte])
+case class AttributeInfo(name: Int, info: Array[Byte]) {
+  def getName(implicit classFile: ClassFile): String = {
+    classFile.constants(name - 1).asInstanceOf[Utf8].string
+
+  }
+}
 case class FieldInfo(accessFlags: Int, name: Int, descriptor: Int, attributes: Seq[AttributeInfo])
 
 object ClassFile {
