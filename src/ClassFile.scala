@@ -5,7 +5,31 @@ import java.nio.ByteBuffer
 
 case class Version(minor: Int, major: Int)
 
-sealed trait Constant
+sealed trait Constant {
+  import Constant._
+
+  def value(classFile: ClassFile): String = {
+    this match {
+      case MethodHandle(refKind, refIndex) =>
+        s"MethodHandle($refKind, ${classFile.const(refIndex).value(classFile)})"
+      case MethodType(idx) =>
+        s"MethodType(${classFile.const(idx).value(classFile)})"
+      case utf8: Utf8 =>
+        s""""${utf8.string}""""
+      case InterfaceMethodRef(klass, nameType) =>
+        s"InterfaceMethodRef(${classFile.const(klass).value(classFile)}, ${classFile.const(nameType).value(classFile)})"
+      case NameAndType(index, descriptor) =>
+        s"NameAndType(${classFile.const(index).value(classFile)}, ${classFile.const(descriptor).value(classFile)})"
+      case Class(name) =>
+        classFile.const(name).value(classFile)
+      case MethodRef(klass, nameType) =>
+        s"MethodRef(${classFile.const(klass).value(classFile)}, ${classFile.const(nameType).value(classFile)})"
+      case o =>
+        o.toString
+    }
+  }
+
+}
 
 object Constant {
   case class Class(name: Int) extends Constant {
@@ -40,7 +64,14 @@ object Constant {
       classFile.constAs[NameAndType](nameType)
     }
   }
-  case class Utf8(string: String) extends Constant
+  case class Utf8(bytes: Array[Byte]) extends Constant {
+    def string: String = new String(bytes)
+
+    override def toString: String = {
+      "Utf8(\"" + string + "\")"
+    }
+  }
+
   case class NameAndType(index: Int, descriptor: Int) extends Constant {
     def stringName(implicit classFile: ClassFile): String = {
       classFile.string(index)
@@ -48,6 +79,10 @@ object Constant {
 
     def stringType(implicit classFile: ClassFile): String = {
       classFile.string(descriptor)
+    }
+
+    def string(implicit classFile: ClassFile): String = {
+      s""""${stringName}":${stringType}"""
     }
   }
   //  3 0x03
@@ -61,7 +96,33 @@ object Constant {
   //  8 0x08
   case class ConstString(index: Int) extends Constant
   // 15 0x0F
-  case class MethodHandle(refKind: Byte, refIndex: Int) extends Constant
+  case class MethodHandle(refKind: RefKind, refIndex: Int) extends Constant
+
+  sealed trait RefKind
+  object RefKind {
+    case object GetField extends RefKind
+    case object GetStatic extends RefKind
+    case object PutField extends RefKind
+    case object PutStatic extends RefKind
+    case object InvokeVirtual extends RefKind
+    case object InvokeStatic extends RefKind
+    case object InvokeSpecial extends RefKind
+    case object NewInvokeSpecial extends RefKind
+    case object InvokeInterface extends RefKind
+
+    def apply(value: Int): RefKind = value match {
+      case 1 => GetField
+      case 2 => GetStatic
+      case 3 => PutField
+      case 4 => PutStatic
+      case 5 => InvokeVirtual
+      case 6 => InvokeStatic
+      case 7 => InvokeSpecial
+      case 8 => NewInvokeSpecial
+      case 9 => InvokeInterface
+    }
+  }
+
   // 16 0x10
   case class MethodType(descriptorIndex: Int) extends Constant
   case class InvokeDynamic(methodIndex: Short, nameTypeIndex: Int) extends Constant
@@ -84,7 +145,11 @@ case class ClassFile(
   attributes: Seq[AttributeInfo]) {
 
   def string(index: Int): String = {
-    const(index).asInstanceOf[Utf8].string
+    utf8(index).string
+  }
+
+  def utf8(index: Int): Utf8 = {
+    const(index).asInstanceOf[Utf8]
   }
 
   def klass(index: Int): Class = {
@@ -95,6 +160,11 @@ case class ClassFile(
     string(klass(index).name)
   }
 
+  def nameAndType(index: Int): NameAndType = {
+    const(index).asInstanceOf[NameAndType]
+  }
+
+  /*
   def nameAndType(index: Int): String = {
     val nt = const(index).asInstanceOf[NameAndType]
     nameAndType(nt)
@@ -105,6 +175,7 @@ case class ClassFile(
     val NameAndType(a, b) = nt
     s""""${string(a)}":${string(b)}"""
   }
+  */
 
   def const(index: Int): Constant = {
     constants(index - 1)
@@ -116,8 +187,8 @@ case class ClassFile(
 
   def get(index: Int): String = {
     const(index) match {
-      case Utf8(value) =>
-        value
+      case utf8: Utf8 =>
+        utf8.string
       case Class(index) =>
         get(index)
       case MethodRef(klass, nameType) =>
@@ -170,9 +241,170 @@ case class MethodInfo(
 case class AttributeInfo(name: Int, info: Array[Byte]) {
   def getName(implicit classFile: ClassFile): String = {
     classFile.constants(name - 1).asInstanceOf[Utf8].string
+  }
 
+}
+
+sealed trait ClassAttribute
+
+object ClassAttribute {
+
+  case class RuntimeVisibileAnnotations(annotations: Seq[RuntimeVisibileAnnotation]) extends ClassAttribute
+
+  case class RuntimeVisibileAnnotation(annotationType: String, fields: Seq[RuntimeVisibileAnnotation.Field])
+
+  object RuntimeVisibileAnnotation {
+    sealed trait Field
+    case class Str(name: String, content: Array[Byte]) extends Field
+    case class Enum(enumType: String, value: String) extends Field
+    case class Arr(fields: Seq[RuntimeVisibileAnnotation.Field]) extends Field
+  }
+
+  case class Signature(name: String) extends ClassAttribute
+
+  case class SourceFile(name: String) extends ClassAttribute
+
+  case object Scala extends ClassAttribute
+
+  case class Info(name: String, info: Array[Byte]) extends ClassAttribute
+
+  case class EnclosingMethod(klassName: String, method: Option[EnclosingMethod.Info]) extends ClassAttribute
+
+  object EnclosingMethod {
+    case class Info(name: String, methodType: String)
+  }
+
+  case class InnerClasses(classes: Seq[InnerClass]) extends ClassAttribute
+
+  sealed trait InnerClass {
+    val name: String
+  }
+
+  case class InnerClassRef(name: String, outer: String, outerName: String) extends InnerClass
+  case class InnerClassSimple(name: String) extends InnerClass
+
+  // TODO: type out with better types
+  case class BootstrapMethods(methods: Seq[BootstrapMethod]) extends ClassAttribute
+  case class BootstrapMethod(index: Int, values: Seq[Short])
+
+  def apply(attributeInfo: AttributeInfo)(implicit classFile: ClassFile): ClassAttribute = {
+    val info = attributeInfo.info
+    val bb = ByteBuffer.wrap(info)
+
+    attributeInfo.getName match {
+      case "RuntimeVisibleAnnotations" =>
+        val annotations = bb.getShort
+
+        val result = (1 to annotations).map { _ =>
+          val typeIndex = bb.getShort
+          val annotationType = classFile.string(typeIndex)
+
+          val numElementValuePairs = bb.getShort
+
+          val fields = (1 to numElementValuePairs).map { _ =>
+            val elementName = classFile.string(bb.getShort)
+            parseElementValue(elementName, bb)
+          }
+
+          RuntimeVisibileAnnotation(annotationType, fields)
+        }
+
+        RuntimeVisibileAnnotations(result)
+      case "Signature" =>
+        ClassAttribute.Signature(classFile.string(bb.getShort))
+      case "SourceFile" =>
+        ClassAttribute.SourceFile(classFile.string(bb.getShort))
+      case "Scala" =>
+        Scala
+      case "EnclosingMethod" =>
+        val klassIndex = bb.getShort
+        val klass = classFile.klass(klassIndex).stringName
+        val methodIndex = bb.getShort
+
+        val methodInfo =
+          if (methodIndex == 0) {
+            Option.empty
+          } else {
+            val method = classFile.nameAndType(methodIndex)
+            Some(EnclosingMethod.Info(method.stringName, method.stringType))
+          }
+
+        EnclosingMethod(klass, methodInfo)
+
+      case "InnerClasses" =>
+        val numberOfClasses = bb.getShort
+        //println(s"InnerClasses: $numberOfClasses")
+
+        val klasses = (1 to numberOfClasses).map { _ =>
+          val innerClassInfoIndex = bb.getShort
+          val outerClassInfoIndex = bb.getShort
+          val innerNameIndex = bb.getShort
+          val innerClassAccessFlags = bb.getShort
+
+          val innerClass = classFile.klass(innerClassInfoIndex).stringName
+
+          if (outerClassInfoIndex == 0 && innerNameIndex == 0) {
+            InnerClassSimple(innerClass)
+          } else if (outerClassInfoIndex != 0 && innerNameIndex != 0) {
+            val outerClass = classFile.klass(outerClassInfoIndex).stringName
+            val innerName = classFile.string(innerNameIndex)
+            InnerClassRef(innerClass, outerClass, innerName)
+          } else if (outerClassInfoIndex == 0 && innerNameIndex != 0) {
+            InnerClassSimple(innerClass)
+          } else {
+            println(s"outer: $outerClassInfoIndex inner: $innerNameIndex")
+            ???
+          }
+
+        }
+
+        InnerClasses(klasses)
+        //Info("InnerClasses", attributeInfo.info)
+      case "BootstrapMethods" =>
+        val numBootstrapMethods = bb.getShort
+        //println(s"numBootstrapMethods: $numBootstrapMethods")
+
+        val methods = (1 to numBootstrapMethods).map { _ =>
+          val bootstrapMethodRef = bb.getShort
+          //println(classFile.const(bootstrapMethodRef).value(classFile))
+          val numBootstrapArguments = bb.getShort
+          val bootstrapArguments = (1 to numBootstrapArguments).map { _ => bb.getShort }
+          //println(s"bootstrapArguments: $bootstrapArguments")
+          //println(s"bootstrapArguments: ${bootstrapArguments.map(a => classFile.const(a).value(classFile))}")
+
+          BootstrapMethod(bootstrapMethodRef, bootstrapArguments)
+        }
+        BootstrapMethods(methods)
+      case name =>
+        Info(name, attributeInfo.info)
+    }
+  }
+
+  def parseElementValue(elementName: String, bb: ByteBuffer)(implicit classFile: ClassFile): RuntimeVisibileAnnotation.Field = {
+
+    val tag = bb.get.toChar
+    tag match {
+      case 's' =>
+        val index = bb.getShort
+        val content = classFile.utf8(index).bytes
+        RuntimeVisibileAnnotation.Str(elementName, content)
+      case 'e' =>
+        val typeNameIndex = bb.getShort
+        val constNameIndex = bb.getShort
+        RuntimeVisibileAnnotation.Enum(classFile.string(typeNameIndex), classFile.string(constNameIndex))
+      case '[' =>
+        val num = bb.getShort
+        val arr = (1 to num).map { _ =>
+          parseElementValue(elementName, bb)
+        }
+        RuntimeVisibileAnnotation.Arr(arr)
+      case _ =>
+        println(tag)
+        ???
+    }
   }
 }
+
 case class FieldInfo(accessFlags: Int, name: Int, descriptor: Int, attributes: Seq[AttributeInfo])
 
 object ClassFile {
@@ -269,7 +501,7 @@ object ClassFile {
         val length = bb.getShort & 0xffff
         val bytes = new Array[Byte](length)
         bb.get(bytes)
-        Utf8(new String(bytes))
+        Utf8(bytes)
       }
       case 0x03 => ConstInteger(bb.getInt)
       case 0x04 => ConstFloat(bb.getFloat)
@@ -283,7 +515,7 @@ object ClassFile {
       case 0x0C => {
         NameAndType(bb.getShort, bb.getShort)
       }
-      case 0x0F => MethodHandle(bb.get, bb.getShort)
+      case 0x0F => MethodHandle(RefKind(bb.get), bb.getShort)
       case 0x10 => MethodType(bb.getShort)
       case 0x12 => InvokeDynamic(bb.getShort, bb.getShort)
       case 0x13 => Module(bb.getShort)

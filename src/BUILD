@@ -167,7 +167,8 @@ scala_binary(
 
 scala_library(
     name = "scalap",
-    exports = ["@maven//:org_json4s_json4s_scalap_2_13_4_0_3"],
+    exports = ["//json4s/scalap/src/main/scala/org/json4s/scalap"],
+    #exports = ["@maven//:org_json4s_json4s_scalap_2_13_4_0_3"],
 )
 
 scala_library(

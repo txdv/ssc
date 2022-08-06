@@ -4,7 +4,7 @@ import ssc.Hex
 import java.util.zip.{ZipFile, ZipEntry}
 import java.util.concurrent.Executors
 import scala.collection.JavaConverters._
-import ssc.classfile.{ClassFile, Constant}
+import ssc.classfile.{ClassFile, Constant, ClassAttribute}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 
@@ -13,8 +13,12 @@ object Jar {
 
   def unzip(filepath: String): Seq[File] = {
     val zip = new ZipFile(filepath)
-    zip.entries.asScala.toSeq.flatMap { entry =>
-      handleEntry(zip, entry)
+    try {
+      zip.entries.asScala.toSeq.flatMap { entry =>
+        handleEntry(zip, entry)
+      }
+    } finally {
+      zip.close
     }
   }
 
@@ -49,14 +53,19 @@ object MainApp {
       string
     }
   }
-  
 
   //val filePool = Executors.newFixedThreadPool(48)
   def main(args: Array[String]): Unit = {
     //val tp = Executors.newFixedThreadPool(24)
     //implicit val ec = ExecutionContext.fromExecutor(tp)
 
-    handle(args.head)
+    args.toSeq match {
+      case Seq(jarFile, classFile) =>
+        handleJar(jarFile, classFile)
+      case Seq(jarFile) =>
+        //handleOld(jarFile)
+        handleJar(jarFile)
+    }
 
     //Await.result(Future.sequence(futures), 60.seconds)
     //tp.shutdown()
@@ -64,33 +73,102 @@ object MainApp {
   }
 
 
-  def handle(path: String): Unit = {
+  def handleJar(path: String, file: String): Unit = {
+    val files = Jar.unzip(path)
+
+    files.filter(_.name == file).foreach { file =>
+      implicit val f = ClassFile.parse(file.content)
+
+      findVRA
+    }
+  }
+
+  def handleJar(path: String): Unit = {
+    Jar.unzip(path).filter(_.name.endsWith(".class")).foreach { file =>
+      println()
+      println(file.name)
+      implicit val f = ClassFile.parse(file.content)
+      findVRA
+    }
+  }
+
+  private def findVRA(implicit classFile: ClassFile): Option[Int] = {
+    /*classFile.attributes.find { _.getName == "RuntimeVisibleAnnotations" }.map { rva =>
+      ClassAttribute(rva)
+    }*/
+    classFile.attributes.map(a => ClassAttribute(a)).foreach { ca =>
+      ca match {
+        case ClassAttribute.Info(name, content) =>
+          println(name + " " + Hex.format(content))
+        case ClassAttribute.RuntimeVisibileAnnotations(annotations) =>
+          annotations.foreach { annotation =>
+            println(annotation.annotationType)
+            annotation.fields.foreach {
+              case ClassAttribute.RuntimeVisibileAnnotation.Str(name, content) =>
+                println(Hex.format(content))
+              case _ =>
+            }
+
+          }
+        case o =>
+          //println(o)
+      }
+    }
+
+    Option.empty
+  }
+
+  def handleOld(path: String): Unit = {
     val files = Jar.unzip(path)
 
     val classFiles = files.filter(_.name.endsWith(".class"))
-
     val classFileNames = classFiles.map(classFile => removeSuffix(classFile.name, ".class"))
     //classFileNames.foreach(println)
 
     val t = classFiles.filter(_.name.endsWith("Array.class"))
 
+    import org.json4s.scalap.scalasig.{ByteCode, ScalaSigAttributeParsers, ScalaSigParser, ClassFileParser}
+    import org.json4s.scalap.ByteCodecs
+
     t.foreach { file =>
+      println {
+        val classFile = ClassFileParser.parse(ByteCode(file.content))
+        ScalaSigParser.scalaSigFromAnnotation(classFile)
+      }
+
       val f = ClassFile.parse(file.content)
       implicit val classFile = f
       val thisClass = f.constants(f.thisClass - 1).asInstanceOf[Constant.Class].stringName
       //val thisClass = f.constants(0)
       //println(s"$thisClass method count: ${f.methods.size}")
+
       f.constants.zipWithIndex.foreach { case (constant, i) =>
         val idx = i + 1
         println(s"#$idx: $constant")
       }
-      f.methods.foreach { method =>
-        //println(s"  ${method.getName} ${method.getDescriptor}")
-      }
+
+      println("HERE:")
+      val scalaSig = f.constants(8).asInstanceOf[Constant.Utf8].bytes
+      println(scalaSig.length)
+
+      val length = ByteCodecs.decode(scalaSig)
+      val result = ScalaSigAttributeParsers.parse(ByteCode(scalaSig.take(length)))
+      println(result)
+
+      //val parser = ScalaSigAttributeParsers.parse(ByteCode(scalaSig))
+
+      //println(parser)
+
+
+      /*f.methods.foreach { method =>
+        println(s"  ${method.getName} ${method.getDescriptor}")
+      }*/
 
       f.attributes.foreach { attribute =>
         val name = attribute.getName
-        println(s"$name 0x${Hex.encode(attribute.info)}")
+        println(s"$name ${attribute.info.length} 0x${Hex.encode(attribute.info)}")
+        println(attribute)
+        println(attribute.info.length)
       }
     }
   }

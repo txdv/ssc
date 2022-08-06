@@ -71,8 +71,8 @@ object ClassFileApp extends App {
         s"#$i"
       case NameAndType(index, descriptor) =>
         s"#$index:#$descriptor"
-      case Utf8(str) =>
-        str
+      case utf8: Utf8 =>
+        utf8.string
       case _ =>
         c.toString
     }
@@ -91,7 +91,7 @@ object ClassFileApp extends App {
         val value = string(index)
         Some("// ").map(_ + value)
       case n: NameAndType =>
-        val value = nameAndType(n)
+        val value = n.string(classFile)
         Some("// ").map(_ + value)
       case _ =>
         None
