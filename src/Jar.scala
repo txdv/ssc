@@ -96,10 +96,46 @@ object MainApp {
     /*classFile.attributes.find { _.getName == "RuntimeVisibleAnnotations" }.map { rva =>
       ClassAttribute(rva)
     }*/
+    val attributes = classFile.attributes.map(a => ClassAttribute(a))
+
+    attributes.foreach {
+      case ClassAttribute.RuntimeVisibileAnnotations(annotations) =>
+        import ClassAttribute.RuntimeVisibileAnnotation
+        import ClassAttribute.RuntimeVisibileAnnotation.Str
+
+        annotations.foreach {
+          case RuntimeVisibileAnnotation("Lscala/reflect/ScalaSignature;", Seq(Str("bytes", scalaSig))) =>
+            import org.json4s.scalap.scalasig.{ByteCode, ScalaSigAttributeParsers, ScalaSigParser, ClassFileParser}
+            import org.json4s.scalap.scalasig._
+            import org.json4s.scalap.ByteCodecs
+            val length = ByteCodecs.decode(scalaSig)
+            val result = ScalaSigAttributeParsers.parse(ByteCode(scalaSig.take(length)))
+
+            (0 until result.table.size).map { i =>
+              result.parseEntry(i) match {
+                case classSymbol: ClassSymbol =>
+                  println(s"$i: classSymbol")
+                case o =>
+                  println(s"$i: $o")
+              }
+            }
+            //println(result.getClass)
+            //println(result)
+        }
+        /*
+        annotations.find(_.annotationType == "Lscala/reflect/ScalaSignature;").foreach {
+          case Seq(Str("bytes", value)) =>
+            println(value)
+
+        }*/
+      case _ =>
+    }
+
     classFile.attributes.map(a => ClassAttribute(a)).foreach { ca =>
       ca match {
         case ClassAttribute.Info(name, content) =>
           println(name + " " + Hex.format(content))
+        /*
         case ClassAttribute.RuntimeVisibileAnnotations(annotations) =>
           annotations.foreach { annotation =>
             println(annotation.annotationType)
@@ -110,6 +146,7 @@ object MainApp {
             }
 
           }
+        */
         case o =>
           //println(o)
       }

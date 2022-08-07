@@ -287,6 +287,42 @@ object ClassAttribute {
   case class BootstrapMethods(methods: Seq[BootstrapMethod]) extends ClassAttribute
   case class BootstrapMethod(index: Int, values: Seq[Short])
 
+  case class ScalaSig(major: Int, minor: Int) extends ClassAttribute
+
+  case class ScalaInlineInfo(version: Int, traitImpl: Option[String], sam: Option[Sam], methods: Seq[InlineMethod]) extends ClassAttribute
+
+  case class Sam(name: String, descriptor: String) extends ClassAttribute
+
+  case class InlineMethod(name: String, descriptor: String, flags: Set[InlineMethodFlag])
+
+  sealed trait InlineMethodFlag
+
+  object InlineMethodFlag {
+    case object Final extends InlineMethodFlag
+    case object StaticImpl extends InlineMethodFlag
+    case object HasInlineAnnotation extends InlineMethodFlag
+    case object HasNoInlineAnnotation extends InlineMethodFlag
+
+    def from(flags: Byte): Set[InlineMethodFlag] = {
+      val isFinal = (flags & (1 << 0)) > 0
+      val hasStaticImpl = (flags & (1 << 1)) > 0
+      val hasInlineAnnotation = (flags & ( 1 << 2)) > 0
+      val hasNoInlineAnnotation = (flags & ( 1 << 2)) > 0
+
+      from(isFinal, hasStaticImpl, hasInlineAnnotation, hasNoInlineAnnotation)
+    }
+
+    def from(isFinal: Boolean, hasStaticImpl: Boolean, hasInlineAnnotation: Boolean, hasNoInlineAnnotation: Boolean): Set[InlineMethodFlag] = {
+      Set.empty ++
+        (if (isFinal) Option(Final) else Option.empty) ++
+        (if (hasStaticImpl) Option(StaticImpl) else Option.empty) ++
+        (if (hasInlineAnnotation) Option(HasInlineAnnotation) else Option.empty) ++
+        (if (hasNoInlineAnnotation) Option(HasNoInlineAnnotation) else Option.empty)
+    }
+  }
+
+  case object Deprecated extends ClassAttribute
+
   def apply(attributeInfo: AttributeInfo)(implicit classFile: ClassFile): ClassAttribute = {
     val info = attributeInfo.info
     val bb = ByteBuffer.wrap(info)
@@ -375,6 +411,46 @@ object ClassAttribute {
           BootstrapMethod(bootstrapMethodRef, bootstrapArguments)
         }
         BootstrapMethods(methods)
+      case "ScalaSig" =>
+        val major, minor, _ = bb.get
+        ScalaSig(major, minor)
+      case "ScalaInlineInfo" =>
+        val version = bb.get
+        val flags = bb.get
+
+        val effectivelyFinal = (flags & (1 << 0)) > 0
+        val hasTraitImplClassSelfType = (flags & (1 << 1)) > 0
+        val hasSam = (flags & (1 << 2)) > 0
+        val hasLaterInterface = (flags & (1 << 3)) > 0
+
+        val traitImplClassSelfType =
+          if (!hasTraitImplClassSelfType) Option.empty
+          else Option(classFile.string(bb.getShort))
+
+        //val traitImplClassSelfType = classFile.const()
+        val sam =
+          if (hasSam) {
+            val samName = classFile.string(bb.getShort)
+            val samDescriptor = classFile.string(bb.getShort)
+            Option(Sam(samName, samDescriptor))
+          } else Option.empty
+
+
+        val numMethodEntries = bb.getShort
+
+        val methods = (1 to numMethodEntries).map { _ =>
+          val name = classFile.string(bb.getShort)
+          val descriptor = classFile.string(bb.getShort)
+          val flags = bb.get
+
+          val methodFlags = InlineMethodFlag.from(flags)
+
+          InlineMethod(name, descriptor, methodFlags)
+        }
+
+        ScalaInlineInfo(version, traitImplClassSelfType, sam, methods)
+      case "Deprecated" =>
+        Deprecated
       case name =>
         Info(name, attributeInfo.info)
     }
