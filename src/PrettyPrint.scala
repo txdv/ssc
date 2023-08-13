@@ -1,10 +1,8 @@
 package ssc.misc
-
 case class Field(name: String, value: Value)
 
 sealed trait Value {
   val depth: Int
-
 }
 case class SimpleValue(typeName: String, value: Any, fields: Seq[Field]) extends Value {
   val depth: Int = {
@@ -53,46 +51,66 @@ object PrettyPrint {
 
   private val tab = "  "
 
+
   def format(value: Value)(implicit depth: Int = 0): String = {
     val indent = tab * depth
     val indent1 = tab * (depth + 1)
 
     value match {
       case simple: SimpleValue =>
-        if (simple.fields.nonEmpty) {
-          val indent = tab * depth
-          val indent1 = tab * (depth + 1)
-
-          if (simple.depth <= 2 && simple.fields.size <= 5) {
-            simple.typeName + "(" + simple.fields.map { field =>
-              val nested = format(field.value)(depth + 1)
-              s"${field.name} = ${nested}"
-            }.mkString(", ") + ")"
-          } else {
-            val fields = simple.fields.map { field =>
-              val nested = format(field.value)(depth + 1)
-              s"${field.name} = ${nested}"
-            }.mkString(",\n" + indent1)
-            simple.typeName + "(\n" + indent1 + fields + s"\n$indent)"
-          }
-        } else {
-          if (simple.value == null) {
-            "null"
-          } else {
-            simple.value.toString
-          }
-        }
+        formatSimpleValue(simple)
       case collection: CollectionValue =>
-        if (collection.depth <= 2 && collection.values.size <= 5) {
-          "[" + collection.values.map(value => format(value)(depth + 1)).mkString(", ") + "]"
-        } else {
-          "[\n" +
-            collection.values.foldLeft("") { case (str, value) =>
-              str + indent1 + format(value)(depth + 1) + ",\n"
-            } +
-            indent + "]"
-        }
+        formatCollectionValue(collection)
     }
+  }
+
+  private def formatSimpleValue(simple: SimpleValue)(implicit depth: Int): String = {
+    if (simple.fields.nonEmpty) {
+      val indent = tab * depth
+      val indent1 = tab * (depth + 1)
+
+      if (simple.depth <= 2 && simple.fields.size <= 5) {
+        val inner = simple.fields.map { field =>
+          val nested = format(field.value)(depth + 1)
+          s"${field.name} = ${nested}"
+        }.mkString(", ")
+        simple.typeName + "(" + inner + ")"
+      } else {
+        val fields = simple.fields.map { field =>
+          val nested = format(field.value)(depth + 1)
+          s"${field.name} = ${nested}"
+        }.mkString(",\n" + indent1)
+        simple.typeName + "(\n" + indent1 + fields + s"\n$indent)"
+      }
+    } else {
+      escape(simple)
+    }
+  }
+
+  private def formatCollectionValue(collection: CollectionValue)(implicit depth: Int): String = {
+    val indent = tab * depth
+    val indent1 = tab * (depth + 1)
+
+    if (collection.depth <= 2 && collection.values.size <= 5) {
+      val inner = collection.values.map(value => format(value)(depth + 1)).mkString(", ")
+      "[" + inner + "]"
+    } else {
+      val inner = collection.values.foldLeft("") { case (str, value) =>
+        str + indent1 + format(value)(depth + 1) + ",\n"
+      }
+
+      "[\n" + inner + indent + "]"
+    }
+
+  }
+
+  private def escape(simple: SimpleValue): String = simple match {
+    case SimpleValue(_, null, _) =>
+      "null"
+    case SimpleValue(_, str: String, _) =>
+      s"""\"$str\""""
+    case _ =>
+      simple.value.toString
   }
 }
 

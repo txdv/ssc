@@ -4,18 +4,36 @@ import ssc.lexer.{Lexer, LexerToken}
 import ssc.lexer.LexerToken._
 import ssc.parser._
 import ssc.parser.Parser._
-
 import scalaz.{Monad, MonadPlus}
 import scalaz.syntax.monadPlus._
+import _root_.scala.reflect.ClassTag
 
 sealed trait AST
 
+
+object Ops {
+  implicit class InstanceConverter[T](obj: T) {
+    def as[T](implicit t: ClassTag[T]): Option[T] = {
+      if (t.runtimeClass == obj.getClass) Some(obj.asInstanceOf[T])
+      else Option.empty
+    }
+  }
+
+}
 object AST {
+  import Ops._
   sealed trait Statement extends AST
 
   case class Package(name: String) extends Statement
   case class Import(name: String) extends Statement
-  case class ObjectDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Statement
+
+  sealed trait Methods {
+    val statements: Seq[Statement]
+
+    def methods: Seq[MethodDecl] = statements.flatMap(_.as[MethodDecl])
+  }
+  case class ObjectDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Statement with Methods
+  case class ClassDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Statement with Methods
 
   sealed trait ScalaType extends AST
   case class SimpleType(name: String) extends ScalaType

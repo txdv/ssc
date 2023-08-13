@@ -1,10 +1,17 @@
 package ssc.jar
 
+import org.json4s.scalap.scalasig._
+import ssc.parser.scala.AST
+import ssc.parser.scala.AST.{ClassDecl, MethodDecl, SimpleType}
+//{MethodSymbol, NullaryMethodType, ScalaSig}
 import ssc.Hex
-import java.util.zip.{ZipFile, ZipEntry}
+import ssc.misc.PrettyPrint
+
+import java.util.zip.{ZipEntry, ZipFile}
 import java.util.concurrent.Executors
 import scala.collection.JavaConverters._
-import ssc.classfile.{ClassFile, Constant, ClassAttribute}
+import ssc.classfile.{ClassAttribute, ClassFile, Constant}
+
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 
@@ -76,7 +83,7 @@ object MainApp {
   def handleJar(path: String, file: String): Unit = {
     val files = Jar.unzip(path)
 
-    files.filter(_.name == file).foreach { file =>
+    files.filter(_.name == file).map { file =>
       implicit val f = ClassFile.parse(file.content)
 
       findVRA
@@ -84,41 +91,104 @@ object MainApp {
   }
 
   def handleJar(path: String): Unit = {
-    Jar.unzip(path).filter(_.name.endsWith(".class")).foreach { file =>
-      println()
-      println(file.name)
+    val scalaSignatures = Jar.unzip(path).filter(_.name.endsWith(".class")).flatMap { file =>
+      //println()
+      //println(file.name)
       implicit val f = ClassFile.parse(file.content)
       findVRA
     }
+
+
+    scalaSignatures.foreach { signatures =>
+      val entries = (0 until signatures.table.length)
+        .map(signatures.parseEntry)
+
+      val methods = findMethods(signatures, entries)
+
+      signatures.topLevelObjects
+      val obj = entries.collectFirst {
+        case o: ObjectSymbol =>
+          o
+      }
+
+      val classDecl = entries.collectFirst {
+        case k: ClassSymbol =>
+          ClassDecl(k.name, methods)
+      }
+
+      classDecl.foreach(PrettyPrint.pformat)
+
+
+    }
   }
 
-  private def findVRA(implicit classFile: ClassFile): Option[Int] = {
+  private def findMethods(signatures: ScalaSig, entries: Seq[Any]): Seq[MethodDecl] = {
+    signatures.topLevelObjects
+    entries.collect {
+      case methodSymbol: MethodSymbol =>
+        val info = signatures.parseEntry(methodSymbol.symbolInfo.info)
+        info match {
+          case NullaryMethodType(t) =>
+            Some(MethodDecl(methodSymbol.name, convert(t)))
+          case MethodType(t, symbols) =>
+            val args = symbols.map {
+              case methodSymbol: MethodSymbol =>
+                val t = signatures.parseEntry(methodSymbol.symbolInfo.info)
+                AST.MethodDeclArgument(methodSymbol.name, convert(t.asInstanceOf[Type]))
+            }
+            Some(MethodDecl(methodSymbol.name, convert(t), args))
+          case _ =>
+            Option.empty
+        }
+    }
+    .flatten
+  }
+
+
+  private def convert(t: Type): AST.ScalaType = t match {
+    case t@TypeRefType(ThisType(_), symbol, typeArgs) =>
+      //println(t)
+      SimpleType(symbol.name)
+    case o =>
+      println(o)
+      ???
+  }
+
+  import org.json4s.scalap.scalasig.ScalaSig
+
+  private def findVRA(implicit classFile: ClassFile): Seq[ScalaSig] = {
     /*classFile.attributes.find { _.getName == "RuntimeVisibleAnnotations" }.map { rva =>
       ClassAttribute(rva)
     }*/
     val attributes = classFile.attributes.map(a => ClassAttribute(a))
 
-    attributes.foreach {
+    attributes.flatMap {
       case ClassAttribute.RuntimeVisibileAnnotations(annotations) =>
         import ClassAttribute.RuntimeVisibileAnnotation
         import ClassAttribute.RuntimeVisibileAnnotation.Str
 
-        annotations.foreach {
+        annotations.flatMap {
           case RuntimeVisibileAnnotation("Lscala/reflect/ScalaSignature;", Seq(Str("bytes", scalaSig))) =>
-            import org.json4s.scalap.scalasig.{ByteCode, ScalaSigAttributeParsers, ScalaSigParser, ClassFileParser}
+            //import org.json4s.scalap.scalasig.{ByteCode, ScalaSigAttributeParsers, ScalaSigParser, ClassFileParser}
             import org.json4s.scalap.scalasig._
             import org.json4s.scalap.ByteCodecs
             val length = ByteCodecs.decode(scalaSig)
             val result = ScalaSigAttributeParsers.parse(ByteCode(scalaSig.take(length)))
+            Option(result)
 
+            /*
             (0 until result.table.size).map { i =>
               result.parseEntry(i) match {
                 case classSymbol: ClassSymbol =>
-                  println(s"$i: classSymbol")
+                  println(s"$i: $classSymbol")
+                case methodSymbol: MethodSymbol =>
+                  println(s"$i: $methodSymbol")
                 case o =>
                   println(s"$i: $o")
               }
-            }
+            }*/
+
+
             //println(result.getClass)
             //println(result)
         }
@@ -129,32 +199,30 @@ object MainApp {
 
         }*/
       case _ =>
+        None
     }
-
-    classFile.attributes.map(a => ClassAttribute(a)).foreach { ca =>
-      ca match {
-        case ClassAttribute.Info(name, content) =>
-          println(name + " " + Hex.format(content))
-        /*
-        case ClassAttribute.RuntimeVisibileAnnotations(annotations) =>
-          annotations.foreach { annotation =>
-            println(annotation.annotationType)
-            annotation.fields.foreach {
-              case ClassAttribute.RuntimeVisibileAnnotation.Str(name, content) =>
-                println(Hex.format(content))
-              case _ =>
-            }
-
-          }
-        */
-        case o =>
-          //println(o)
-      }
-    }
-
-    Option.empty
   }
 
+  /*
+  classFile.attributes.map(a => ClassAttribute(a)).foreach { ca =>
+  ca match {
+  case ClassAttribute.Info(name, content) =>
+    println(name + " " + Hex.format(content))
+  case ClassAttribute.RuntimeVisibileAnnotations(annotations) =>
+    annotations.foreach { annotation =>
+      println(annotation.annotationType)
+      annotation.fields.foreach {
+        case ClassAttribute.RuntimeVisibileAnnotation.Str(name, content) =>
+          println(Hex.format(content))
+        case _ =>
+      }
+
+    }
+      case o =>
+        //println(o)
+    }
+  }
+  */
   def handleOld(path: String): Unit = {
     val files = Jar.unzip(path)
 

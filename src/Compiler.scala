@@ -35,7 +35,7 @@ import java.nio.file.Files
 object ScalaCompiler {
   def convert(obj: ObjectDecl): Class = {
     Class(
-      version = Version(0, 58),
+      version = Version(0, 55),
       thisClass = JavaType.Class(obj.name),
       superClass = JavaType.Object,
       methods = {

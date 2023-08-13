@@ -179,6 +179,7 @@ scala_library(
 scala_binary(
     name = "jar",
     srcs = ["Jar.scala"],
-    deps = [":classfile", ":scalap", ":hex"],
+    deps = [":classfile", ":scalap", ":hex", ":scala", ":pretty_print"],
+
     scalacopts = fatal_warnings(),
     main_class = "ssc.jar.MainApp")
