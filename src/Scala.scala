@@ -33,11 +33,14 @@ object AST {
     def methods: Seq[MethodDecl] = statements.flatMap(_.as[MethodDecl])
   }
   case class ObjectDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Statement with Methods
-  case class ClassDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Statement with Methods
+  case class ClassDecl(name: String, statements: Seq[Statement] = Seq.empty, inherits: Seq[ScalaType] = List.empty) extends Statement with Methods
 
   sealed trait ScalaType extends AST
   case class SimpleType(name: String) extends ScalaType
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
+  case class Repeated(scalaType: ScalaType) extends ScalaType
+
+  case class AliasType(name: String, targeT: ScalaType) extends ScalaType
 
   case class VarDecl(name: String, scalaType: Option[ScalaType], expr: Option[Expr]) extends Statement
 

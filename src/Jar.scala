@@ -2,7 +2,7 @@ package ssc.jar
 
 import org.json4s.scalap.scalasig._
 import ssc.parser.scala.AST
-import ssc.parser.scala.AST.{ClassDecl, MethodDecl, SimpleType}
+import ssc.parser.scala.AST.{ClassDecl, MethodDecl, Repeated, SimpleType}
 //{MethodSymbol, NullaryMethodType, ScalaSig}
 import ssc.Hex
 import ssc.misc.PrettyPrint
@@ -68,10 +68,10 @@ object MainApp {
 
     args.toSeq match {
       case Seq(jarFile, classFile) =>
-        handleJar(jarFile, classFile)
+        handleJar(jarFile, Option(classFile))
       case Seq(jarFile) =>
         //handleOld(jarFile)
-        handleJar(jarFile)
+        handleJar(jarFile, Option.empty)
     }
 
     //Await.result(Future.sequence(futures), 60.seconds)
@@ -79,29 +79,33 @@ object MainApp {
     //filePool.shutdown()
   }
 
-
-  def handleJar(path: String, file: String): Unit = {
-    val files = Jar.unzip(path)
-
-    files.filter(_.name == file).map { file =>
-      implicit val f = ClassFile.parse(file.content)
-
-      findVRA
-    }
-  }
-
-  def handleJar(path: String): Unit = {
-    val scalaSignatures = Jar.unzip(path).filter(_.name.endsWith(".class")).flatMap { file =>
+  def handleJar(path: String, findFile: Option[String]): Unit = {
+    val scalaSignatures = Jar.unzip(path).iterator
+      .filter(_.name.endsWith(".class"))
+      .filter(file => findFile.forall(ff => file.name.endsWith(ff)))
+      .flatMap { file =>
       //println()
       //println(file.name)
       implicit val f = ClassFile.parse(file.content)
-      findVRA
-    }
+      try {
+        //println(s"file: ${file.name}")
+        Option(findVRA.map(sig => (sig, file.name)))
+      } catch {
+        case ex: Throwable =>
+          println(file)
+          ex.printStackTrace()
+          Option.empty
+      }
+    }.flatten
 
-
-    scalaSignatures.foreach { signatures =>
+    scalaSignatures.foreach { case (signatures, name) =>
       val entries = (0 until signatures.table.length)
         .map(signatures.parseEntry)
+
+      debug(entries)
+
+      println(s"file: ${name}")
+      println(signatures)
 
       val methods = findMethods(signatures, entries)
 
@@ -113,19 +117,34 @@ object MainApp {
 
       val classDecl = entries.collectFirst {
         case k: ClassSymbol =>
-          ClassDecl(k.name, methods)
+          ClassDecl(getName(k), methods)
       }
 
       classDecl.foreach(PrettyPrint.pformat)
-
-
     }
+  }
+
+  private def debug(entries: Seq[Any]): Unit = {
+    entries.groupBy(_.getClass).foreach { case (klass, entries) =>
+      println(klass)
+      entries.foreach { entry =>
+        println(s"\t $entry")
+      }
+    }
+  }
+
+  private def getName(obj: Any): String = obj match {
+    case classSymbol: ClassSymbol =>
+      classSymbol.symbolInfo.owner.toString + "." + classSymbol.name
+    case _ =>
+      ???
   }
 
   private def findMethods(signatures: ScalaSig, entries: Seq[Any]): Seq[MethodDecl] = {
     signatures.topLevelObjects
     entries.collect {
       case methodSymbol: MethodSymbol =>
+        println(methodSymbol.name)
         val info = signatures.parseEntry(methodSymbol.symbolInfo.info)
         info match {
           case NullaryMethodType(t) =>
@@ -146,9 +165,49 @@ object MainApp {
 
 
   private def convert(t: Type): AST.ScalaType = t match {
-    case t@TypeRefType(ThisType(_), symbol, typeArgs) =>
-      //println(t)
-      SimpleType(symbol.name)
+    case t@TypeRefType(thisType: ThisType, symbol, List()) =>
+      //val result = thisType.symbol.name + "." + symbol.name
+      symbol match {
+        case classSymbol: ClassSymbol =>
+          //val identifier = classSymbol.symbolInfo.owner.toString + "." + classSymbol.name
+          SimpleType(getName(classSymbol))
+        case _ =>
+          SimpleType(symbol.toString)
+      }
+    case t@TypeRefType(thisType: ThisType, symbol, List(arg)) if symbol.path == "scala.<repeated>" =>
+      Repeated(convert(arg))
+    case t@TypeRefType(NoPrefixType, symbol, typeArgs) =>
+      SimpleType(s"two ${symbol.name}")
+    case ExistentialType(typeRef, symbols) =>
+      // TODO: treat this differently
+      SimpleType("existential")
+    case SingleType(thisType: ThisType, objectSymbol: ObjectSymbol) =>
+      val name = thisType.symbol.name + "." + objectSymbol.name
+      SimpleType(s"singleType $name")
+      /*
+    case SingleType(thisType: ThisType, symbol) =>
+      val name = thisType.symbol.name + "." + symbol.name
+      SimpleType(s"singleType2 $name")
+    case SingleType(singleType: SingleType, symbol) =>
+      val name = singleType.symbol.name + "." + symbol.name
+      SimpleType(s"singleType3 $name")
+       */
+
+    case trt:TypeRefType =>
+      SimpleType(trt.symbol.path)
+      //SimpleType(s"trt: ${trt.symbol.path}.${trt.symbol.name}")
+    case at: AnnotatedType =>
+      SimpleType(s"at: $at")
+    case mt:MethodType =>
+      SimpleType(s"mt: $mt")
+    case ct: ConstantType =>
+      SimpleType(s"ct $ct")
+    case rf: RefinedType =>
+      SimpleType(s"rf: $rf")
+    case tt: ThisType =>
+      SimpleType(s"tt: $tt")
+    case st: SingleType =>
+      SimpleType(s"st: $st")
     case o =>
       println(o)
       ???
@@ -175,6 +234,9 @@ object MainApp {
             val length = ByteCodecs.decode(scalaSig)
             val result = ScalaSigAttributeParsers.parse(ByteCode(scalaSig.take(length)))
             Option(result)
+          case other =>
+            println(other)
+            Option.empty
 
             /*
             (0 until result.table.size).map { i =>
