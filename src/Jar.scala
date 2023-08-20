@@ -72,9 +72,9 @@ object ScalaSignature {
       .filter(_.name.endsWith(".class"))
       .filter(file => findFile.forall(ff => file.name.endsWith(ff)))
       .flatMap { file =>
-        implicit val f = ClassFile.parse(file.content)
+        val classFile = ClassFile.parse(file.content)
         rescue {
-          findVRA.map(sig => (sig, file.name))
+          findVRA(classFile).map(sig => (sig, file.name))
         }
       }.flatten
 
@@ -228,8 +228,8 @@ object ScalaSignature {
 
   import org.json4s.scalap.scalasig.ScalaSig
 
-  private def findVRA(implicit classFile: ClassFile): Seq[ScalaSig] = {
-    val attributes = classFile.attributes.map(a => ClassAttribute(a))
+  private def findVRA(classFile: ClassFile): Seq[ScalaSig] = {
+    val attributes = classFile.attributes.map(a => ClassAttribute(a)(classFile))
 
     attributes.flatMap {
       case ClassAttribute.RuntimeVisibileAnnotations(annotations) =>
