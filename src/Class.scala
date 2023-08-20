@@ -54,6 +54,8 @@ object JavaType {
 
   val String = Class("java/lang/String")
   val Object = Class("java/lang/Object")
+  val Integer = Class("java/lang/Integer")
+  val JavaBoolean = Class("java/lang/Boolean")
 
   case class Class(namespace: String) extends JavaType {
     val tmp = namespace.split("/").reverse
@@ -166,6 +168,15 @@ case class Code(
       localsCount + other.localsCount,
       ops ++ other.ops,
       stackMap ++ other.stackMap)
+  }
+
+  def +(otherOption: Option[Code]): Code = {
+    otherOption match {
+      case None =>
+        this
+      case Some(other) =>
+        this + other
+    }
   }
 
   def withStackSize(newStackSize: Int): Code = {

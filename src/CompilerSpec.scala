@@ -1,12 +1,12 @@
 package ssc
 
 import java.lang.reflect.InvocationTargetException
-
 import org.scalatest._
 import flatspec._
 import matchers._
 import ssc.parser.scala.AST.ObjectDecl
 
+import java.io.PrintStream
 import collection.JavaConverters._
 
 class CompilerSpec extends AnyFlatSpec with should.Matchers {
@@ -35,20 +35,51 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
 
     val method = jclass.getMethods.find(_.getName == "main").get
 
+
+    captureOutput {
+      try {
+        method.invoke(method, Array[String]())
+      } catch {
+        case ex: InvocationTargetException =>
+          throw ex.getTargetException
+      }
+    }
+  }
+
+  def captureSystemOutput(f: => Unit): String = {
     val baos = new java.io.ByteArrayOutputStream
     val oldOut = System.out
-    System.setOut(new java.io.PrintStream(baos));
+    System.setOut(new java.io.PrintStream(baos))
 
-    try {
-      method.invoke(method, Array[String]())
-    } catch {
-      case ex: InvocationTargetException =>
-        throw ex.getTargetException
-    }
+    f
+
 
     System.setOut(oldOut)
-
     baos.toString
+  }
+
+  def captureOutput(f: => Unit): String = {
+    val baos = new java.io.ByteArrayOutputStream
+    val oldOut = System.out
+    val method = scala.Console.getClass.getDeclaredMethods.toSeq.find(_.getName == "setOutDirect").get
+    method.invoke(scala.Console, new java.io.PrintStream(baos))
+
+    f
+
+    method.invoke(scala.Console, oldOut)
+    baos.toString
+  }
+
+  "test" should "capture system println output" in {
+    captureOutput {
+      println("Hello World!")
+    } should be ("Hello World!\n")
+  }
+
+  "test" should "capture console println output" in {
+    captureSystemOutput {
+      System.out.println("Hello World!")
+    } should be("Hello World!\n")
   }
 
   "Compiler" should "println string" in {

@@ -246,29 +246,24 @@ object ScalaCompiler {
 
     expr match {
       case Func("println", Seq(arg)) =>
-        val printStream = JavaType.Class("java/io/PrintStream")
-
-        val systemOut = FieldRef(
-          JavaType.Class("java/lang/System"),
-          "out",
-          Seq(printStream))
+        val predefHelper = JavaType.Class("scala/Predef$")
 
         val argExpr = eval(arg)
 
-        val methodType = guessType(argExpr)
+        val methodType = JavaType.Object
+        val method = MethodRef(predefHelper, "println", Seq(JavaType.Void, methodType))
 
-        val method = MethodRef(
-          printStream,
-          "println",
-          Seq(JavaType.Void, methodType))
+        val predefModule = FieldRef(predefHelper, "MODULE$", Seq(predefHelper))
 
-        val res = Code.op(Op.getstatic(systemOut), stackSize = 1, localsCount = 1) +
-        genops(argExpr, Seq(
-          StackFrame(offset = 3, Seq(StackElement.Type(systemOut.signature.head)))
-        )) +
-        Code.op(Op.invoke(method, Op.invoke.virtual))
+        {
+          Code.op(Op.getstatic(predefModule), stackSize = 1, localsCount = 1) +
+            genops(argExpr, Seq(
+              StackFrame(offset = 3, Seq(StackElement.Type(predefModule.signature.head)))
+            )) +
+            maybeConvertToObject(argExpr) +
+            Code.op(Op.invoke(method, Op.invoke.virtual))
+        }.addStackSize(1)
 
-        res.addStackSize(1)
       case Ident("???") =>
         val predef = JavaType.Class("scala/Predef$")
         val nothing = JavaType.Class("scala/runtime/Nothing$")
@@ -279,6 +274,24 @@ object ScalaCompiler {
           Op.invoke(method, Op.invoke.virtual),
         )).copy(localsCount = 1, stackSize = 1)
     }
+  }
+
+
+
+  val boxesRunTime = JavaType.Class("scala/runtime/BoxesRunTime")
+  val boxToInteger = MethodRef(boxesRunTime, "boxToInteger", Seq(JavaType.Integer, JavaType.Int))
+  val boxToBoolean = MethodRef(boxesRunTime, "boxToBoolean", Seq(JavaType.JavaBoolean, JavaType.Boolean))
+  private def maybeConvertToObject(expr: Expr): Option[Code] = {
+    guessType(expr) match {
+      case JavaType.Int =>
+        Some(Code.op(Op.invoke(boxToInteger, Op.invoke.static)))
+      case JavaType.Boolean =>
+        Some(Code.op(Op.invoke(boxToBoolean, Op.invoke.static)))
+      case _ =>
+        None
+
+    }
+
   }
 
   def convert(method: MethodDecl): Method = {

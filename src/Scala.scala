@@ -38,9 +38,11 @@ object AST {
   sealed trait ScalaType extends AST
   case class SimpleType(name: String) extends ScalaType
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
+
+  case class TemplateType(name: String) extends ScalaType
   case class Repeated(scalaType: ScalaType) extends ScalaType
 
-  case class AliasType(name: String, targeT: ScalaType) extends ScalaType
+  case class AliasType(name: String, target: ScalaType) extends ScalaType
 
   case class VarDecl(name: String, scalaType: Option[ScalaType], expr: Option[Expr]) extends Statement
 

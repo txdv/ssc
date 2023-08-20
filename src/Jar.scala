@@ -2,7 +2,7 @@ package ssc.jar
 
 import org.json4s.scalap.scalasig._
 import ssc.parser.scala.AST
-import ssc.parser.scala.AST.{ClassDecl, MethodDecl, Repeated, SimpleType}
+import ssc.parser.scala.AST.{ClassDecl, GenericType, MethodDecl, Repeated, SimpleType}
 //{MethodSymbol, NullaryMethodType, ScalaSig}
 import ssc.Hex
 import ssc.misc.PrettyPrint
@@ -125,10 +125,10 @@ object MainApp {
   }
 
   private def debug(entries: Seq[Any]): Unit = {
-    entries.groupBy(_.getClass).foreach { case (klass, entries) =>
+    entries.zipWithIndex.groupBy(_._1.getClass).foreach { case (klass, entries) =>
       println(klass)
-      entries.foreach { entry =>
-        println(s"\t $entry")
+      entries.foreach { case (entry, i) =>
+        println(s"\t $i: $entry")
       }
     }
   }
@@ -170,14 +170,21 @@ object MainApp {
       symbol match {
         case classSymbol: ClassSymbol =>
           //val identifier = classSymbol.symbolInfo.owner.toString + "." + classSymbol.name
+          println(classSymbol)
           SimpleType(getName(classSymbol))
-        case _ =>
-          SimpleType(symbol.toString)
+        case o =>
+          //SimpleType(s"unknown: ${o.getClass} ${o.toString}")
+          SimpleType(o.toString)
       }
     case t@TypeRefType(thisType: ThisType, symbol, List(arg)) if symbol.path == "scala.<repeated>" =>
       Repeated(convert(arg))
+    case t@TypeRefType(NoPrefixType, symbol, List()) =>
+      SimpleType(s"HERE: $t")
+      //SimpleType(symbol.path)
     case t@TypeRefType(NoPrefixType, symbol, typeArgs) =>
-      SimpleType(s"two ${symbol.name}")
+      //val generics = typeArgs.map(convert)
+      //GenericType(symbol.path, generics)
+      SimpleType(s"two ${symbol}")
     case ExistentialType(typeRef, symbols) =>
       // TODO: treat this differently
       SimpleType("existential")
@@ -207,7 +214,7 @@ object MainApp {
     case tt: ThisType =>
       SimpleType(s"tt: $tt")
     case st: SingleType =>
-      SimpleType(s"st: $st")
+      SimpleType(st.symbol.path)
     case o =>
       println(o)
       ???
