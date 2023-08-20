@@ -128,7 +128,7 @@ scala_test(
 scala_binary(
     name = "compiler",
     srcs = ["Compiler.scala"],
-    deps = [":scala", ":class", ":classfile", ":pretty_print", ":materializer", ":type"],
+    deps = [":scala", ":class", ":classfile", ":pretty_print", ":materializer", ":type", ":jar"],
     scalacopts = fatal_warnings(),
     main_class = "ssc.ScalaCompiler")
 

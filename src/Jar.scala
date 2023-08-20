@@ -49,11 +49,18 @@ object MainApp {
 
     args.toSeq match {
       case Seq(jarFile, classFile) =>
-        ScalaSignature.handleJar(jarFile, Option(classFile))
+        handleJar(jarFile, Option(classFile))
       case Seq(jarFile) =>
-        ScalaSignature.handleJar(jarFile, Option.empty)
+        handleJar(jarFile, Option.empty)
     }
   }
+
+  def handleJar(path: String, findFile: Option[String]): Unit = {
+    ScalaSignature.load(path, findFile).foreach { decl =>
+      PrettyPrint.pformat(decl)
+    }
+  }
+
 }
 
 object ScalaSignature {
@@ -66,7 +73,9 @@ object ScalaSignature {
     }
   }
 
-  def handleJar(path: String, findFile: Option[String]): Unit = {
+
+  def load(path: String, findFile: Option[String] = Option.empty): Iterator[AST.Decl] = {
+
     val scalaSignatures = Jar
       .unzip(path, entry => findFile.forall(ff => entry.getName.endsWith(ff)))
       .filter(_.name.endsWith(".class"))
@@ -77,11 +86,10 @@ object ScalaSignature {
         }
       }.flatten
 
-    scalaSignatures.foreach { case (signatures, name) =>
-      val decls = findDecls(signatures)
-
-      decls.foreach(PrettyPrint.pformat)
+    scalaSignatures.flatMap { case (signatures, name) =>
+      findDecls(signatures)
     }
+
   }
 
   private def rescue[T](f: => T): Option[T] = {

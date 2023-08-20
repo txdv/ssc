@@ -1,33 +1,15 @@
 package ssc
 
 import ssc.classfile.Version
-import ssc.classfile.higher.{
-  ClassAccessFlag,
-  AccessFlag,
-  Class,
-  Code,
-  StackFrame,
-  StackElement,
-  ConstString,
-  FieldRef,
-  JavaType,
-  Method,
-  MethodRef,
-  Op,
-  ClassFile,
-}
+import ssc.classfile.higher.{AccessFlag, Class, ClassAccessFlag, ClassFile, Code, ConstString, FieldRef, JavaType, Method, MethodRef, Op, StackElement, StackFrame}
 import ssc.lexer.Lexer
 import ssc.parser.Parser
-import ssc.parser.scala.{Scala, AST}
-import ssc.parser.scala.AST.{
-  ObjectDecl,
-  MethodDecl,
-  Expr
-}
+import ssc.parser.scala.{AST, Scala}
+import ssc.parser.scala.AST.{Expr, MethodDecl, ObjectDecl}
 import ssc.span.Span
 import ssc.misc.PrettyPrint
 import ssc.classfile.types.runtime.Types
-
+import ssc.jar.ScalaSignature
 
 import java.io.File
 import java.nio.file.Files
@@ -241,29 +223,65 @@ object ScalaCompiler {
     }
   }
 
+  private val predefJarPath = new File(Predef.getClass.getProtectionDomain.getCodeSource.getLocation.toURI).getPath
+
+  private val predef = ScalaSignature.load(predefJarPath, Some("Predef.class")).collectFirst {
+    case obj: ObjectDecl if obj.name == "scala.Predef" =>
+      obj
+  }.get
+
+  private def javaRef(decl: AST.Decl): JavaType.Class = decl match {
+    case objectDecl: ObjectDecl =>
+      JavaType.Class(objectDecl.name.replace(".", "/") + "$")
+    case classDecl: AST.ClassDecl =>
+      JavaType.Class(classDecl.name.replace(".", "/"))
+
+  }
+
   def convertBody(expr: Expr): Code = {
     import AST._
 
     expr match {
-      case Func("println", Seq(arg)) =>
-        val predefHelper = JavaType.Class("scala/Predef$")
+      case Func(name, args) =>
+        predef.methods.find { decl => decl.name == name && decl.arguments.size == args.size } match {
+          case None =>
+            ???
+          case Some(method) =>
+            val klass = predef // we gonna generalise this later on
+            println(method)
+            val klassRef = javaRef(klass)
 
-        val argExpr = eval(arg)
+            // TODO: multiple argument support
+            //val argExpr = eval(args.head)
 
-        val methodType = JavaType.Object
-        val method = MethodRef(predefHelper, "println", Seq(JavaType.Void, methodType))
+            val signature = method.returnArguments.map {
+              case SimpleType("scala.Any") =>
+                JavaType.Object
+              case SimpleType("scala.Unit") =>
+                JavaType.Void
+              case other =>
+                println(other)
+                ???
+            }
 
-        val predefModule = FieldRef(predefHelper, "MODULE$", Seq(predefHelper))
+            val methodRef = MethodRef(klassRef, method.name, signature)
 
-        {
-          Code.op(Op.getstatic(predefModule), stackSize = 1, localsCount = 1) +
-            genops(argExpr, Seq(
-              StackFrame(offset = 3, Seq(StackElement.Type(predefModule.signature.head)))
-            )) +
-            maybeConvertToObject(argExpr) +
-            Code.op(Op.invoke(method, Op.invoke.virtual))
-        }.addStackSize(1)
+            val argExpr = eval(args.head)
 
+            klass match {
+              case objectDecl: ObjectDecl =>
+                val module = FieldRef(klassRef, "MODULE$", Seq(klassRef))
+
+                {
+                  Code.op(Op.getstatic(module), stackSize = 1, localsCount = 1) +
+                    genops(argExpr, Seq(
+                      StackFrame(offset = 3, Seq(StackElement.Type(module.signature.head)))
+                    )) +
+                    maybeConvertToObject(argExpr) +
+                    Code.op(Op.invoke(methodRef, Op.invoke.virtual))
+                }.addStackSize(1)
+            }
+        }
       case Ident("???") =>
         val predef = JavaType.Class("scala/Predef$")
         val nothing = JavaType.Class("scala/runtime/Nothing$")
@@ -273,6 +291,8 @@ object ScalaCompiler {
           Op.getstatic(FieldRef(predef, "MODULE$", Seq(predef))),
           Op.invoke(method, Op.invoke.virtual),
         )).copy(localsCount = 1, stackSize = 1)
+      case _ =>
+        ???
     }
   }
 

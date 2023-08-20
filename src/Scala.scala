@@ -39,6 +39,7 @@ object AST {
 
   sealed trait ScalaType extends AST
   case class SimpleType(name: String) extends ScalaType
+
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType
 
   case class TemplateType(name: String) extends ScalaType
@@ -58,7 +59,12 @@ object AST {
     name: String,
     returnType: ScalaType,
     arguments: Seq[MethodDeclArgument] = Seq.empty,
-    body: Option[Statement] = None) extends Statement
+    body: Option[Statement] = None) extends Statement {
+
+    def returnArguments: Seq[ScalaType] =
+      returnType +: arguments.map(_.argumentType)
+
+  }
 
   case class MethodDeclArgument(name: String, argumentType: ScalaType)
 
