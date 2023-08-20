@@ -1,4 +1,5 @@
 package ssc.misc
+
 case class Field(name: String, value: Value)
 
 sealed trait Value {
@@ -108,10 +109,27 @@ object PrettyPrint {
     case SimpleValue(_, null, _) =>
       "null"
     case SimpleValue(_, str: String, _) =>
-      s"""\"$str\""""
+      s"""\"${escapeString(str)}\""""
     case _ =>
       simple.value.toString
   }
+
+  private def escapeString(str: String): String = {
+    str.map(escapeChar).mkString("")
+  }
+
+  private def escapeChar(char: Char): String = char match {
+    case char if char.isLetterOrDigit => char.toString
+    case '.' => char.toString
+    case '\n' => hex(char)
+    case 27 => hex(char)
+    case char if char.toByte < 256 => char.toString
+    case other => hex(other)
+  }
+
+  private def hex(char: Char): String =
+    String.format("\\x%02x", Byte.box(char.toByte))
+
 }
 
 
