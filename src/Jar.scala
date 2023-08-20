@@ -12,23 +12,22 @@ import ssc.classfile.{ClassAttribute, ClassFile}
 object Jar {
   case class File(name: String, content: Array[Byte])
 
-  def unzip(filepath: String): Seq[File] = {
+  def unzip(filepath: String, filter: ZipEntry => Boolean): Iterator[File] = {
     val zip = new ZipFile(filepath)
     try {
-      zip.entries.asScala.toSeq.flatMap { entry =>
+      zip.entries.asScala.filter(filter).flatMap { entry =>
         handleEntry(zip, entry)
       }
     } finally {
-      zip.close
+      //zip.close
     }
   }
 
-  def stream(filepath: String): LazyList[File] = {
+  def stream(filepath: String): Iterator[File] = {
     val zip = new ZipFile(filepath)
-    zip.entries.asScala.to(LazyList).flatMap { entry =>
+    zip.entries.asScala.flatMap { entry =>
       handleEntry(zip, entry)
     }
-
   }
 
   private def handleEntry(zip: ZipFile, entry: ZipEntry): Option[File] = {
@@ -68,9 +67,9 @@ object ScalaSignature {
   }
 
   def handleJar(path: String, findFile: Option[String]): Unit = {
-    val scalaSignatures = Jar.unzip(path).iterator
+    val scalaSignatures = Jar
+      .unzip(path, entry => findFile.forall(ff => entry.getName.endsWith(ff)))
       .filter(_.name.endsWith(".class"))
-      .filter(file => findFile.forall(ff => file.name.endsWith(ff)))
       .flatMap { file =>
         val classFile = ClassFile.parse(file.content)
         rescue {
@@ -124,7 +123,7 @@ object ScalaSignature {
   }
 
   private def debug(entries: Seq[Any]): Unit = {
-    entries.zipWithIndex.groupBy(_._1.getClass).foreach { case (klass, entries) =>
+    entries.filter(_ != null).zipWithIndex.groupBy(_._1.getClass).foreach { case (klass, entries) =>
       println(klass)
       entries.foreach { case (entry, i) =>
         println(s"\t $i: $entry")
@@ -133,6 +132,11 @@ object ScalaSignature {
   }
 
   private def getName(symbol: Symbol): String = symbol match {
+    case methodSymbol: MethodSymbol =>
+      methodSymbol.toString
+    case classSymbol: ClassSymbol if classSymbol.name == "<refinement>" =>
+      // TODO: handle refinement?
+      "<refinement>"
     case classSymbol: ClassSymbol =>
       getName(classSymbol.symbolInfo.owner) + "." + classSymbol.name
     case objectSymbol: ObjectSymbol =>
@@ -243,6 +247,16 @@ object ScalaSignature {
             val length = ByteCodecs.decode(scalaSig)
             val result = ScalaSigAttributeParsers.parse(ByteCode(scalaSig.take(length)))
             Option(result)
+          // TODO: handle scala long signature
+          case RuntimeVisibileAnnotation("Lscala/reflect/ScalaLongSignature;", _) =>
+            Option.empty
+          // TODO: handle down below cases
+          case RuntimeVisibileAnnotation("Ljava/lang/FunctionalInterface;", _) =>
+            Option.empty
+          case RuntimeVisibileAnnotation("Ljava/lang/annotation/Retention;", _) =>
+            Option.empty
+          case RuntimeVisibileAnnotation("Ljava/lang/annotation/Target;", _) =>
+            Option.empty
           case other =>
             println(other)
             Option.empty
