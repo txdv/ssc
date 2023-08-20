@@ -50,7 +50,20 @@ object Jar {
   }
 }
 
+
 object MainApp {
+  def main(args: Array[String]): Unit = {
+
+    args.toSeq match {
+      case Seq(jarFile, classFile) =>
+        ScalaSignature.handleJar(jarFile, Option(classFile))
+      case Seq(jarFile) =>
+        ScalaSignature.handleJar(jarFile, Option.empty)
+    }
+  }
+}
+
+object ScalaSignature {
 
   def removeSuffix(string: String, suffix: String): String = {
     if (string.endsWith(suffix)) {
@@ -60,47 +73,31 @@ object MainApp {
     }
   }
 
-  //val filePool = Executors.newFixedThreadPool(48)
-  def main(args: Array[String]): Unit = {
-    //val tp = Executors.newFixedThreadPool(24)
-    //implicit val ec = ExecutionContext.fromExecutor(tp)
-
-    args.toSeq match {
-      case Seq(jarFile, classFile) =>
-        handleJar(jarFile, Option(classFile))
-      case Seq(jarFile) =>
-        //handleOld(jarFile)
-        handleJar(jarFile, Option.empty)
-    }
-
-    //Await.result(Future.sequence(futures), 60.seconds)
-    //tp.shutdown()
-    //filePool.shutdown()
-  }
-
   def handleJar(path: String, findFile: Option[String]): Unit = {
     val scalaSignatures = Jar.unzip(path).iterator
       .filter(_.name.endsWith(".class"))
       .filter(file => findFile.forall(ff => file.name.endsWith(ff)))
       .flatMap { file =>
-      //println()
-      //println(file.name)
-      implicit val f = ClassFile.parse(file.content)
-      try {
-        //println(s"file: ${file.name}")
-        Option(findVRA.map(sig => (sig, file.name)))
-      } catch {
-        case ex: Throwable =>
-          println(file)
-          ex.printStackTrace()
-          Option.empty
-      }
-    }.flatten
+        implicit val f = ClassFile.parse(file.content)
+        rescue {
+          findVRA.map(sig => (sig, file.name))
+        }
+      }.flatten
 
     scalaSignatures.foreach { case (signatures, name) =>
       val decls = findDecls(signatures)
 
       decls.foreach(PrettyPrint.pformat)
+    }
+  }
+
+  private def rescue[T](f: => T): Option[T] = {
+    try Option {
+      f
+    } catch {
+      case throwable: Throwable =>
+        throwable.printStackTrace()
+        Option.empty
     }
   }
 
