@@ -2,18 +2,12 @@ package ssc.jar
 
 import org.json4s.scalap.scalasig._
 import ssc.parser.scala.AST
-import ssc.parser.scala.AST.{ClassDecl, GenericType, MethodDecl, Repeated, SimpleType}
-//{MethodSymbol, NullaryMethodType, ScalaSig}
-import ssc.Hex
+import ssc.parser.scala.AST.{ClassDecl, MethodDecl, Repeated, SimpleType}
 import ssc.misc.PrettyPrint
 
 import java.util.zip.{ZipEntry, ZipFile}
-import java.util.concurrent.Executors
 import scala.collection.JavaConverters._
-import ssc.classfile.{ClassAttribute, ClassFile, Constant}
-
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.duration._
+import ssc.classfile.{ClassAttribute, ClassFile}
 
 object Jar {
   case class File(name: String, content: Array[Byte])
@@ -235,9 +229,6 @@ object ScalaSignature {
   import org.json4s.scalap.scalasig.ScalaSig
 
   private def findVRA(implicit classFile: ClassFile): Seq[ScalaSig] = {
-    /*classFile.attributes.find { _.getName == "RuntimeVisibleAnnotations" }.map { rva =>
-      ClassAttribute(rva)
-    }*/
     val attributes = classFile.attributes.map(a => ClassAttribute(a))
 
     attributes.flatMap {
@@ -247,7 +238,6 @@ object ScalaSignature {
 
         annotations.flatMap {
           case RuntimeVisibileAnnotation("Lscala/reflect/ScalaSignature;", Seq(Str("bytes", scalaSig))) =>
-            //import org.json4s.scalap.scalasig.{ByteCode, ScalaSigAttributeParsers, ScalaSigParser, ClassFileParser}
             import org.json4s.scalap.scalasig._
             import org.json4s.scalap.ByteCodecs
             val length = ByteCodecs.decode(scalaSig)
@@ -256,123 +246,9 @@ object ScalaSignature {
           case other =>
             println(other)
             Option.empty
-
-            /*
-            (0 until result.table.size).map { i =>
-              result.parseEntry(i) match {
-                case classSymbol: ClassSymbol =>
-                  println(s"$i: $classSymbol")
-                case methodSymbol: MethodSymbol =>
-                  println(s"$i: $methodSymbol")
-                case o =>
-                  println(s"$i: $o")
-              }
-            }*/
-
-
-            //println(result.getClass)
-            //println(result)
         }
-        /*
-        annotations.find(_.annotationType == "Lscala/reflect/ScalaSignature;").foreach {
-          case Seq(Str("bytes", value)) =>
-            println(value)
-
-        }*/
       case _ =>
         None
     }
-  }
-
-  /*
-  classFile.attributes.map(a => ClassAttribute(a)).foreach { ca =>
-  ca match {
-  case ClassAttribute.Info(name, content) =>
-    println(name + " " + Hex.format(content))
-  case ClassAttribute.RuntimeVisibileAnnotations(annotations) =>
-    annotations.foreach { annotation =>
-      println(annotation.annotationType)
-      annotation.fields.foreach {
-        case ClassAttribute.RuntimeVisibileAnnotation.Str(name, content) =>
-          println(Hex.format(content))
-        case _ =>
-      }
-
-    }
-      case o =>
-        //println(o)
-    }
-  }
-  */
-  def handleOld(path: String): Unit = {
-    val files = Jar.unzip(path)
-
-    val classFiles = files.filter(_.name.endsWith(".class"))
-    val classFileNames = classFiles.map(classFile => removeSuffix(classFile.name, ".class"))
-    //classFileNames.foreach(println)
-
-    val t = classFiles.filter(_.name.endsWith("Array.class"))
-
-    import org.json4s.scalap.scalasig.{ByteCode, ScalaSigAttributeParsers, ScalaSigParser, ClassFileParser}
-    import org.json4s.scalap.ByteCodecs
-
-    t.foreach { file =>
-      println {
-        val classFile = ClassFileParser.parse(ByteCode(file.content))
-        ScalaSigParser.scalaSigFromAnnotation(classFile)
-      }
-
-      val f = ClassFile.parse(file.content)
-      implicit val classFile = f
-      val thisClass = f.constants(f.thisClass - 1).asInstanceOf[Constant.Class].stringName
-      //val thisClass = f.constants(0)
-      //println(s"$thisClass method count: ${f.methods.size}")
-
-      f.constants.zipWithIndex.foreach { case (constant, i) =>
-        val idx = i + 1
-        println(s"#$idx: $constant")
-      }
-
-      println("HERE:")
-      val scalaSig = f.constants(8).asInstanceOf[Constant.Utf8].bytes
-      println(scalaSig.length)
-
-      val length = ByteCodecs.decode(scalaSig)
-      val result = ScalaSigAttributeParsers.parse(ByteCode(scalaSig.take(length)))
-      println(result)
-
-      //val parser = ScalaSigAttributeParsers.parse(ByteCode(scalaSig))
-
-      //println(parser)
-
-
-      /*f.methods.foreach { method =>
-        println(s"  ${method.getName} ${method.getDescriptor}")
-      }*/
-
-      f.attributes.foreach { attribute =>
-        val name = attribute.getName
-        println(s"$name ${attribute.info.length} 0x${Hex.encode(attribute.info)}")
-        println(attribute)
-        println(attribute.info.length)
-      }
-    }
-  }
-
-  def handle2(path: String): Unit = {
-    val files = Jar.stream(path)
-
-    files.foreach { file =>
-      val f = ClassFile.parse(file.content)
-      implicit val classFile = f
-      val thisClass = f.constants(f.thisClass - 1).asInstanceOf[Constant.Class].stringName
-      //val thisClass = f.constants(0)
-      //println(s"$thisClass method count: ${f.methods.size}")
-      f.methods.foreach { method =>
-        //println(s"  ${method.getName} ${method.getDescriptor}")
-      }
-      println(f.attributes)
-    }
-
   }
 }
