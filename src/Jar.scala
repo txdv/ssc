@@ -40,13 +40,12 @@ object Jar {
   private def handleEntry(zip: ZipFile, entry: ZipEntry): Option[File] = {
     if (entry.isDirectory) {
       Option.empty[File]
-
     } else {
       val name = entry.getName
       val fileStream = zip.getInputStream(entry)
       val bytes = fileStream.readAllBytes()
       fileStream.close()
-      Some(File(entry.getName, bytes))
+      Some(File(name, bytes))
     }
   }
 }
@@ -99,29 +98,38 @@ object MainApp {
     }.flatten
 
     scalaSignatures.foreach { case (signatures, name) =>
-      val entries = (0 until signatures.table.length)
-        .map(signatures.parseEntry)
+      val decls = findDecls(signatures)
 
-      debug(entries)
-
-      println(s"file: ${name}")
-      println(signatures)
-
-      val methods = findMethods(signatures, entries)
-
-      signatures.topLevelObjects
-      val obj = entries.collectFirst {
-        case o: ObjectSymbol =>
-          o
-      }
-
-      val classDecl = entries.collectFirst {
-        case k: ClassSymbol =>
-          ClassDecl(getName(k), methods)
-      }
-
-      classDecl.foreach(PrettyPrint.pformat)
+      decls.foreach(PrettyPrint.pformat)
     }
+  }
+
+  private def findDecls(signatures: ScalaSig): Seq[AST.Decl] = {
+    val entries = (0 until signatures.table.length)
+      .map(signatures.parseEntry)
+
+    /*
+    debug(entries)
+    println(s"file: ${name}")
+    println(signatures)
+    */
+
+    val methods = findMethods(signatures, entries)
+
+    val objectDecls = entries.collect {
+      case o: ObjectSymbol =>
+        getName(o)
+    }
+
+    val classDecls = entries.collect {
+      case k: ClassSymbol =>
+        val klassMethods = methods.filter(_._1 == k.index).map(_._2)
+        val name = getName(k)
+        if (objectDecls.contains(name)) AST.ObjectDecl(name, klassMethods)
+        else ClassDecl(name, klassMethods)
+    }
+
+    classDecls
   }
 
   private def debug(entries: Seq[Any]): Unit = {
@@ -133,29 +141,37 @@ object MainApp {
     }
   }
 
-  private def getName(obj: Any): String = obj match {
+  private def getName(symbol: Symbol): String = symbol match {
     case classSymbol: ClassSymbol =>
-      classSymbol.symbolInfo.owner.toString + "." + classSymbol.name
+      getName(classSymbol.symbolInfo.owner) + "." + classSymbol.name
+    case objectSymbol: ObjectSymbol =>
+      getName(objectSymbol.symbolInfo.owner) + "." + objectSymbol.name
+    case externalSymbol: ExternalSymbol =>
+      externalSymbol.toString
     case _ =>
+      println(symbol)
       ???
   }
 
-  private def findMethods(signatures: ScalaSig, entries: Seq[Any]): Seq[MethodDecl] = {
+  private def findMethods(signatures: ScalaSig, entries: Seq[Any]): Seq[(Int, MethodDecl)] = {
     signatures.topLevelObjects
     entries.collect {
       case methodSymbol: MethodSymbol =>
-        println(methodSymbol.name)
+        val ownerIndex = methodSymbol.symbolInfo.owner.asInstanceOf[SymbolInfoSymbol].index
+
         val info = signatures.parseEntry(methodSymbol.symbolInfo.info)
         info match {
           case NullaryMethodType(t) =>
-            Some(MethodDecl(methodSymbol.name, convert(t)))
+            val methodDecl = MethodDecl(methodSymbol.name, convert(t))
+            Some((ownerIndex, methodDecl))
           case MethodType(t, symbols) =>
             val args = symbols.map {
               case methodSymbol: MethodSymbol =>
                 val t = signatures.parseEntry(methodSymbol.symbolInfo.info)
                 AST.MethodDeclArgument(methodSymbol.name, convert(t.asInstanceOf[Type]))
             }
-            Some(MethodDecl(methodSymbol.name, convert(t), args))
+            val methodDecl = MethodDecl(methodSymbol.name, convert(t), args)
+            Some((ownerIndex, methodDecl))
           case _ =>
             Option.empty
         }
@@ -170,7 +186,6 @@ object MainApp {
       symbol match {
         case classSymbol: ClassSymbol =>
           //val identifier = classSymbol.symbolInfo.owner.toString + "." + classSymbol.name
-          println(classSymbol)
           SimpleType(getName(classSymbol))
         case o =>
           //SimpleType(s"unknown: ${o.getClass} ${o.toString}")

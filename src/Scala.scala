@@ -24,6 +24,8 @@ object AST {
   import Ops._
   sealed trait Statement extends AST
 
+  sealed trait Decl extends AST
+
   case class Package(name: String) extends Statement
   case class Import(name: String) extends Statement
 
@@ -32,8 +34,8 @@ object AST {
 
     def methods: Seq[MethodDecl] = statements.flatMap(_.as[MethodDecl])
   }
-  case class ObjectDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Statement with Methods
-  case class ClassDecl(name: String, statements: Seq[Statement] = Seq.empty, inherits: Seq[ScalaType] = List.empty) extends Statement with Methods
+  case class ObjectDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Decl with Methods
+  case class ClassDecl(name: String, statements: Seq[Statement] = Seq.empty, inherits: Seq[ScalaType] = List.empty) extends Decl with Methods
 
   sealed trait ScalaType extends AST
   case class SimpleType(name: String) extends ScalaType
