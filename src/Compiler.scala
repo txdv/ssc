@@ -225,10 +225,21 @@ object ScalaCompiler {
 
   private val predefJarPath = new File(Predef.getClass.getProtectionDomain.getCodeSource.getLocation.toURI).getPath
 
-  private val predef = ScalaSignature.load(predefJarPath, Some("Predef.class")).collectFirst {
-    case obj: ObjectDecl if obj.name == "scala.Predef" =>
-      obj
-  }.get
+  private val loadedClasses = Benchmark.gauge2("unjar") {
+    ScalaSignature.load(predefJarPath, Some("Predef.class")).collectFirst {
+      case obj: ObjectDecl if obj.name == "scala.Predef" =>
+        obj
+    }.toSeq
+  }
+
+
+  private val symbolsInContext: Map[String, Seq[(MethodDecl, AST.Decl)]] = {
+    loadedClasses.flatMap { klass =>
+      klass.methods.map { method =>
+        method -> klass
+      }
+    }
+  }.groupBy { _._1.name }
 
   private def javaRef(decl: AST.Decl): JavaType.Class = decl match {
     case objectDecl: ObjectDecl =>
@@ -243,16 +254,15 @@ object ScalaCompiler {
 
     expr match {
       case Func(name, args) =>
-        predef.methods.find { decl => decl.name == name && decl.arguments.size == args.size } match {
-          case None =>
-            ???
-          case Some(method) =>
+        val symbol = symbolsInContext.get(name).toSeq.flatten.find { case (method, _) =>
+          method.name == name && method.arguments.size == args.size
+        }
+
+        symbol match {
+          case Some((method, predef)) =>
             val klass = predef // we gonna generalise this later on
             println(method)
             val klassRef = javaRef(klass)
-
-            // TODO: multiple argument support
-            //val argExpr = eval(args.head)
 
             val signature = method.returnArguments.map {
               case SimpleType("scala.Any") =>
@@ -266,6 +276,7 @@ object ScalaCompiler {
 
             val methodRef = MethodRef(klassRef, method.name, signature)
 
+            // TODO: multiple argument support
             val argExpr = eval(args.head)
 
             klass match {
@@ -280,8 +291,13 @@ object ScalaCompiler {
                     maybeConvertToObject(argExpr) +
                     Code.op(Op.invoke(methodRef, Op.invoke.virtual))
                 }.addStackSize(1)
+              case other =>
+                ???
             }
-        }
+          case other =>
+            println(s"symbol ${name} not found")
+            ???
+       }
       case Ident("???") =>
         val predef = JavaType.Class("scala/Predef$")
         val nothing = JavaType.Class("scala/runtime/Nothing$")
