@@ -168,7 +168,7 @@ class Materializer {
 
       if (code.stackMap.size > 0) {
         body.putShort(1)
-        writeCodeAttributes(body, code)
+        writeCodeAttributes(body, method, code)
       } else {
         body.putShort(0)
       }
@@ -177,7 +177,7 @@ class Materializer {
     }
   }
 
-  private def writeCodeAttributes(body: ByteBufferStream, code: Code): Unit = {
+  private def writeCodeAttributes(body: ByteBufferStream, method: Method, code: Code): Unit = {
 
     body.putShort(const(Constant.Utf8("StackMapTable")))
 
@@ -185,31 +185,29 @@ class Materializer {
 
     body.putShort(code.stackMap.size)
 
-    if (code.stackMap.size > 0) {
-      body.putByte(80)
+    val stackMap = StackFrame(-1, Seq()) +: code.stackMap
 
-      code.stackMap(0).elements.map { element =>
-        writeElement(body, element)
-      }
+    stackMap.sliding(2).foreach {
+      case List(StackFrame(start, _), StackFrame(end, List(t))) if end - start < 65 =>
+        val offset = end - start - 1
+        body.putByte(offset + 64)
+        writeElement(body, t)
+      case List(StackFrame(start, _), StackFrame(end, stack)) =>
+        body.putByte(255) // type
+        body.putShort(end - start - 1) // offset delta
+
+        body.putShort(1) // number_of_locals
+
+        val stringArray = JavaType.Array(JavaType.String)
+        val stringArrayType = StackElement.Type(stringArray)
+
+        writeElement(body, stringArrayType)
+
+        body.putShort(stack.size)
+        stack.foreach { stackElement =>
+          writeElement(body, stackElement)
+        }
     }
-
-    if (code.stackMap.size > 1) {
-      body.putByte(255) // type
-      body.putShort(0) // offset delta
-
-      body.putShort(1) // number_of_locals
-
-      val a = JavaType.Array(JavaType.String)
-      val tmp = StackElement.Type(a)
-      writeElement(body, tmp)
-
-      body.putShort(2) // number_of_stack_items
-
-      code.stackMap(1).elements.foreach { element =>
-        writeElement(body, element)
-      }
-    }
-
     attributeLength.resolve()
   }
 

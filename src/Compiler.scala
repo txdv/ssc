@@ -138,13 +138,13 @@ object ScalaCompiler {
         val method = ns.findMethods(f).head
         val args = f.arguments
 
-        args.map(a => genops(a)).foldLeft(Code.empty)(_ + _) +
+        args.map(a => genops(a, stack)).foldLeft(Code.empty)(_ + _) +
           Code.op(Op.invoke(method, Op.invoke.static))
       case Stri(arg) =>
         Code.op(Op.ldc(ConstString(arg)), stackSize = 1)
       case Num(a) =>
         val num = a.toInt
-        if (num <= 3) {
+        if (num >= -1 && num <= 5) {
           Code.op(Op.iconst(num), stackSize = 1)
         } else if (num <= 255) {
           Code.op(Op.bipush(num.toByte), stackSize = 1)
@@ -157,7 +157,11 @@ object ScalaCompiler {
       case ExprOp("+", left, right) =>
         guessType(left) match {
           case JavaType.Int =>
-            genops(left) + genops(right) + Code.op(Op.iadd).withStackSize(expr.depth)
+            // TODO: right might not be Int
+            genops(left, stack) +
+              genops(right, stack) +
+              Code.op(Op.iadd)
+                .withStackSize(expr.depth)
           case leftType =>
             println(s"left type: $leftType")
             ???
@@ -167,8 +171,8 @@ object ScalaCompiler {
           .withStackSize(2)
 
         val newStack =
-          stack.map(_.addOffset(pre.codeSize + 7)) ++
-          stack.map(_.add(pre.codeSize + 8, StackElement.Type(JavaType.Int)))
+          stack.map(_.addOffset(7)) ++
+          stack.map(_.add(8, StackElement.Type(JavaType.Int)))
 
         pre +
           Code.ops(Seq(
@@ -246,7 +250,6 @@ object ScalaCompiler {
       JavaType.Class(objectDecl.name.replace(".", "/") + "$")
     case classDecl: AST.ClassDecl =>
       JavaType.Class(classDecl.name.replace(".", "/"))
-
   }
 
   def convertBody(expr: Expr): Code = {
@@ -286,7 +289,7 @@ object ScalaCompiler {
                 {
                   Code.op(Op.getstatic(module), stackSize = 1, localsCount = 1) +
                     genops(argExpr, Seq(
-                      StackFrame(offset = 3, Seq(StackElement.Type(module.signature.head)))
+                      StackFrame(offset = 0, Seq(StackElement.Type(module.signature.head)))
                     )) +
                     maybeConvertToObject(argExpr) +
                     Code.op(Op.invoke(methodRef, Op.invoke.virtual))

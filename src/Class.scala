@@ -167,7 +167,7 @@ case class Code(
       Math.max(stackSize, other.stackSize),
       localsCount + other.localsCount,
       ops ++ other.ops,
-      stackMap ++ other.stackMap)
+      stackMap ++ other.stackMap.map(_.addOffset(codeSize)))
   }
 
   def +(otherOption: Option[Code]): Code = {
@@ -246,7 +246,7 @@ object Op {
       case invoke(_, itype) => 3
       case Op.Return => 1
       case getstatic(_) => 3
-      case bipush(_) => 1
+      case bipush(_) => 2
       case if_icmpne(_) => 3
       case iconst(value) =>
         if ((value >= 0 && value <= 5) || (value == -1)) 1 else 3
