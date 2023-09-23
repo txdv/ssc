@@ -181,6 +181,27 @@ object ScalaCompiler {
             Op.goto(4),
             Op.iconst(0),
           )).withStackMap(newStack)
+      case If(ExprOp("==", left, right), leftBranch, rightBranch) =>
+        // some code reusage from above?
+
+        val pre = genops(left) + genops(right)
+          .withStackSize(2)
+
+        val l = genops(leftBranch, stack)
+        val r = genops(rightBranch, stack)
+
+        val newStack =
+          stack.map(_.addOffset(3 + 3 + l.codeSize)) ++
+            stack.map(_.add(3 + 3 + l.codeSize + r.codeSize, StackElement.Type(guessType(leftBranch))))
+
+          pre + {
+            Code.empty +
+            Op.if_icmpne(3 + 3 + l.codeSize) +
+              l +
+              Op.goto(3 + r.codeSize) +
+              r
+          }.withStackMap(newStack)
+
       case err =>
         println(s"error: $err")
         ???
@@ -204,8 +225,8 @@ object ScalaCompiler {
         JavaType.Boolean
       case ExprOp(_, left, _) =>
         guessType(left)
-      case If(cond, left, right) =>
-        ???
+      case If(_, left, right) =>
+        guessType(left)
       case _ =>
         println("HERE:")
         println(expr)

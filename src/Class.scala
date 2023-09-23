@@ -162,6 +162,10 @@ case class Code(
   ops: Seq[Op],
   stackMap: Seq[StackFrame]) {
 
+  def +(op: Op): Code = {
+    copy(ops = ops :+ op)
+  }
+
   def +(other: Code): Code = {
     Code(
       Math.max(stackSize, other.stackSize),

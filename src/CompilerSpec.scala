@@ -240,4 +240,30 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
     """ } should be ("1\n2\n")
   }
 */
+
+  "Compiler" should "support multiple statements in a row with stackframes" in {
+    compileAndRun {
+      """
+        |object MainApp {
+        |  def main(args: Array[String]): Unit = {
+        |    println(Math.addExact(1, 2) == 3)
+        |    println(Math.addExact(1, 2) == 4)
+        |  }
+        |}
+        |""".stripMargin
+    } should be ("true\nfalse\n")
+  }
+
+
+  "Compiler" should "println if statement" in {
+    compileAndRun {
+      """
+        |object MainApp {
+        |  def main(args: Array[String]): Unit = {
+        |    println(if (Math.addExact(1, 2) == 3) "yes" else "no")
+        |  }
+        |}
+        |""".stripMargin
+    } should be("yes\n")
+  }
 }
