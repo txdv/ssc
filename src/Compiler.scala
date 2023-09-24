@@ -201,7 +201,6 @@ object ScalaCompiler {
         genops(left, stack) +
           genops(right, stack) +
           Code.op(Op.iadd)
-            .withStackSize(5)
       case ExprOp("==", left, right) if sameType(left, right)(JavaType.Int) =>
         val pre = genops(left) + genops(right)
           .withStackSize(2)
@@ -221,7 +220,7 @@ object ScalaCompiler {
         val pre = {
           maybeBox(genops(left, stack), left) +
             maybeBox(genops(right, stack), right)
-        }.withStackSize(2)
+        }
 
         pre +
           Op.invoke(equalsMethod, Op.invoke.virtual) + {
@@ -238,7 +237,6 @@ object ScalaCompiler {
         // some code reusage from above?
 
         val pre = genops(left) + genops(right)
-          .withStackSize(2)
 
         val l = genops(leftBranch, stack)
         val r = genops(rightBranch, stack)
