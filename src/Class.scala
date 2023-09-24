@@ -13,6 +13,11 @@ import ssc.classfile.{
 }
 import java.nio.ByteBuffer
 
+object ScalaType {
+
+  val Nothing = JavaType.Class("scala/runtime/Nothing$")
+
+}
 
 sealed trait JavaType {
 

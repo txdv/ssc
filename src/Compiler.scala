@@ -1,11 +1,11 @@
 package ssc
 
 import ssc.classfile.Version
-import ssc.classfile.higher.{AccessFlag, Class, ClassAccessFlag, ClassFile, Code, ConstString, FieldRef, JavaType, Method, MethodRef, Op, StackElement, StackFrame}
+import ssc.classfile.higher.{AccessFlag, Class, ClassAccessFlag, ClassFile, Code, ConstString, FieldRef, JavaType, Method, MethodRef, Op, ScalaType, StackElement, StackFrame}
 import ssc.lexer.Lexer
 import ssc.parser.Parser
 import ssc.parser.scala.{AST, Scala}
-import ssc.parser.scala.AST.{Expr, Ident, MethodDecl, ObjectDecl}
+import ssc.parser.scala.AST.{Expr, MethodDecl, ObjectDecl}
 import ssc.span.Span
 import ssc.misc.PrettyPrint
 import ssc.classfile.types.runtime.Types
@@ -295,9 +295,10 @@ object ScalaCompiler {
         guessType(left)
       case If(_, left, right) =>
         guessType(left)
+      case Ident("???") =>
+        ScalaType.Nothing
       case _ =>
-        println("HERE:")
-        println(expr)
+        println(s"cant' guess the type of $expr")
         ???
     }
   }
