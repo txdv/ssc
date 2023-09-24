@@ -30,4 +30,19 @@ class CodeSpec extends AnyFlatSpec with should.Matchers {
     code.stackSize should be(1)
     code.maxStackSize should be(2)
   }
+
+  "Code" should "take into account invoke method argument count" in {
+    // first element in the signature is the return type
+    val invokeWith2Args = Code.empty + Op.invoke(
+      MethodRef(JavaType.Object, "method", Seq(JavaType.Int, JavaType.Int, JavaType.Int)),
+      Op.invoke.virtual,
+    )
+
+    val invokeWith1Args = Code.empty + Op.invoke(
+      MethodRef(JavaType.Object, "method", Seq(JavaType.Int, JavaType.Int)),
+      Op.invoke.virtual,
+    )
+
+    invokeWith1Args.stackSize should be(0)
+  }
 }
