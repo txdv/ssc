@@ -266,4 +266,17 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
         |""".stripMargin
     } should be("yes\n")
   }
+
+  "Compiler" should "be able to call equals method on Object" in {
+    compileAndRun {
+      """
+        |object MainApp {
+        |  def main(args: Array[String]): Unit = {
+        |    println("asd" == "ASD")
+        |  }
+        |}
+        |""".stripMargin
+    } should be("false\n")
+
+  }
 }

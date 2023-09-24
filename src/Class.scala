@@ -240,6 +240,8 @@ object Op {
 
   case class if_acmpne(offset: Int) extends Op
   case class if_icmpne(offset: Int) extends Op
+
+  case class ifeq(offset: Int) extends Op
   case class goto(offset: Int) extends Op
 
   def size(op: Op): Int = {
@@ -256,6 +258,7 @@ object Op {
         if ((value >= 0 && value <= 5) || (value == -1)) 1 else 3
       case goto(_) => 3
       case ldc(_) => 2
+      case ifeq(_) => 3
       case _ =>
         println(s"missing: $op")
         ???
@@ -274,6 +277,13 @@ case class MethodRef(
   signature: Seq[JavaType])
 {
   def returnType: JavaType = signature.head
+}
+
+object MethodRef {
+  def apply(jclass: JavaType.Class, name: String, singleArgument: JavaType): MethodRef = {
+    MethodRef(jclass, name, Seq(singleArgument))
+  }
+
 }
 
 case class Method(

@@ -166,7 +166,7 @@ object ScalaCompiler {
             println(s"left type: $leftType")
             ???
         }
-      case ExprOp("==", left, right) =>
+      case ExprOp("==", left, right) if sameType(left, right)(JavaType.Int) =>
         val pre = genops(left) + genops(right)
           .withStackSize(2)
 
@@ -181,6 +181,23 @@ object ScalaCompiler {
             Op.goto(4),
             Op.iconst(0),
           )).withStackMap(newStack)
+      case ExprOp("==", left, right) =>
+        val pre = {
+          genops(left, stack) +
+            genops(right, stack)
+        }.withStackSize(2)
+
+        pre +
+          Op.invoke(equalsMethod, Op.invoke.virtual) + {
+            Code.empty +
+              Op.ifeq(7) +
+              Op.iconst(1) +
+              Op.goto(4) +
+              Op.iconst(0)
+          }.withStackMap {
+            stack.map(_.addOffset(7)) ++
+            stack.map(_.add(8, StackElement.Type(JavaType.Int)))
+        }
       case If(ExprOp("==", left, right), leftBranch, rightBranch) =>
         // some code reusage from above?
 
@@ -208,6 +225,8 @@ object ScalaCompiler {
     }
   }
 
+  private val equalsMethod = MethodRef(JavaType.Object, "equals", Seq(JavaType.Boolean, JavaType.Object))
+
   def guessType(expr: Expr): JavaType = {
     import AST._
     expr match {
@@ -232,6 +251,12 @@ object ScalaCompiler {
         println(expr)
         ???
     }
+  }
+
+  def sameType(left: Expr, right: Expr)(t: JavaType): Boolean = {
+    val l = guessType(left)
+    val r = guessType(right)
+    l == r && r == t
   }
 
   def convertBody(statement: AST.Statement): Code = {
@@ -285,7 +310,6 @@ object ScalaCompiler {
         symbol match {
           case Some((method, predef)) =>
             val klass = predef // we gonna generalise this later on
-            println(method)
             val klassRef = javaRef(klass)
 
             val signature = method.returnArguments.map {

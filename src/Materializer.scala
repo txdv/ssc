@@ -274,6 +274,8 @@ class Materializer {
          ByteArray(0xa0, (offset >> 8) & 0xff, offset & 0xff)
       case goto(offset) =>
          ByteArray(0xa7, (offset >> 8) & 0xff, offset & 0xff)
+      case ifeq(offset) =>
+        ByteArray(0x99, (offset >> 8) & 0xff, offset & 0xff)
       case _ =>
         println(s"missing op: $op")
         ???
