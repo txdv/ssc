@@ -5,7 +5,7 @@ import ssc.classfile.higher.{AccessFlag, Class, ClassAccessFlag, ClassFile, Code
 import ssc.lexer.Lexer
 import ssc.parser.Parser
 import ssc.parser.scala.{AST, Scala}
-import ssc.parser.scala.AST.{Expr, MethodDecl, ObjectDecl}
+import ssc.parser.scala.AST.{Expr, Ident, MethodDecl, ObjectDecl}
 import ssc.span.Span
 import ssc.misc.PrettyPrint
 import ssc.classfile.types.runtime.Types
@@ -131,15 +131,56 @@ object ScalaCompiler {
   ))
 
 
-  def genops(expr: Expr, stack: Seq[StackFrame] = Seq.empty): Code = {
+  def genops(expr: Expr, stack: Seq[StackFrame] = Seq.empty, locals: Seq[JavaType] = Seq.empty): Code = {
     import AST._
     expr match {
-      case f: Func =>
-        val method = ns.findMethods(f).head
-        val args = f.arguments
+      case f@Func(name, args) =>
+        val symbol = symbolsInContext.get(name).toSeq.flatten.find { case (method, _) =>
+          method.name == name && method.arguments.size == args.size
+        }
 
-        args.map(a => genops(a, stack)).foldLeft(Code.empty)(_ + _) +
-          Code.op(Op.invoke(method, Op.invoke.static))
+        symbol match {
+          case Some((method, predef)) =>
+            val klass = predef // we gonna generalise this later on
+            val klassRef = javaRef(klass)
+
+            val signature = method.returnArguments.map {
+              case SimpleType("scala.Any") =>
+                JavaType.Object
+              case SimpleType("scala.Unit") =>
+                JavaType.Void
+              case other =>
+                println(other)
+                ???
+            }
+
+            val methodRef = MethodRef(klassRef, method.name, signature)
+
+            // TODO: multiple argument support
+            val argExpr = eval(args.head)
+
+            klass match {
+              case objectDecl: ObjectDecl =>
+                val module = FieldRef(klassRef, "MODULE$", Seq(klassRef))
+
+                {
+                  Code.op(Op.getstatic(module), stackSize = 1, localsCount = 1) +
+                    genops(argExpr, Seq(
+                      StackFrame(offset = 0, Seq(StackElement.Type(module.signature.head)))
+                    )) +
+                    maybeConvertToObject(argExpr) +
+                    Code.op(Op.invoke(methodRef, Op.invoke.virtual))
+                }.addStackSize(1)
+              case other =>
+                ???
+            }
+          case other =>
+            val method = ns.findMethods(f).head
+            val args = f.arguments
+
+            args.map(a => genops(a, stack)).foldLeft(Code.empty)(_ + _) +
+              Code.op(Op.invoke(method, Op.invoke.static))
+        }
       case Stri(arg) =>
         Code.op(Op.ldc(ConstString(arg)), stackSize = 1)
       case Num(a) =>
@@ -183,8 +224,8 @@ object ScalaCompiler {
           )).withStackMap(newStack)
       case ExprOp("==", left, right) =>
         val pre = {
-          genops(left, stack) +
-            genops(right, stack)
+          maybeBox(genops(left, stack), left) +
+            maybeBox(genops(right, stack), right)
         }.withStackSize(2)
 
         pre +
@@ -218,7 +259,15 @@ object ScalaCompiler {
               Op.goto(3 + r.codeSize) +
               r
           }.withStackMap(newStack)
+      case Ident("???") =>
+        val predef = JavaType.Class("scala/Predef$")
+        val nothing = JavaType.Class("scala/runtime/Nothing$")
+        val method = MethodRef(predef, "$qmark$qmark$qmark", Seq(nothing))
 
+        Code.ops(Seq(
+          Op.getstatic(FieldRef(predef, "MODULE$", Seq(predef))),
+          Op.invoke(method, Op.invoke.virtual),
+        )).copy(localsCount = 1, stackSize = 1)
       case err =>
         println(s"error: $err")
         ???
@@ -261,10 +310,10 @@ object ScalaCompiler {
 
   def convertBody(statement: AST.Statement): Code = {
     statement match {
-      case expr: Expr => convertBody(expr)
+      case expr: Expr =>
+        genops(expr)
       case AST.Multi(all) =>
-        val empty = Code(0, 0, Seq.empty, Seq.empty)
-        all.map(convertBody).foldLeft(empty)(_ + _)
+        all.map(convertBody).foldLeft(Code.empty)(_ + _)
       case b: AST.VarDecl =>
         println(b)
         ???
@@ -298,73 +347,14 @@ object ScalaCompiler {
       JavaType.Class(classDecl.name.replace(".", "/"))
   }
 
-  def convertBody(expr: Expr): Code = {
-    import AST._
-
-    expr match {
-      case Func(name, args) =>
-        val symbol = symbolsInContext.get(name).toSeq.flatten.find { case (method, _) =>
-          method.name == name && method.arguments.size == args.size
-        }
-
-        symbol match {
-          case Some((method, predef)) =>
-            val klass = predef // we gonna generalise this later on
-            val klassRef = javaRef(klass)
-
-            val signature = method.returnArguments.map {
-              case SimpleType("scala.Any") =>
-                JavaType.Object
-              case SimpleType("scala.Unit") =>
-                JavaType.Void
-              case other =>
-                println(other)
-                ???
-            }
-
-            val methodRef = MethodRef(klassRef, method.name, signature)
-
-            // TODO: multiple argument support
-            val argExpr = eval(args.head)
-
-            klass match {
-              case objectDecl: ObjectDecl =>
-                val module = FieldRef(klassRef, "MODULE$", Seq(klassRef))
-
-                {
-                  Code.op(Op.getstatic(module), stackSize = 1, localsCount = 1) +
-                    genops(argExpr, Seq(
-                      StackFrame(offset = 0, Seq(StackElement.Type(module.signature.head)))
-                    )) +
-                    maybeConvertToObject(argExpr) +
-                    Code.op(Op.invoke(methodRef, Op.invoke.virtual))
-                }.addStackSize(1)
-              case other =>
-                ???
-            }
-          case other =>
-            println(s"symbol ${name} not found")
-            ???
-       }
-      case Ident("???") =>
-        val predef = JavaType.Class("scala/Predef$")
-        val nothing = JavaType.Class("scala/runtime/Nothing$")
-        val method = MethodRef(predef, "$qmark$qmark$qmark", Seq(nothing))
-
-        Code.ops(Seq(
-          Op.getstatic(FieldRef(predef, "MODULE$", Seq(predef))),
-          Op.invoke(method, Op.invoke.virtual),
-        )).copy(localsCount = 1, stackSize = 1)
-      case _ =>
-        ???
-    }
-  }
-
-
 
   val boxesRunTime = JavaType.Class("scala/runtime/BoxesRunTime")
   val boxToInteger = MethodRef(boxesRunTime, "boxToInteger", Seq(JavaType.Integer, JavaType.Int))
   val boxToBoolean = MethodRef(boxesRunTime, "boxToBoolean", Seq(JavaType.JavaBoolean, JavaType.Boolean))
+
+  private def maybeBox(code: Code, expr: Expr): Code = {
+    code + maybeConvertToObject(expr)
+  }
   private def maybeConvertToObject(expr: Expr): Option[Code] = {
     guessType(expr) match {
       case JavaType.Int =>
@@ -373,9 +363,7 @@ object ScalaCompiler {
         Some(Code.op(Op.invoke(boxToBoolean, Op.invoke.static)))
       case _ =>
         None
-
     }
-
   }
 
   def convert(method: MethodDecl): Method = {

@@ -277,6 +277,18 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
         |}
         |""".stripMargin
     } should be("false\n")
-
   }
+
+  "Compiler" should "convert value type to object before calling equal" in {
+    compileAndRun {
+      """
+        |object MainApp {
+        |  def main(args: Array[String]): Unit = {
+        |    println("asd" == 123)
+        |  }
+        |}
+        |""".stripMargin
+    } should be("false\n")
+  }
+
 }
