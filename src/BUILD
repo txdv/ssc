@@ -119,6 +119,13 @@ scala_binary(
     scalacopts = fatal_warnings(),
     main_class = "ssc.classfile.higher.MainApp")
 
+
+scala_test(
+    name = "code_spec",
+    srcs = ["CodeSpec.scala"],
+    deps = [":class"],
+    scalacopts = fatal_warnings())
+
 scala_test(
     name = "class_spec",
     srcs = ["ClassSpec.scala"],

@@ -164,7 +164,7 @@ object ScalaCompiler {
                 val module = FieldRef(klassRef, "MODULE$", Seq(klassRef))
 
                 {
-                  Code.op(Op.getstatic(module), stackSize = 1, localsCount = 1) +
+                  Code.op(Op.getstatic(module)) +
                     genops(argExpr, Seq(
                       StackFrame(offset = 0, Seq(StackElement.Type(module.signature.head)))
                     )) +
@@ -182,31 +182,26 @@ object ScalaCompiler {
               Code.op(Op.invoke(method, Op.invoke.static))
         }
       case Stri(arg) =>
-        Code.op(Op.ldc(ConstString(arg)), stackSize = 1)
+        Code.op(Op.ldc(ConstString(arg)))
       case Num(a) =>
         val num = a.toInt
         if (num >= -1 && num <= 5) {
-          Code.op(Op.iconst(num), stackSize = 1)
+          Code.op(Op.iconst(num))
         } else if (num <= 255) {
-          Code.op(Op.bipush(num.toByte), stackSize = 1)
+          Code.op(Op.bipush(num.toByte))
         } else {
-          Code.op(Op.iconst(a.toInt), stackSize = 1)
+          Code.op(Op.iconst(a.toInt))
         }
       case Bool(value) =>
         val op = if (value) Op.iconst(1) else Op.iconst(0)
-        Code.op(op, stackSize = 1)
-      case ExprOp("+", left, right) =>
-        guessType(left) match {
-          case JavaType.Int =>
-            // TODO: right might not be Int
-            genops(left, stack) +
-              genops(right, stack) +
-              Code.op(Op.iadd)
-                .withStackSize(expr.depth)
-          case leftType =>
-            println(s"left type: $leftType")
-            ???
-        }
+        Code.op(op)
+      case ExprOp("+", left, right) if guessType(left) == JavaType.Int =>
+        // TODO: right might not be Int
+        println("HERE")
+        genops(left, stack) +
+          genops(right, stack) +
+          Code.op(Op.iadd)
+            .withStackSize(5)
       case ExprOp("==", left, right) if sameType(left, right)(JavaType.Int) =>
         val pre = genops(left) + genops(right)
           .withStackSize(2)

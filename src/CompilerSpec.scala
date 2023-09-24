@@ -205,8 +205,8 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     }
   }
-/*
-  "Compiler" should "stack depth check" in {
+
+  "Compiler" should "calculate stack depth correctly" in {
     compileAndRun { """
       object MainApp {
         def main(args: Array[String]): Unit = {
@@ -215,7 +215,6 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
       }
     """ } should be ("false\n")
   }
-*/
 
   "Compiler" should "method with two lines" in {
     compileAndRun { """

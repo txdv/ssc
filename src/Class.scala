@@ -161,22 +161,43 @@ case class StackFrame(offset: Int, elements: Seq[StackElement]) {
   }
 }
 
-case class Code(
-  stackSize: Int,
-  localsCount: Int,
+case class Code private(
   ops: Seq[Op],
-  stackMap: Seq[StackFrame]) {
+  localsCount: Int,
+  stackSize: Int, // the stack size at the end of the block
+  maxStackSize: Int = 0,
+  stackMap: Seq[StackFrame],
+) { // the maximum stack size at some point
 
   def +(op: Op): Code = {
-    copy(ops = ops :+ op)
+    this + Code.op(op)
   }
 
   def +(other: Code): Code = {
+    val combinedStackSize = stackSize + other.stackSize
     Code(
-      Math.max(stackSize, other.stackSize),
-      localsCount + other.localsCount,
       ops ++ other.ops,
-      stackMap ++ other.stackMap.map(_.addOffset(codeSize)))
+      Math.max(localsCount, other.localsCount), // TODO: questionable at best
+      stackSize + other.stackSize,
+      Math.max(Math.max(maxStackSize, other.maxStackSize), combinedStackSize),
+      stackMap ++ other.stackMap.map(_.addOffset(codeSize)),
+    )
+  }
+
+  // nice for debugging
+  private def print(other: Code): Unit = {
+    val combinedStackSize = stackSize + other.stackSize
+    print
+    other.print
+    println(s"new stack size is $combinedStackSize")
+  }
+  private def print: Unit = {
+    println(s"stackSize: ${stackSize}")
+    var i = 0
+    ops.foreach { op =>
+      println(s"$i: op: $op")
+      i += 1
+    }
   }
 
   def +(otherOption: Option[Code]): Code = {
@@ -206,12 +227,37 @@ case class Code(
 object Code {
   val empty = Code(stackSize = 0, localsCount = 0, ops = Seq.empty, stackMap = Seq.empty)
 
-  def op(op: Op, stackSize: Int = 0, localsCount: Int = 0): Code = {
-    Code(stackSize, localsCount, ops = Seq(op), stackMap = Seq.empty)
+  def op(op: Op): Code = {
+    val s = stackSize(op)
+    Code(Seq(op), localsCount= 1, stackSize = s, maxStackSize = s, stackMap = Seq.empty)
   }
 
   def ops(ops: Seq[Op]): Code = {
-    Code(stackSize = 0, localsCount = 0, ops, stackMap = Seq.empty)
+    ops.foldLeft(Code.empty)(_ + _)
+  }
+
+  def stackSize(op: Op): Int = {
+    import Op._
+    op match {
+      case iconst(_) => 1
+      case bipush(_) => 1
+      case Return => 0
+      case astore(_) => -3
+      case aload(_) => -1
+      case Op.dup => 1
+      case getstatic(_) => 1
+      case goto(_) => 0
+      case Op.iadd => -1
+      case if_icmpne(_) => -2
+      case if_acmpne(_) => -2
+      case ifeq(_) => -1
+      case invoke(methodRef, _) =>
+        // 1 methods return something
+        // TODO: does unit return something?
+        1 - (methodRef.signature.length - 1)
+      case ldc(_) => 1
+      case newobj(_) => 1
+    }
   }
 }
 
@@ -580,10 +626,12 @@ object Converter {
       CodeAttribute.parse(classFile, attribute).map { codeAttribute =>
         import codeAttribute._
         Code(
-          maxStack,
-          maxLocals,
           instructions.map(instr => convert(instr)(classFile)),
-          stackMap = Seq.empty)
+          maxLocals,
+          stackMap = Seq.empty,
+          stackSize = 0, //TODO: calculate from code
+          maxStackSize =  maxStack,
+        )
       }
     }
   }
