@@ -123,7 +123,7 @@ object ScalaSignature {
       case k: ClassSymbol =>
         val klassMethods = methods.filter(_._1 == k.index).map(_._2)
         val name = getName(k)
-        if (objectDecls.contains(name)) AST.ObjectDecl(name, klassMethods)
+        if (objectDecls.contains(name) && k.isModule) AST.ObjectDecl(name, klassMethods)
         else ClassDecl(name, klassMethods)
     }
 
