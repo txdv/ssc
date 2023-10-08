@@ -37,7 +37,13 @@ object AST {
   case class ObjectDecl(name: String, statements: Seq[Statement] = Seq.empty) extends Decl with Methods
   case class ClassDecl(name: String, statements: Seq[Statement] = Seq.empty, inherits: Seq[ScalaType] = List.empty) extends Decl with Methods
 
-  sealed trait ScalaType extends AST
+  sealed trait ScalaType extends AST {
+    def isArray: Boolean = this match {
+      case GenericType("Array", _) => true
+      case _ => false
+    }
+
+  }
   case class SimpleType(name: String) extends ScalaType
 
   case class GenericType(name: String, generics: Seq[ScalaType]) extends ScalaType

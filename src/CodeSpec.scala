@@ -11,6 +11,8 @@ class CodeSpec extends AnyFlatSpec with should.Matchers {
       val code = Code.op(op)
       code.stackSize should be(1)
       code.maxStackSize should be(1)
+      // TODO: calculate stack automatically
+      // code.currentStack should be(Seq(StackElement(JavaType.Int)))
     }
   }
 
@@ -45,4 +47,27 @@ class CodeSpec extends AnyFlatSpec with should.Matchers {
 
     invokeWith1Args.stackSize should be(0)
   }
+
+  "Code" should "represent negative stacks" in {
+    Code.op(Op.iadd).stackSize shouldBe -1
+  }
+
+  "Code" should "test" in {
+    val op = Seq(Op.bipush(2))
+    Code.calculateStack(op) shouldBe Seq(StackElement(JavaType.Int))
+  }
+
+  "Code" should "multiple bipush" in {
+    val op = Seq(Op.bipush(2), Op.bipush(3))
+    Code.calculateStack(op) shouldBe Seq(StackElement(JavaType.Int), StackElement(JavaType.Int))
+  }
+
+  "Code" should "handle aload" in {
+    Code.calculateStack(Seq(Op.aload(0)), Seq(JavaType.Int)) shouldBe Seq(StackElement(JavaType.Int))
+  }
+
+  "code" should "handle newobj" in {
+    Code.calculateStack(Seq(Op.newobj(JavaType.Object))) shouldBe Seq(StackElement(JavaType.Object))
+  }
 }
+

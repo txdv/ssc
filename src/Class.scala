@@ -2,15 +2,8 @@ package ssc.classfile.higher
 
 import ssc.span.Span
 import ssc.misc.PrettyPrint
-import ssc.classfile.{
-  AttributeInfo,
-  Constant,
-  Instr,
-  ClassFile,
-  CodeAttribute,
-  MethodInfo,
-  Version
-}
+import ssc.classfile.{AttributeInfo, ClassFile, CodeAttribute, Constant, Instr, MethodInfo, Version}
+
 import java.nio.ByteBuffer
 
 object ScalaType {
@@ -145,6 +138,10 @@ sealed trait StackElement
 object StackElement {
   case class Ref(ref: FieldRef) extends StackElement
   case class Type(jtype: JavaType) extends StackElement
+
+  def apply(ref: FieldRef): StackElement = Ref(ref)
+
+  def apply(jtype: JavaType): StackElement = Type(jtype)
 }
 
 case class StackFrame(offset: Int, elements: Seq[StackElement]) {
@@ -167,7 +164,9 @@ case class Code private(
   stackSize: Int, // the stack size at the end of the block
   maxStackSize: Int = 0,
   stackMap: Seq[StackFrame],
+  currentStack: Seq[StackElement] = Seq.empty,
 ) { // the maximum stack size at some point
+
 
   def +(op: Op): Code = {
     this + Code.op(op)
@@ -175,24 +174,32 @@ case class Code private(
 
   def +(other: Code): Code = {
     val combinedStackSize = stackSize + other.stackSize
-    Code(
+    val result = Code(
       ops ++ other.ops,
       Math.max(localsCount, other.localsCount), // TODO: questionable at best
       stackSize + other.stackSize,
-      Math.max(Math.max(maxStackSize, other.maxStackSize), combinedStackSize),
+      Math.max(Math.max(maxStackSize, stackSize + other.maxStackSize), combinedStackSize),
       stackMap ++ other.stackMap.map(_.addOffset(codeSize)),
     )
+    //debug2(result, other)
+    result
   }
 
-  // nice for debugging
-  private def print(other: Code): Unit = {
-    val combinedStackSize = stackSize + other.stackSize
-    print
-    other.print
-    println(s"new stack size is $combinedStackSize")
+  def debug2(result: Code, other: Code): Code = {
+    println("=====")
+    debug
+    println("+")
+    other.debug
+    println("=")
+    result.debug
+    println("=====")
+    result
   }
-  private def print: Unit = {
+
+  def debug: Unit = {
     println(s"stackSize: ${stackSize}")
+    println(s"maxStackSize: $maxStackSize")
+    println(s"stackMap: $stackMap")
     var i = 0
     ops.foreach { op =>
       println(s"$i: op: $op")
@@ -209,14 +216,6 @@ case class Code private(
     }
   }
 
-  def withStackSize(newStackSize: Int): Code = {
-    this.copy(stackSize = newStackSize)
-  }
-
-  def addStackSize(additional: Int): Code = {
-    withStackSize(stackSize + additional)
-  }
-
   def withStackMap(newStackMap: Seq[StackFrame]): Code = {
     this.copy(stackMap = newStackMap)
   }
@@ -225,7 +224,7 @@ case class Code private(
 }
 
 object Code {
-  val empty = Code(stackSize = 0, localsCount = 0, ops = Seq.empty, stackMap = Seq.empty)
+  val empty = Code(stackSize = 0, localsCount = 0, ops = Vector.empty, stackMap = Seq.empty)
 
   def op(op: Op): Code = {
     val s = stackSize(op)
@@ -243,7 +242,7 @@ object Code {
       case bipush(_) => 1
       case Return => 0
       case astore(_) => -3
-      case aload(_) => -1
+      case aload(_) => 1
       case Op.dup => 1
       case getstatic(_) => 1
       case goto(_) => 0
@@ -257,7 +256,51 @@ object Code {
         1 - (methodRef.signature.length - 1)
       case ldc(_) => 1
       case newobj(_) => 1
+      case Op.arraylength => 0
     }
+  }
+
+  def calculateStack(ops: Seq[Op], locals: Seq[JavaType] = Seq.empty): Seq[StackElement] = {
+    var stack = Seq.empty[StackElement]
+    val l = scala.collection.mutable.Seq(locals:_*)
+    ops.foreach {
+      case Op.bipush(_) =>
+        stack = stack :+ StackElement(JavaType.Int)
+      case Op.dup =>
+        stack = stack :+ stack.last
+      case Op.Return =>
+      case Op.aload(i) =>
+        stack = stack :+ StackElement(l(i))
+      case Op.astore(o) =>
+        stack.last match {
+          case StackElement.Type(t) =>
+            l.update(o, t)
+            stack = stack.dropRight(1)
+          case _ =>
+            ???
+        }
+      case Op.arraylength =>
+        stack = stack :+ StackElement(JavaType.Int)
+      case Op.iadd =>
+        stack = stack.dropRight(1)
+      case Op.getstatic(ref) =>
+        stack = stack :+ StackElement(ref)
+      case Op.goto(_) =>
+      case Op.iconst(_) =>
+        stack = stack :+ StackElement(JavaType.Int)
+      case Op.if_acmpne(_) =>
+      case Op.if_icmpne(_) =>
+      case Op.ifeq(_) =>
+      case Op.invoke(method, ret) =>
+        val count = method.signature.length - 1
+        stack = stack.dropRight(count) :+ StackElement(method.returnType)
+      case Op.ldc(ConstString(_)) =>
+        stack = stack :+ StackElement(JavaType.String)
+      case Op.newobj(o) =>
+        stack = stack :+ StackElement(o)
+    }
+    stack
+
   }
 }
 
@@ -272,6 +315,7 @@ object Op {
   case object iadd extends Op
 
   case class aload(index: Int) extends Op
+  case object arraylength extends Op
   case class astore(index: Int) extends Op
   case object Return extends Op
   case class invoke(method: MethodRef, invokeType: invoke.Type) extends Op
@@ -310,6 +354,7 @@ object Op {
       case goto(_) => 3
       case ldc(_) => 2
       case ifeq(_) => 3
+      case Op.arraylength => 1
       case _ =>
         println(s"missing: $op")
         ???
@@ -356,7 +401,8 @@ object Method {
 
   val DefaultConstructor = {
     val code = Code(
-      stackSize = 1,
+      stackSize = 0,
+      maxStackSize = 1,
       localsCount = 1,
       ops = Seq(
         Op.aload(0),

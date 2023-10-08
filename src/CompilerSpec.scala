@@ -6,9 +6,6 @@ import flatspec._
 import matchers._
 import ssc.parser.scala.AST.ObjectDecl
 
-import java.io.PrintStream
-import collection.JavaConverters._
-
 class CompilerSpec extends AnyFlatSpec with should.Matchers {
   def compileAndRun(code: String): String = {
     val codeBytes = code.getBytes
@@ -284,6 +281,18 @@ class CompilerSpec extends AnyFlatSpec with should.Matchers {
         |object MainApp {
         |  def main(args: Array[String]): Unit = {
         |    println("asd" == 123)
+        |  }
+        |}
+        |""".stripMargin
+    } should be("false\n")
+  }
+
+  "Compiler" should "be able to call method of Array class which is in scope" in {
+    compileAndRun {
+      """
+        |object MainApp {
+        |  def main(a: Array[String]): Unit = {
+        |    println(a.length == 3)
         |  }
         |}
         |""".stripMargin

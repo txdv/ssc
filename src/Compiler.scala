@@ -5,7 +5,7 @@ import ssc.classfile.higher.{AccessFlag, Class, ClassAccessFlag, ClassFile, Code
 import ssc.lexer.Lexer
 import ssc.parser.Parser
 import ssc.parser.scala.{AST, Scala}
-import ssc.parser.scala.AST.{Expr, MethodDecl, ObjectDecl}
+import ssc.parser.scala.AST.{ClassDecl, Expr, GenericType, MethodDecl, MethodDeclArgument, ObjectDecl, ScalaType, SimpleType}
 import ssc.span.Span
 import ssc.misc.PrettyPrint
 import ssc.classfile.types.runtime.Types
@@ -34,7 +34,7 @@ object ScalaCompiler {
             signature = sig,
             access = Set(AccessFlag.Public, AccessFlag.Static),
             code = defMethod
-              .body.map(convertBody)
+              .body.map(statement => convertBody(statement, defMethod.arguments))
               .map(_ + Code.op(Op.Return)))
         }
       },
@@ -131,7 +131,7 @@ object ScalaCompiler {
   ))
 
 
-  def genops(expr: Expr, stack: Seq[StackFrame] = Seq.empty, locals: Seq[JavaType] = Seq.empty): Code = {
+  def genops(expr: Expr, stack: Seq[StackFrame] = Seq.empty, locals: Seq[MethodDeclArgument]): Code = {
     import AST._
     expr match {
       case f@Func(name, args) =>
@@ -167,19 +167,23 @@ object ScalaCompiler {
                   Code.op(Op.getstatic(module)) +
                     genops(argExpr, Seq(
                       StackFrame(offset = 0, Seq(StackElement.Type(module.signature.head)))
-                    )) +
-                    maybeConvertToObject(argExpr) +
+                    ), locals) +
+                    maybeConvertToObject(argExpr, locals) +
                     Code.op(Op.invoke(methodRef, Op.invoke.virtual))
-                }.addStackSize(1)
+                }
               case other =>
                 ???
             }
           case other =>
-            val method = ns.findMethods(f).head
-            val args = f.arguments
+            ns.findMethods(f).headOption match {
+              case None =>
+                ???
+              case Some(method) =>
+                val args = f.arguments
 
-            args.map(a => genops(a, stack)).foldLeft(Code.empty)(_ + _) +
-              Code.op(Op.invoke(method, Op.invoke.static))
+                args.map(a => genops(a, stack, locals)).foldLeft(Code.empty)(_ + _) +
+                  Code.op(Op.invoke(method, Op.invoke.static))
+            }
         }
       case Stri(arg) =>
         Code.op(Op.ldc(ConstString(arg)))
@@ -195,15 +199,16 @@ object ScalaCompiler {
       case Bool(value) =>
         val op = if (value) Op.iconst(1) else Op.iconst(0)
         Code.op(op)
-      case ExprOp("+", left, right) if guessType(left) == JavaType.Int =>
+      case ExprOp("+", left, right) if guessType(left, locals) == JavaType.Int =>
         // TODO: right might not be Int
         println("HERE")
-        genops(left, stack) +
-          genops(right, stack) +
+        genops(left, stack, locals) +
+          genops(right, stack, locals) +
           Code.op(Op.iadd)
-      case ExprOp("==", left, right) if sameType(left, right)(JavaType.Int) =>
-        val pre = genops(left) + genops(right)
-          .withStackSize(2)
+      case ExprOp("==", left, right) if sameType(left, right, locals)(JavaType.Int) =>
+        val l = genops(left, stack, locals)
+        val r = genops(right, stack, locals)
+        val pre = l + r
 
         val newStack =
           stack.map(_.addOffset(7)) ++
@@ -218,8 +223,8 @@ object ScalaCompiler {
           )).withStackMap(newStack)
       case ExprOp("==", left, right) =>
         val pre = {
-          maybeBox(genops(left, stack), left) +
-            maybeBox(genops(right, stack), right)
+          maybeBox(genops(left, stack, locals), left, locals) +
+            maybeBox(genops(right, stack, locals), right, locals)
         }
 
         pre +
@@ -233,25 +238,31 @@ object ScalaCompiler {
             stack.map(_.addOffset(7)) ++
             stack.map(_.add(8, StackElement.Type(JavaType.Int)))
         }
-      case If(ExprOp("==", left, right), leftBranch, rightBranch) =>
+      case a@If(ExprOp("==", left, right), leftBranch, rightBranch) =>
         // some code reusage from above?
 
-        val pre = genops(left) + genops(right)
+        val pre = genops(left, stack, locals) + genops(right, stack, locals)
 
-        val l = genops(leftBranch, stack)
-        val r = genops(rightBranch, stack)
+        val l = genops(leftBranch, stack, locals)
+        val r = genops(rightBranch, stack, locals)
 
         val newStack =
           stack.map(_.addOffset(3 + 3 + l.codeSize)) ++
-            stack.map(_.add(3 + 3 + l.codeSize + r.codeSize, StackElement.Type(guessType(leftBranch))))
+            stack.map(_.add(3 + 3 + l.codeSize + r.codeSize, StackElement.Type(guessType(leftBranch, locals))))
 
-          pre + {
-            Code.empty +
-            Op.if_icmpne(3 + 3 + l.codeSize) +
-              l +
-              Op.goto(3 + r.codeSize) +
-              r
-          }.withStackMap(newStack)
+          val result = pre + {
+            {
+              Code.empty +
+                Op.if_icmpne(3 + 3 + l.codeSize) +
+                l +
+                Op.goto(3 + r.codeSize) +
+                r
+            }.withStackMap(newStack)
+          }
+
+        //println(result)
+
+        result
       case Ident("???") =>
         val predef = JavaType.Class("scala/Predef$")
         val nothing = JavaType.Class("scala/runtime/Nothing$")
@@ -261,6 +272,26 @@ object ScalaCompiler {
           Op.getstatic(FieldRef(predef, "MODULE$", Seq(predef))),
           Op.invoke(method, Op.invoke.virtual),
         )).copy(localsCount = 1, stackSize = 1)
+      case Ident(path) =>
+        path.split("\\.") match {
+          case Array(field, method) =>
+            locals.find(_.name == field) match {
+              case Some(result) if result.argumentType.isArray && method == "length" =>
+                Code.empty +
+                  Op.aload(0) +
+                  Op.arraylength
+              case Some(some) =>
+                println(s"don't know what to do with $some")
+                ???
+              case None =>
+                println(s"no identifier in scope '$field'")
+                ???
+            }
+          case _ =>
+            println(s"trying to reference $path")
+            ???
+
+        }
       case err =>
         println(s"error: $err")
         ???
@@ -269,7 +300,7 @@ object ScalaCompiler {
 
   private val equalsMethod = MethodRef(JavaType.Object, "equals", Seq(JavaType.Boolean, JavaType.Object))
 
-  def guessType(expr: Expr): JavaType = {
+  def guessType(expr: Expr, locals: Seq[MethodDeclArgument]): JavaType = {
     import AST._
     expr match {
       case _: Stri =>
@@ -285,29 +316,85 @@ object ScalaCompiler {
       case ExprOp("==", _, _) =>
         JavaType.Boolean
       case ExprOp(_, left, _) =>
-        guessType(left)
+        guessType(left, locals)
       case If(_, left, right) =>
-        guessType(left)
+        guessType(left, locals)
+      case Ident("args.length") =>
+        // TODO: quick hack
+      JavaType.Int
       case Ident("???") =>
         ScalaType.Nothing
+      case Ident(something) =>
+        guessIdentType(something.split("\\.").toList, locals)
       case _ =>
-        println(s"cant' guess the type of $expr")
+        println(locals)
+        println(s"can't guess the type of $expr")
         ???
     }
   }
 
-  def sameType(left: Expr, right: Expr)(t: JavaType): Boolean = {
-    val l = guessType(left)
-    val r = guessType(right)
+  def guessIdentType(identifier: List[String], locals: Seq[MethodDeclArgument]): JavaType = {
+    println("identifier")
+    identifier match {
+      case ident :: tail =>
+        locals.find(decl => decl.name == ident) match {
+          case None =>
+            println(s"no such identifier in scope $ident")
+            ???
+          case Some(methodDecl) =>
+            methodDecl.argumentType match {
+              case GenericType(typeName, generics) =>
+                loadedClasses.collectFirst {
+                  case classDecl: ClassDecl if classDecl.name == s"scala.$typeName" =>
+                    guessIdentType(tail, classDecl)
+                } getOrElse {
+                  ???
+                }
+              case _ =>
+                ???
+            }
+        }
+      case _ =>
+        ???
+    }
+  }
+
+  def guessIdentType(identifier: List[String], classDecl: ClassDecl): JavaType = {
+    identifier match {
+      case last :: Nil =>
+        classDecl.statements.collectFirst {
+          case methodDecl:MethodDecl if methodDecl.name == last && methodDecl.arguments.isEmpty =>
+            scalaTypeToJavaType(methodDecl.returnType)
+        } getOrElse {
+          ???
+
+        }
+      case _ =>
+        ???
+    }
+  }
+
+  def scalaTypeToJavaType(scalaType: ScalaType): JavaType = {
+    scalaType match {
+      case SimpleType("scala.Int") =>
+        JavaType.Int
+      case _ =>
+        ???
+    }
+  }
+
+  def sameType(left: Expr, right: Expr, locals: Seq[MethodDeclArgument])(t: JavaType): Boolean = {
+    val l = guessType(left, locals)
+    val r = guessType(right, locals)
     l == r && r == t
   }
 
-  def convertBody(statement: AST.Statement): Code = {
+  def convertBody(statement: AST.Statement, locals: Seq[MethodDeclArgument]): Code = {
     statement match {
       case expr: Expr =>
-        genops(expr)
+        genops(expr, locals = locals)
       case AST.Multi(all) =>
-        all.map(convertBody).foldLeft(Code.empty)(_ + _)
+        all.map(statement => convertBody(statement, locals)).foldLeft(Code.empty)(_ + _)
       case b: AST.VarDecl =>
         println(b)
         ???
@@ -319,20 +406,38 @@ object ScalaCompiler {
   private val predefJarPath = new File(Predef.getClass.getProtectionDomain.getCodeSource.getLocation.toURI).getPath
 
   private val loadedClasses = Benchmark.gauge2("unjar") {
-    ScalaSignature.load(predefJarPath, Some("Predef.class")).collectFirst {
-      case obj: ObjectDecl if obj.name == "scala.Predef" =>
-        obj
-    }.toSeq
-  }
+    val files = List(
+      "scala/Predef.class",
+      "scala/Array.class",
+      "scala/Array$.class",
+    )
+    ScalaSignature.load(predefJarPath, files)
+  }.toArray.toSeq
 
 
   private val symbolsInContext: Map[String, Seq[(MethodDecl, AST.Decl)]] = {
-    loadedClasses.flatMap { klass =>
+    /*
+    loadedClasses.foreach {
+      case objectDecl: ObjectDecl =>
+        println(objectDecl.name)
+      case classDecl: ClassDecl =>
+        println(classDecl.name)
+      case other =>
+        println(other)
+    }
+    */
+
+    val objs = loadedClasses.collect {
+      case obj: ObjectDecl =>
+        obj
+    }
+
+    objs.flatMap { klass =>
       klass.methods.map { method =>
         method -> klass
       }
-    }
-  }.groupBy { _._1.name }
+    }.groupBy { _._1.name }
+  }
 
   private def javaRef(decl: AST.Decl): JavaType.Class = decl match {
     case objectDecl: ObjectDecl =>
@@ -346,11 +451,11 @@ object ScalaCompiler {
   val boxToInteger = MethodRef(boxesRunTime, "boxToInteger", Seq(JavaType.Integer, JavaType.Int))
   val boxToBoolean = MethodRef(boxesRunTime, "boxToBoolean", Seq(JavaType.JavaBoolean, JavaType.Boolean))
 
-  private def maybeBox(code: Code, expr: Expr): Code = {
-    code + maybeConvertToObject(expr)
+  private def maybeBox(code: Code, expr: Expr, locals: Seq[MethodDeclArgument]): Code = {
+    code + maybeConvertToObject(expr, locals)
   }
-  private def maybeConvertToObject(expr: Expr): Option[Code] = {
-    guessType(expr) match {
+  private def maybeConvertToObject(expr: Expr, locals: Seq[MethodDeclArgument]): Option[Code] = {
+    guessType(expr, locals) match {
       case JavaType.Int =>
         Some(Code.op(Op.invoke(boxToInteger, Op.invoke.static)))
       case JavaType.Boolean =>
@@ -473,7 +578,6 @@ object ScalaCompiler {
       Seq.empty
     }
   }
-
 
   def main(args: Array[String]): Unit = {
     val targetFile = args.head

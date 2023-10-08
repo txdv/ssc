@@ -151,7 +151,7 @@ class Materializer {
       body.putShort(const(Constant.Utf8("Code")))
       val attributeLength = body.trackLength
 
-      body.putShort(code.stackSize)
+      body.putShort(code.maxStackSize)
       body.putShort(code.localsCount)
       val codeLength = body.trackLength
 
@@ -276,6 +276,8 @@ class Materializer {
          ByteArray(0xa7, (offset >> 8) & 0xff, offset & 0xff)
       case ifeq(offset) =>
         ByteArray(0x99, (offset >> 8) & 0xff, offset & 0xff)
+      case Op.arraylength =>
+        ByteArray(0xbe)
       case _ =>
         println(s"missing op: $op")
         ???

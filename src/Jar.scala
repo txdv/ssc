@@ -46,21 +46,21 @@ object Jar {
 
 object MainApp {
   def main(args: Array[String]): Unit = {
+    println(args.toSeq)
 
-    args.toSeq match {
-      case Seq(jarFile, classFile) =>
-        handleJar(jarFile, Option(classFile))
-      case Seq(jarFile) =>
-        handleJar(jarFile, Option.empty)
+    args.toList match {
+      case jarFile :: Nil =>
+        ScalaSignature.load(jarFile, _ => true).foreach { decl =>
+          PrettyPrint.pformat(decl)
+        }
+      case jarFile :: classFiles =>
+        ScalaSignature.load(jarFile, classFiles).foreach { decl =>
+          PrettyPrint.pformat(decl)
+        }
+      case Nil =>
+        println("need jar file as argument")
     }
   }
-
-  def handleJar(path: String, findFile: Option[String]): Unit = {
-    ScalaSignature.load(path, findFile).foreach { decl =>
-      PrettyPrint.pformat(decl)
-    }
-  }
-
 }
 
 object ScalaSignature {
@@ -73,11 +73,18 @@ object ScalaSignature {
     }
   }
 
+  def load(path: String, fileList: List[String]): Iterator[AST.Decl] = {
+    load(path, name => fileList.contains(name))
+  }
 
-  def load(path: String, findFile: Option[String] = Option.empty): Iterator[AST.Decl] = {
+  def load(path: String, findFile: Option[String]): Iterator[AST.Decl] = {
+    load(path, name => findFile.contains(name))
+  }
+
+  def load(path: String, filter: String => Boolean): Iterator[AST.Decl] = {
 
     val scalaSignatures = Jar
-      .unzip(path, entry => findFile.forall(ff => entry.getName.endsWith(ff)))
+      .unzip(path, entry => filter(entry.getName))
       .filter(_.name.endsWith(".class"))
       .flatMap { file =>
         val classFile = ClassFile.parse(file.content)
@@ -106,11 +113,9 @@ object ScalaSignature {
     val entries = (0 until signatures.table.length)
       .map(signatures.parseEntry)
 
-    /*
-    debug(entries)
-    println(s"file: ${name}")
-    println(signatures)
-    */
+    //debug(entries)
+    //println(s"file: ${name}")
+    //println(signatures)
 
     val methods = findMethods(signatures, entries)
 
@@ -121,6 +126,38 @@ object ScalaSignature {
 
     val classDecls = entries.collect {
       case k: ClassSymbol =>
+        val info = entries(k.symbolInfo.info)
+        /*
+        println("====")
+        println(k.index)
+        println(k)
+        println(info)
+
+        info match {
+          case PolyType(classInfo: ClassInfoType, symbols) =>
+            // classInfo -- info about the class itself
+            // symbols - info about the classes
+          classInfo.typeRefs.foreach { typeRef =>
+            println(s"typRef: $typeRef")
+
+          }
+
+          symbols.map { symbol =>
+            val typeBounds = entries(symbol.symbolInfo.info).asInstanceOf[TypeBoundsType]
+            println(s"symbol: $symbol")
+            println(s"typeBounds: $typeBounds")
+          }
+          /*
+          symbols.foreach { symbol =>
+            println(symbol)
+            println(entries(symbol.symbolInfo.info))
+
+          }*/
+          case classInfo@ClassInfoType(symbol, typeRefs) =>
+            println("LOL")
+        }
+        println("====")
+        */
         val klassMethods = methods.filter(_._1 == k.index).map(_._2)
         val name = getName(k)
         if (objectDecls.contains(name) && k.isModule) AST.ObjectDecl(name, klassMethods)
