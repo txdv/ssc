@@ -15,7 +15,7 @@ case class Parser[+A](run: List[LexerToken] => List[(A, List[LexerToken])]){
   
   def +++(other: Any): Parser[A] = {
     other match {
-      case b: Parser[A] =>
+      case b: Parser[_] =>
         Parser[A](cs => t(cs) ++ b.asInstanceOf[Parser[A]].t(cs) match {
           case Nil => Nil
           case x :: _ => List(x)
@@ -25,7 +25,7 @@ case class Parser[+A](run: List[LexerToken] => List[(A, List[LexerToken])]){
 }
 
 object Parser {
-  implicit val parserMonad = new MonadPlus[Parser] {
+  implicit val parserMonad: MonadPlus[Parser] = new MonadPlus[Parser] {
     override def empty[A]: Parser[A] = Parser[A](_ => Nil)
 
     override def plus[A](a: Parser[A], b: => Parser[A]): Parser[A] = Parser(cs => a.run(cs) ++ b.run(cs))
